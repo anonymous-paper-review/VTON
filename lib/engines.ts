@@ -28,7 +28,7 @@ const klingPrompt = (videoRef: string, target: string) =>
 export const ENGINES: Record<EngineKey, Engine> = {
   // 참고 사진이 화면의 주요 인물에 왼쪽부터 대응한다. 오른쪽 인물을 바꿀 땐 왼쪽 인물의 원본 얼굴을 앞에 넣어
   // 그대로 두게 한다 (실험: 원본 유지 ArcFace 0.85, 바뀐 인물 0.59). 인물 전체를 다시 그려서 옷·성별도 셀카를 따라간다.
-  // 배경은 다시 그려지지만 눈으로는 거의 같다. 실험은 1080P($0.45/초)로 했다. 768P는 $0.30/초.
+  // 배경은 다시 그려지지만 눈으로는 거의 같다. 실험은 1080P($0.45/초)로 했고, 휴대폰 화면에선 차이가 작아 768P($0.30/초)로 만든다.
   "minimax-h3": {
     endpoint: "minimax/h3-max/recast",
     minSeconds: 5,
@@ -36,7 +36,7 @@ export const ENGINES: Record<EngineKey, Engine> = {
     build: ({ videoUrl, lineup }) => ({
       video_url: videoUrl,
       reference_image_urls: lineup.map((p) => p.imageUrl),
-      resolution: "1080P",
+      resolution: "768P",
       prompt:
         lineup
           .map((p, i) => (p.swap ? `${p.target} becomes the person in photo ${i + 1}` : `${p.target} stays the same person as in photo ${i + 1}`))
