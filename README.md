@@ -33,11 +33,19 @@ npm run dev
 
 ## 영상 추가
 
-`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `target`은 프롬프트에서 교체할 인물을 특정하는 말이다 (예: `"the woman in the red coat"`). `public/videos/`의 mp4·jpg는 로컬 테스트용이라 커밋하지 않는다.
+`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `target`은 프롬프트에서 교체할 인물을 특정하는 말이다 (예: `"the woman in the red coat"`). 영상은 휴대폰에서 바로 재생되도록 720p H.264, faststart로 넣는다 (예: `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -movflags +faststart -c:a aac out.mp4`). 지금 들어 있는 `rain-alley`는 엔진 실험용으로 생성한 가상 인물 영상이다.
 
 ## 엔진
 
 2026-10-21 2차 비교 기준 MiniMax H3 Max Recast(1080P)가 기본이다. 닮음 점수가 가장 높고 3분 정도 걸리지만 초당 $0.45로 Kling O3(약 $0.168)의 2.5배라, 비용을 줄일 땐 `VTON_ENGINE=kling-o3`로 바꾼다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
+
+## 배포 (Vercel)
+
+1. Vercel에서 이 저장소를 Import (Framework: Next.js, 설정 변경 없음)
+2. Environment Variables에 `FAL_KEY`, `NEXT_PUBLIC_SITE_URL`(배포 주소) 추가. 엔진을 바꿀 땐 `VTON_ENGINE`
+3. 배포 후 `/qr`을 열어 인쇄
+
+fal이 원본 영상을 `https://<배포 주소>/videos/...`에서 받아가므로 배포 주소가 공개되어 있어야 한다 (Vercel 비밀번호 보호를 켜면 fal이 영상을 못 받는다).
 
 ## 남은 일
 
