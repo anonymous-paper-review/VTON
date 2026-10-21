@@ -1,7 +1,10 @@
 // fal 교체 엔진 정의. 호출 형식은 faceswap-studio.html에서 동작 확인된 것을 따른다.
-// 기본 엔진은 VTON_ENGINE 환경변수로 바꾼다 (엔진 비교 실험 결과에 맞춰 고른다).
+// 기본 엔진은 VTON_ENGINE 환경변수로 바꾼다. 엔진 비교 실험(2026-10-21) 결과 Kling O3가 1순위,
+// 셀카 1장을 정면·참고 이미지로 함께 넣어도 캐릭터시트와 닮음 차이가 거의 없었다.
+// Seedance 2.5 editing은 실존 인물 닮음 정책으로 얼굴 교체 요청을 거부해서(422) 뺐다.
+// Wan은 화면에서 가장 큰 인물만 바뀌고 대상을 고를 수 없으며 한 번에 13~18분 걸린다.
 
-export type EngineKey = "kling-o3" | "kling-o1" | "wan" | "seedance";
+export type EngineKey = "kling-o3" | "kling-o1" | "wan";
 
 type BuildArgs = { videoUrl: string; faceUrl: string; target: string };
 
@@ -47,17 +50,6 @@ export const ENGINES: Record<EngineKey, Engine> = {
       num_inference_steps: 20,
       use_turbo: false,
       video_quality: "high",
-    }),
-  },
-  // Seedance 2.5 파라미터는 조사 대화 기준이며 실제 호출로 검증 전이다.
-  seedance: {
-    endpoint: "bytedance/seedance-2.5/reference-to-video",
-    maxSeconds: 30,
-    build: ({ videoUrl, faceUrl, target }) => ({
-      task: "editing",
-      video_urls: [videoUrl],
-      image_urls: [faceUrl],
-      prompt: `Replace ${target} in @Video1 with the person in @Image1. Keep motion, camera, framing, lighting and background unchanged. Do not change any other people.`,
     }),
   },
 };

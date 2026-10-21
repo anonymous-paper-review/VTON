@@ -33,7 +33,9 @@ export async function submitJob(opts: {
     const payload = Buffer.from(JSON.stringify({ at: Date.now(), video: opts.videoUrl })).toString("base64url");
     return `mock.${payload}`;
   }
-  const faceUrl = await fal.storage.upload(opts.selfie);
+  // 셀카는 클라이언트에서 1280px JPEG로 줄여 오므로 data URI로 바로 넣는다 (Kling·Wan 모두 받음).
+  // fal 스토리지 업로드를 거치지 않아 사진이 별도 저장소에 남지 않는다.
+  const faceUrl = `data:${opts.selfie.type};base64,${Buffer.from(await opts.selfie.arrayBuffer()).toString("base64")}`;
   const engine = ENGINES[opts.engine];
   const { request_id } = await fal.queue.submit(engine.endpoint, {
     input: engine.build({ videoUrl: opts.videoUrl, faceUrl, target: opts.target }),

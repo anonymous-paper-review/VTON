@@ -27,7 +27,7 @@ npm run dev
 | 변수 | 설명 |
 | --- | --- |
 | `FAL_KEY` | fal API 키. 서버에서만 쓴다. |
-| `VTON_ENGINE` | `kling-o3`(기본) · `kling-o1` · `wan` · `seedance` |
+| `VTON_ENGINE` | `kling-o3`(기본) · `kling-o1` · `wan` |
 | `VTON_MOCK` | `1`이면 모의 모드 |
 | `NEXT_PUBLIC_SITE_URL` | QR에 넣을 배포 주소 |
 
@@ -35,10 +35,12 @@ npm run dev
 
 `data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `target`은 프롬프트에서 교체할 인물을 특정하는 말이다 (예: `"the woman in the red coat"`). `public/videos/`의 mp4·jpg는 로컬 테스트용이라 커밋하지 않는다.
 
+## 엔진
+
+2026-10-21 비교 실험 기준 Kling O3 Edit가 기본이다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
+
 ## 남은 일
 
-- 엔진 비교 실험 결과에 맞춰 기본 엔진 정하기
-- 셀카 → 캐릭터시트(정면·측면·뒷모습) 생성 단계 추가
 - 동의 기록·24시간 삭제를 DB(Supabase)와 예약 작업으로 옮기기 (지금은 서버 로그에만 남김)
 - 동의 문구 법무 검토
 - 목소리 교체

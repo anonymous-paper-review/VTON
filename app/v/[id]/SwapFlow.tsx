@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Video } from "@/lib/videos";
+import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
 
 type ConsentProps = { version: string; items: { id: string; title: string; body: string[] }[] };
 type Step = "intro" | "consent" | "selfie" | "working" | "done";
@@ -29,6 +30,12 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   useEffect(() => {
     const saved = store.get(jobKey(video.id));
     if (saved) { setJobId(saved); setStep("working"); }
+  }, [video.id]);
+
+  const saveJobId = useCallback((id: string | null) => {
+    setJobId(id);
+    if (id) store.set(jobKey(video.id), id);
+    else store.del(jobKey(video.id));
   }, [video.id]);
 
   const reset = () => {
@@ -68,11 +75,12 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
       {step === "working" && (
         <WorkingStep
           videoId={video.id}
+          videoSrc={video.src}
           consentVersion={consent.version}
           agreed={agreed}
           selfie={selfie}
           jobId={jobId}
-          setJobId={(id) => { setJobId(id); store.set(jobKey(video.id), id); }}
+          setJobId={saveJobId}
           onDone={(url) => { setResultUrl(url); store.del(jobKey(video.id)); setStep("done"); }}
           onRetry={reset}
         />
@@ -148,8 +156,21 @@ function SelfieStep({ onDone, onBack }: { onDone: (b: Blob) => void; onBack: () 
     if (blob) setShot({ blob, url: URL.createObjectURL(blob) });
   };
 
-  const pickFile = (f?: File) => {
-    if (f && f.type.startsWith("image/")) setShot({ blob: f, url: URL.createObjectURL(f) });
+  // 앨범 사진도 촬영본과 같은 크기의 JPEG로 맞춘다 (서버가 data URI로 그대로 넘긴다)
+  const pickFile = async (f?: File) => {
+    if (!f || !f.type.startsWith("image/")) return;
+    try {
+      const bmp = await createImageBitmap(f);
+      const scale = Math.min(1, SELFIE_MAX_PX / Math.max(bmp.width, bmp.height));
+      const c = document.createElement("canvas");
+      c.width = Math.round(bmp.width * scale);
+      c.height = Math.round(bmp.height * scale);
+      c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
+      const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.9));
+      if (blob) setShot({ blob, url: URL.createObjectURL(blob) });
+    } catch {
+      setError("이 사진은 열 수 없어요. 다른 사진을 골라 주세요.");
+    }
   };
 
   return (
@@ -189,11 +210,13 @@ function SelfieStep({ onDone, onBack }: { onDone: (b: Blob) => void; onBack: () 
   );
 }
 
-function WorkingStep({ videoId, consentVersion, agreed, selfie, jobId, setJobId, onDone, onRetry }: {
-  videoId: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
-  setJobId: (id: string) => void; onDone: (url: string) => void; onRetry: () => void;
+function WorkingStep({ videoId, videoSrc, consentVersion, agreed, selfie, jobId, setJobId, onDone, onRetry }: {
+  videoId: string; videoSrc: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
+  setJobId: (id: string | null) => void; onDone: (url: string) => void; onRetry: () => void;
 }) {
   const [status, setStatus] = useState<Status | null>(null);
+  const [checking, setChecking] = useState(false);
+  const retried = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const submitted = useRef(false);
@@ -228,7 +251,20 @@ function WorkingStep({ videoId, consentVersion, agreed, selfie, jobId, setJobId,
         const s: Status = await (await fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { cache: "no-store" })).json();
         if (stop) return;
         setStatus(s);
-        if (s.state === "done") return onDoneRef.current(s.videoUrl);
+        if (s.state === "done") {
+          // 엔진이 원본을 거의 그대로 돌려주는 경우가 있어, 그러면 같은 셀카로 한 번 더 요청한다
+          setChecking(true);
+          const db = await psnrAgainstSource(videoSrc, s.videoUrl);
+          if (stop) return;
+          setChecking(false);
+          if (db !== null && db > NOOP_PSNR_DB && !retried.current && selfie) {
+            retried.current = true;
+            submitted.current = false;
+            setStatus(null);
+            return setJobId(null);
+          }
+          return onDoneRef.current(s.videoUrl);
+        }
         if (s.state === "failed") return setError(s.error);
       } catch {
         // 네트워크가 잠깐 끊겨도 다음 조회에서 다시 시도
@@ -237,7 +273,7 @@ function WorkingStep({ videoId, consentVersion, agreed, selfie, jobId, setJobId,
     };
     poll();
     return () => { stop = true; };
-  }, [jobId]);
+  }, [jobId, videoSrc, selfie, setJobId]);
 
   useEffect(() => {
     if (error) return;
@@ -256,7 +292,7 @@ function WorkingStep({ videoId, consentVersion, agreed, selfie, jobId, setJobId,
     );
   }
 
-  const label = !jobId ? "사진을 보내는 중" : status?.state === "queued" ? `순서를 기다리는 중${status.position ? ` (${status.position}번째)` : ""}` : "주인공을 바꾸는 중";
+  const label = checking ? "결과를 확인하는 중" : !jobId ? (retried.current ? "한 번 더 만드는 중" : "사진을 보내는 중") : status?.state === "queued" ? `순서를 기다리는 중${status.position ? ` (${status.position}번째)` : ""}` : "주인공을 바꾸는 중";
   return (
     <div className="panel progress" role="status" aria-live="polite">
       <div className="spinner" aria-hidden />
