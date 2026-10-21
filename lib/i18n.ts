@@ -22,7 +22,9 @@ export function detectLang(nav: string | undefined): Lang {
 
 const dict = {
   "home.kicker": { ko: "화개장터에서, 셀카 한 장으로", zh: "在花开市场，只需一张自拍", en: "At Hwagae Market, with one selfie", ja: "花開（ファゲ）市場で、自撮り1枚で" },
-  "home.title": { ko: "화개장터의 주인공은 당신", zh: "花开市场的主角就是你", en: "You're the star of Hwagae Market", ja: "花開市場の主人公は、あなた" },
+  "home.mega1": { ko: "화개장터", zh: "花开市场", en: "Star in", ja: "花開市場の" },
+  "home.mega2": { ko: "주인공은", zh: "的主角", en: "Hwagae", ja: "主人公は" },
+  "home.mega3": { ko: "당신.", zh: "就是你。", en: "Market.", ja: "あなた。" },
   "home.sub": { ko: "장면을 고르고 셀카를 찍으면, 화개장터 영상 속 주인공이 당신으로 바뀌어요.", zh: "选一个场景，拍一张自拍，花开市场视频里的主角就会变成你。", en: "Pick a scene, take a selfie, and the lead of the Hwagae Market film becomes you.", ja: "シーンを選んで自撮りすると、花開市場の映像の主人公があなたに変わります。" },
   "home.scenes": { ko: "화개장터 장면", zh: "花开市场场景", en: "Hwagae Market scenes", ja: "花開市場のシーン" },
   "home.free": { ko: "무료 시범 서비스", zh: "免费试用服务", en: "Free pilot service", ja: "無料パイロットサービス" },
@@ -93,7 +95,7 @@ const dict = {
   "work.failTitle": { ko: "이번 컷은 실패했어요", zh: "这一幕没有成功", en: "That take didn't work", ja: "今回のテイクは失敗しました" },
   "work.retry": { ko: "다시 찍어서 해보기", zh: "重新拍摄再试", en: "Retake and try again", ja: "撮り直して再挑戦" },
 
-  "done.kicker": { ko: "STARRING YOU", zh: "STARRING YOU", en: "STARRING YOU", ja: "STARRING YOU" },
+  "done.kicker": { ko: "나의 화개장터", zh: "我的花开市场", en: "My Hwagae Market", ja: "わたしの花開市場" },
   "done.title": { ko: "화개장터의 주인공이 되었어요", zh: "你成为了花开市场的主角", en: "You're the star of Hwagae Market", ja: "花開市場の主人公になりました" },
   "done.after": { ko: "결과", zh: "结果", en: "After", ja: "結果" },
   "done.before": { ko: "원본", zh: "原片", en: "Before", ja: "元の映像" },

@@ -28,12 +28,12 @@ export const Arrow = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
-/** 화개장터 주인공 컨셉의 큰 타이틀. 영화 크레딧처럼 언어와 관계없이 영어로 둔다. */
-export const Mega = () => (
-  <h1 className="mega" aria-label="Hwagae, starring you">
-    <span>Hwagae</span>
-    <span className="outline">Starring</span>
-    <span className="hot">You.</span>
+/** 화개장터 주인공 컨셉의 큰 타이틀 (세 줄: 한지색, 금색, 주칠) */
+export const Mega = ({ lines }: { lines: [string, string, string] }) => (
+  <h1 className="mega">
+    <span>{lines[0]}</span>
+    <span className="gold">{lines[1]}</span>
+    <span className="hot">{lines[2]}</span>
   </h1>
 );
 
@@ -44,8 +44,7 @@ export default function HomeView({ videos }: { videos: Video[] }) {
       <TopBar />
       <section className="hero">
         <div className="kicker">{t("home.kicker")}</div>
-        <Mega />
-        <h2 className="hero-title">{t("home.title")}</h2>
+        <Mega lines={[t("home.mega1"), t("home.mega2"), t("home.mega3")]} />
         <p>{t("home.sub")}</p>
         <span className="free">{t("home.free")}</span>
       </section>
