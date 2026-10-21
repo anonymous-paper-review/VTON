@@ -30,7 +30,6 @@ export const ENGINES: Record<EngineKey, Engine> = {
     maxSeconds: 30,
     build: ({ videoUrl, faceUrl, target }) => ({
       video_url: videoUrl,
-      // data URI로 넣은 셀카를 받는지는 아직 실제 호출로 확인 전 (실험은 다른 방식으로 넘김)
       reference_image_urls: [faceUrl],
       resolution: "1080P",
       prompt: `Recast ${target} as the person in the reference photo. Keep everything else unchanged.`,
