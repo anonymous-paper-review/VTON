@@ -41,7 +41,7 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 
 ## 엔진
 
-2026-10-21 2차 비교 기준 MiniMax H3 Max Recast(1080P)가 기본이다. 닮음 점수가 가장 높고 3분 정도 걸리지만 초당 $0.45로 Kling O3(약 $0.168)의 2.5배라, 비용을 줄일 땐 `VTON_ENGINE=kling-o3`로 바꾼다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
+2026-10-21 2차 비교 기준 MiniMax H3 Max Recast가 기본이다 (실험은 1080P, 앱은 768P로 만든다). 닮음 점수가 가장 높고 3분 정도 걸리지만 768P도 초당 $0.30으로 Kling O3(약 $0.168)의 1.8배라, 비용을 줄일 땐 `VTON_ENGINE=kling-o3`로 바꾼다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
 
 ## 배포 (Vercel)
 
@@ -58,7 +58,7 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 - 영상 생성은 fal 큐에서 따로 돌고 서버 함수는 등록·조회만 하므로(몇 초), 함수 실행 시간이나 리전 설정은 바꿀 필요가 없다.
 - 운영 주소(Production)는 공개 상태여야 한다. fal이 `https://<주소>/videos/...`에서 원본 영상을 받아간다. Vercel 기본 설정(Standard Protection)은 프리뷰 주소만 막으므로 그대로 두면 된다.
 - 자기 도메인을 쓰려면 Project → Settings → Domains에서 추가하고, `NEXT_PUBLIC_SITE_URL`도 그 주소로 바꾼 뒤 Redeploy.
-- QR만 있으면 누구나 생성을 돌릴 수 있으니 fal 대시보드에서 사용 한도(Usage limit)를 걸어 두는 게 안전하다. MiniMax 기준 8초 영상 한 편에 약 $3.6.
+- QR만 있으면 누구나 생성을 돌릴 수 있으니 fal 대시보드에서 사용 한도(Usage limit)를 걸어 두는 게 안전하다. MiniMax 768P 기준 8초 영상 한 편에 약 $2.4 (무변화 자동 재시도가 붙으면 그 두 배).
 - Vercel Hobby(무료) 요금제는 비상업 개인 용도 조건이 있어, 회사 실증이면 Pro를 검토한다.
 
 ## 남은 일
