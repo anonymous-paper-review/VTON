@@ -143,7 +143,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .cam { position: relative; flex: 1; overflow: hidden; }
 .cam video, .cam img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; }
 .cam video.mirror { transform: scaleX(-1); }
-.cam .ring { position: absolute; left: 50%; top: 56%; width: min(62%, 300px); aspect-ratio: 3 / 4; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--hot); box-shadow: 0 0 0 150vmax rgba(0,0,0,.5); pointer-events: none; }
+.cam .ring { position: absolute; left: 50%; top: 58%; width: min(62%, 300px); aspect-ratio: 3 / 4; transform: translate(-50%, -50%); border-radius: 50%; border: 3px solid var(--hot); box-shadow: 0 0 0 150vmax rgba(0,0,0,.5); pointer-events: none; }
 .cam-copy { position: absolute; left: 0; right: 0; top: calc(max(12px, env(safe-area-inset-top)) + 58px); text-align: center; padding: 0 var(--pad); }
 .cam-copy h1 { font: 900 28px/1.15 var(--display); margin: 0; letter-spacing: -.03em; text-shadow: 0 2px 20px rgba(0,0,0,.6); }
 .cam-copy p { margin: 8px auto 0; color: var(--dim); font-size: 14px; max-width: 30ch; text-shadow: 0 1px 10px rgba(0,0,0,.8); }
