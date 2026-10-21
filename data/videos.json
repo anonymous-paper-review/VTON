@@ -1,14 +1,30 @@
 [
   {
     "id": "rain-alley",
-    "title": "비 갠 골목",
-    "description": "비 그친 골목에서 우산 쓴 그녀와 마주친 그. 셀카로 둘 중 한 사람이 되어 보세요.",
+    "title": { "ko": "비 갠 골목", "zh": "雨后小巷", "en": "After the Rain", "ja": "雨上がりの路地" },
+    "description": {
+      "ko": "비 그친 골목, 우산 아래 그녀와 마주친 그. 둘 중 한 사람이 되어 보세요.",
+      "zh": "雨后的小巷，他与伞下的她不期而遇。成为其中一人吧。",
+      "en": "A quiet alley after the rain. He meets her under an umbrella. Step into either role.",
+      "ja": "雨上がりの路地、傘の下の彼女と出会った彼。どちらかになってみよう。"
+    },
     "src": "/videos/rain-alley.mp4",
     "poster": "/videos/rain-alley.jpg",
     "seconds": 8,
     "cast": [
-      { "id": "man", "label": "남자 주인공", "target": "the man on the left", "still": "/videos/rain-alley-man.jpg" },
-      { "id": "woman", "label": "여자 주인공", "target": "the woman on the right" }
+      {
+        "id": "man",
+        "label": { "ko": "그", "zh": "他", "en": "Him", "ja": "彼" },
+        "target": "the man on the left",
+        "still": "/videos/rain-alley-man.jpg",
+        "photo": "/videos/rain-alley-man.jpg"
+      },
+      {
+        "id": "woman",
+        "label": { "ko": "그녀", "zh": "她", "en": "Her", "ja": "彼女" },
+        "target": "the woman on the right",
+        "photo": "/videos/rain-alley-woman.jpg"
+      }
     ]
   }
 ]

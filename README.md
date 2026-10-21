@@ -10,7 +10,9 @@
 4. 셀카 촬영 (카메라가 안 열리면 사진 선택으로 대체)
 5. 서버가 fal에 작업 등록 → 상태 조회 → 결과 영상 재생·저장
 
-현장에 붙일 QR은 `/qr`에서 출력한다.
+현장에 붙일 QR은 `/qr`에서 출력한다 (4개 국어 안내가 들어간 포스터).
+
+화면은 한국어·중국어·영어·일본어로 바뀐다. 처음엔 브라우저 언어를 따르고, 상단 `한 中 EN 日` 버튼으로 고르면 기억한다. `?lang=en`처럼 링크로 고정할 수도 있다. 문구는 `lib/i18n.ts`, 동의서는 `lib/consent.ts`에 있고, 키를 더하면 네 언어를 모두 채운다.
 
 ## 실행
 
@@ -35,7 +37,7 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 
 ## 영상 추가
 
-`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `cast`에는 고를 수 있는 인물을 화면 왼쪽부터 순서대로 넣는다. `target`은 프롬프트에서 그 인물을 특정하는 말(예: `"the woman in the red coat"`), `still`은 원본 속 그 인물의 얼굴 사진이다. 오른쪽 인물을 바꿀 때 왼쪽 인물들을 그대로 두려고 MiniMax에 함께 넣으므로, 맨 오른쪽이 아닌 인물에는 `still`이 필요하다. 인물이 둘 이상이면 "남자 주인공 되기"처럼 고르는 버튼이 나온다. 영상은 휴대폰에서 바로 재생되도록 720p H.264, faststart로 넣는다 (예: `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -movflags +faststart -c:a aac out.mp4`). 지금 들어 있는 `rain-alley`는 엔진 실험용으로 생성한 가상 인물 영상이다.
+`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `cast`에는 고를 수 있는 인물을 화면 왼쪽부터 순서대로 넣는다. `target`은 프롬프트에서 그 인물을 특정하는 말(예: `"the woman in the red coat"`), `still`은 원본 속 그 인물의 얼굴 사진, `photo`는 고르는 타일에 보일 인물 사진이다. `title`, `description`, `label`은 `{ko, zh, en, ja}`로 네 언어를 넣는다. 오른쪽 인물을 바꿀 때 왼쪽 인물들을 그대로 두려고 MiniMax에 함께 넣으므로, 맨 오른쪽이 아닌 인물에는 `still`이 필요하다. 인물이 둘 이상이면 인물 사진 타일로 고르게 된다. 영상은 휴대폰에서 바로 재생되도록 720p H.264, faststart로 넣는다 (예: `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -movflags +faststart -c:a aac out.mp4`). 지금 들어 있는 `rain-alley`는 엔진 실험용으로 생성한 가상 인물 영상이다.
 
 ## 엔진
 

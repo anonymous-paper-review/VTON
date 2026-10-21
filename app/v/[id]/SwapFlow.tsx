@@ -3,14 +3,19 @@
 import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import type { Video } from "@/lib/videos";
+import type { Localized, MsgKey } from "@/lib/i18n";
+import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
+import { Arrow, TopBar } from "../../HomeView";
+import { useLang } from "../../LangProvider";
 
-type ConsentProps = { version: string; items: { id: string; title: string; body: string[] }[] };
+type ConsentProps = { version: string; items: { id: string; title: Localized; body: Localized[] }[] };
 type Step = "intro" | "consent" | "selfie" | "working" | "done";
-type Status = { state: "queued"; position?: number } | { state: "running" } | { state: "done"; videoUrl: string } | { state: "failed"; error: string };
+type Status = { state: "queued"; position?: number } | { state: "running" } | { state: "done"; videoUrl: string } | { state: "failed"; code: string };
 
 const POLL_MS = 4000;
 const SELFIE_MAX_PX = 1280;
+const LINES: MsgKey[] = ["work.line1", "work.line2", "work.line3", "work.line4"];
 const jobKey = (videoId: string) => `vton.job.${videoId}`;
 
 // 새로고침해도 진행 중인 작업을 이어 보도록 sessionStorage에 job id를 둔다 (없어도 동작).
@@ -21,6 +26,7 @@ const store = {
 };
 
 export default function SwapFlow({ video, consent }: { video: Video; consent: ConsentProps }) {
+  const { t } = useLang();
   const [step, setStep] = useState<Step>("intro");
   const [agreed, setAgreed] = useState<string[]>([]);
   const [selfie, setSelfie] = useState<Blob | null>(null);
@@ -33,6 +39,8 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
     if (saved) { setJobId(saved); setStep("working"); }
   }, [video.id]);
 
+  useEffect(() => { window.scrollTo(0, 0); }, [step]);
+
   const saveJobId = useCallback((id: string | null) => {
     setJobId(id);
     if (id) store.set(jobKey(video.id), id);
@@ -44,41 +52,19 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
     setJobId(null); setResultUrl(null); setSelfie(null); setStep("selfie");
   };
 
+  const back = step === "consent" ? () => setStep("intro") : step === "selfie" ? () => setStep("consent") : undefined;
+
   return (
-    <>
-      {step === "intro" && (
-        <>
-          <video src={video.src} poster={video.poster} controls playsInline muted autoPlay loop />
-          <h1>{video.title}</h1>
-          <p className="muted">{video.description}</p>
-          <div className="panel">
-            <h2>얼굴 바꾸기 해볼까요?</h2>
-            <p className="muted">셀카 한 장을 찍으면 이 영상의 주인공이 내 얼굴로 바뀐 영상을 만들어 드려요. 몇 분 정도 걸려요.</p>
-            {video.cast.length > 1 && <p className="muted">고른 인물은 얼굴뿐 아니라 옷차림까지 셀카를 따라 바뀔 수 있어요.</p>}
-            <div className="btns">
-              {video.cast.length > 1 ? (
-                video.cast.map((c) => (
-                  <button key={c.id} className="btn" onClick={() => { setRole(c.id); setStep("consent"); }}>{c.label} 되기</button>
-                ))
-              ) : (
-                <button className="btn" onClick={() => setStep("consent")}>네, 해볼게요</button>
-              )}
-              <Link className="btn ghost" href="/">다른 영상 볼게요</Link>
-            </div>
-          </div>
-        </>
+    <div className="page">
+      {step !== "working" && (
+        <TopBar back={back ? { label: t("common.back"), onClick: back } : { label: t("common.list"), href: "/" }} />
       )}
 
-      {step === "consent" && (
-        <ConsentStep consent={consent} agreed={agreed} setAgreed={setAgreed} onNext={() => setStep("selfie")} onBack={() => setStep("intro")} />
-      )}
+      {step === "intro" && <IntroStep video={video} onPick={(id) => { setRole(id); setStep("consent"); }} />}
 
-      {step === "selfie" && (
-        <SelfieStep
-          onDone={(blob) => { setSelfie(blob); setStep("working"); }}
-          onBack={() => setStep("consent")}
-        />
-      )}
+      {step === "consent" && <ConsentStep consent={consent} agreed={agreed} setAgreed={setAgreed} onNext={() => setStep("selfie")} />}
+
+      {step === "selfie" && <SelfieStep onDone={(blob) => { setSelfie(blob); setStep("working"); }} />}
 
       {step === "working" && (
         <WorkingStep
@@ -96,126 +82,197 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
       )}
 
       {step === "done" && resultUrl && <ResultStep video={video} resultUrl={resultUrl} onRetry={reset} />}
+    </div>
+  );
+}
+
+function Steps({ at }: { at: 0 | 1 | 2 }) {
+  const { t } = useLang();
+  const keys: MsgKey[] = ["step.consent", "step.selfie", "step.make"];
+  return (
+    <div className="steps" aria-hidden>
+      {keys.map((k, i) => <div key={k} className={i <= at ? "on" : undefined}><b>0{i + 1}</b>{t(k)}</div>)}
+    </div>
+  );
+}
+
+function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => void }) {
+  const { t, pick } = useLang();
+  const many = video.cast.length > 1;
+  return (
+    <>
+      <section className="stage">
+        <video className="bg-video" src={video.src} poster={video.poster} muted loop autoPlay playsInline aria-hidden />
+        <div className="stage-body">
+          <div className="kicker">{video.seconds}{t("common.sec")} · No.01</div>
+          <h1 className="title-xl">{pick(video.title)}</h1>
+          <p>{pick(video.description)}</p>
+        </div>
+      </section>
+
+      <h2 className="cast-h">{t(many ? "intro.who" : "intro.whoSingle")}</h2>
+      <p className="cast-note">{t("intro.note")}</p>
+      {many ? (
+        <div className="cast">
+          {video.cast.map((c) => (
+            <button key={c.id} className="tile" style={c.photo ? { backgroundImage: `url(${c.photo})` } : undefined} onClick={() => onPick(c.id)}>
+              <span className="who">{pick(c.label)}</span>
+              <span className="cta">{t("intro.become")}</span>
+            </button>
+          ))}
+        </div>
+      ) : (
+        <div className="solo">
+          <button className="btn" onClick={() => onPick(video.cast[0].id)}>{t("intro.start")} <Arrow /></button>
+        </div>
+      )}
+      <div className="foot">
+        <Link className="btn ghost" href="/">{t("done.other")}</Link>
+      </div>
     </>
   );
 }
 
-function ConsentStep({ consent, agreed, setAgreed, onNext, onBack }: {
-  consent: ConsentProps; agreed: string[]; setAgreed: (v: string[]) => void; onNext: () => void; onBack: () => void;
+const Tick = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+);
+
+function ConsentStep({ consent, agreed, setAgreed, onNext }: {
+  consent: ConsentProps; agreed: string[]; setAgreed: (v: string[]) => void; onNext: () => void;
 }) {
+  const { t, pick } = useLang();
   const all = consent.items.every((c) => agreed.includes(c.id));
   const toggle = (id: string) => setAgreed(agreed.includes(id) ? agreed.filter((a) => a !== id) : [...agreed, id]);
   return (
     <>
-      <h1>개인정보 동의</h1>
-      <p className="muted">무료 시범 서비스예요. 얼굴 사진은 영상을 만드는 데에만 쓰고, 서비스 서버에는 저장하지 않아요.</p>
-      <label className="all">
-        <input type="checkbox" checked={all} onChange={() => setAgreed(all ? [] : consent.items.map((c) => c.id))} />
-        모두 동의해요
-      </label>
-      {consent.items.map((c) => (
-        <div className="consent" key={c.id}>
-          <label>
-            <input type="checkbox" checked={agreed.includes(c.id)} onChange={() => toggle(c.id)} />
-            {c.title}
-          </label>
-          <ul>{c.body.map((b) => <li key={b}>{b}</li>)}</ul>
+      <Steps at={0} />
+      <section className="screen">
+        <h1 className="h-big">{t("consent.title")}</h1>
+        <p className="lead">{t("consent.sub")}</p>
+        <button className="agree-all" aria-pressed={all} onClick={() => setAgreed(all ? [] : consent.items.map((c) => c.id))}>
+          <span className="check"><Tick /></span>
+          {t("consent.all")}
+        </button>
+        <div className="rows">
+          {consent.items.map((c) => (
+            <div className="row-wrap" key={c.id}>
+              <button className="row" aria-pressed={agreed.includes(c.id)} onClick={() => toggle(c.id)}>
+                <span className="check"><Tick /></span>
+                <span>{pick(c.title)}</span>
+              </button>
+              <details>
+                <summary>{t("consent.view")}</summary>
+                <ul>{c.body.map((b) => <li key={b.en}>{pick(b)}</li>)}</ul>
+              </details>
+            </div>
+          ))}
         </div>
-      ))}
-      <div className="btns">
-        <button className="btn" disabled={!all} onClick={onNext}>동의하고 셀카 찍기</button>
-        <button className="btn ghost" onClick={onBack}>이전</button>
+      </section>
+      <div className="foot">
+        <button className="btn" disabled={!all} onClick={onNext}>{t("consent.next")} <Arrow /></button>
       </div>
     </>
   );
 }
 
-function SelfieStep({ onDone, onBack }: { onDone: (b: Blob) => void; onBack: () => void }) {
+/** 이미지(촬영 프레임 또는 앨범 사진)를 긴 변 1280px JPEG로 맞춘다. 서버가 data URI로 그대로 넘긴다. */
+async function toJpeg(src: CanvasImageSource, w: number, h: number) {
+  const scale = Math.min(1, SELFIE_MAX_PX / Math.max(w, h));
+  const c = document.createElement("canvas");
+  c.width = Math.round(w * scale);
+  c.height = Math.round(h * scale);
+  c.getContext("2d")!.drawImage(src, 0, 0, c.width, c.height);
+  return new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.9));
+}
+
+function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
+  const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
   const [shot, setShot] = useState<{ blob: Blob; url: string } | null>(null);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState<MsgKey | null>(null);
+  const [camFailed, setCamFailed] = useState(false);
 
-  const start = useCallback(async () => {
-    setError(null);
-    try {
-      const s = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 } }, audio: false });
-      setStream(s);
-    } catch {
-      setError("카메라를 열 수 없어요. 아래 버튼으로 사진을 찍거나 골라 주세요.");
-    }
+  useEffect(() => {
+    navigator.mediaDevices?.getUserMedia({ video: { facingMode: "user", width: { ideal: 1280 } }, audio: false })
+      .then(setStream)
+      .catch(() => setCamFailed(true)) ?? setCamFailed(true);
   }, []);
-
-  useEffect(() => { start(); }, [start]);
   useEffect(() => {
     if (videoRef.current && stream) videoRef.current.srcObject = stream;
-    return () => stream?.getTracks().forEach((t) => t.stop());
+    return () => stream?.getTracks().forEach((tr) => tr.stop());
   }, [stream]);
   useEffect(() => () => { if (shot) URL.revokeObjectURL(shot.url); }, [shot]);
+
+  const keep = (blob: Blob | null) => { if (blob) { setError(null); setShot({ blob, url: URL.createObjectURL(blob) }); } };
 
   const capture = async () => {
     const v = videoRef.current;
     if (!v || !v.videoWidth) return;
-    const scale = Math.min(1, SELFIE_MAX_PX / Math.max(v.videoWidth, v.videoHeight));
-    const c = document.createElement("canvas");
-    c.width = Math.round(v.videoWidth * scale);
-    c.height = Math.round(v.videoHeight * scale);
-    c.getContext("2d")!.drawImage(v, 0, 0, c.width, c.height);
-    const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.9));
-    if (blob) setShot({ blob, url: URL.createObjectURL(blob) });
+    keep(await toJpeg(v, v.videoWidth, v.videoHeight));
   };
 
-  // 앨범 사진도 촬영본과 같은 크기의 JPEG로 맞춘다 (서버가 data URI로 그대로 넘긴다)
   const pickFile = async (f?: File) => {
     if (!f || !f.type.startsWith("image/")) return;
     try {
       const bmp = await createImageBitmap(f);
-      const scale = Math.min(1, SELFIE_MAX_PX / Math.max(bmp.width, bmp.height));
-      const c = document.createElement("canvas");
-      c.width = Math.round(bmp.width * scale);
-      c.height = Math.round(bmp.height * scale);
-      c.getContext("2d")!.drawImage(bmp, 0, 0, c.width, c.height);
-      const blob = await new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.9));
-      if (blob) setShot({ blob, url: URL.createObjectURL(blob) });
+      keep(await toJpeg(bmp, bmp.width, bmp.height));
     } catch {
-      setError("이 사진은 열 수 없어요. 다른 사진을 골라 주세요.");
+      setError("selfie.badFile");
     }
   };
 
+  const album = (
+    <label className="side right">
+      <span className="sq">
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="3" /><path d="M3 16l5-5 4 4 3-3 6 6" /><circle cx="16" cy="9" r="1.6" /></svg>
+      </span>
+      {t("selfie.album")}
+      <input type="file" accept="image/*" hidden onChange={(e) => pickFile(e.target.files?.[0])} />
+    </label>
+  );
+
   return (
-    <>
-      <h1>셀카 찍기</h1>
-      <p className="muted">얼굴이 정면으로, 밝게 나오게 찍어 주세요. 모자나 마스크는 벗는 게 좋아요.</p>
-      <div className="camera">
+    <div className="cam-screen">
+      <div className="cam">
         {shot ? (
           // eslint-disable-next-line @next/next/no-img-element
-          <img src={shot.url} alt="찍은 셀카" />
+          <img src={shot.url} alt="" />
         ) : (
           <>
             <video ref={videoRef} className="mirror" playsInline muted autoPlay />
-            <div className="guide" aria-hidden />
+            <div className="ring" aria-hidden />
           </>
         )}
-      </div>
-      {error && <p className="err">{error}</p>}
-      <div className="btns">
-        {shot ? (
-          <>
-            <button className="btn" onClick={() => { stream?.getTracks().forEach((t) => t.stop()); onDone(shot.blob); }}>이 사진으로 만들기</button>
-            <button className="btn ghost" onClick={() => setShot(null)}>다시 찍기</button>
-          </>
-        ) : (
-          <>
-            {stream && <button className="btn" onClick={capture}>찍기</button>}
-            <label className="btn ghost">
-              {stream ? "앨범에서 고르기" : "카메라로 찍기 / 사진 고르기"}
-              <input type="file" accept="image/*" capture="user" hidden onChange={(e) => pickFile(e.target.files?.[0])} />
-            </label>
-            <button className="btn ghost" onClick={onBack}>이전</button>
-          </>
+        {!shot && (
+          <div className="cam-copy">
+            <h1>{t("selfie.title")}</h1>
+            <p>{t("selfie.tip")}</p>
+          </div>
         )}
+        {!shot && (camFailed || error) && <p className="cam-err">{t(error ?? "selfie.noCam")}</p>}
       </div>
-    </>
+
+      {shot ? (
+        <div className="cam-confirm btns">
+          <button className="btn" onClick={() => { stream?.getTracks().forEach((tr) => tr.stop()); onDone(shot.blob); }}>{t("selfie.use")} <Arrow /></button>
+          <button className="btn ghost" onClick={() => setShot(null)}>{t("selfie.retake")}</button>
+        </div>
+      ) : stream ? (
+        <div className="cam-bar">
+          <span />
+          <button className="shutter" onClick={capture} aria-label={t("selfie.shoot")} />
+          {album}
+        </div>
+      ) : (
+        <div className="cam-confirm">
+          <label className="btn">
+            {t("selfie.pickPhoto")}
+            <input type="file" accept="image/*" capture="user" hidden onChange={(e) => pickFile(e.target.files?.[0])} />
+          </label>
+        </div>
+      )}
+    </div>
   );
 }
 
@@ -223,6 +280,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   videoId: string; videoSrc: string; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
   setJobId: (id: string | null) => void; onDone: (url: string) => void; onRetry: () => void;
 }) {
+  const { t } = useLang();
   const [status, setStatus] = useState<Status | null>(null);
   const [checking, setChecking] = useState(false);
   const retried = useRef(false);
@@ -245,11 +303,11 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     fd.append("selfie", selfie, "selfie.jpg");
     fetch("/api/jobs", { method: "POST", body: fd })
       .then(async (r) => {
-        const j = await r.json();
-        if (!r.ok) throw new Error(j.error || "요청에 실패했어요.");
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) return setError(j.code ?? "generic");
         setJobId(j.jobId);
       })
-      .catch((e) => setError(e.message));
+      .catch(() => setError("generic"));
   }, [jobId, selfie, videoId, role, consentVersion, agreed, setJobId]);
 
   // 상태 조회
@@ -275,7 +333,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           }
           return onDoneRef.current(s.videoUrl);
         }
-        if (s.state === "failed") return setError(s.error);
+        if (s.state === "failed") return setError(s.code);
       } catch {
         // 네트워크가 잠깐 끊겨도 다음 조회에서 다시 시도
       }
@@ -294,38 +352,58 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
 
   if (error) {
     return (
-      <div className="panel">
-        <h2>영상을 만들지 못했어요</h2>
-        <p className="err">{error}</p>
-        <div className="btns"><button className="btn" onClick={onRetry}>다시 찍어서 해보기</button></div>
+      <div className="fail" role="alert">
+        <div className="kicker">CUT</div>
+        <h1 className="h-big" style={{ marginTop: 14 }}>{t("work.failTitle")}</h1>
+        <p>{t(errKey(error))}</p>
+        <div className="btns" style={{ marginTop: 18 }}>
+          <button className="btn" onClick={onRetry}>{t("work.retry")}</button>
+          <Link className="btn ghost" href="/">{t("done.other")}</Link>
+        </div>
       </div>
     );
   }
 
-  const label = checking ? "결과를 확인하는 중" : !jobId ? (retried.current ? "한 번 더 만드는 중" : "사진을 보내는 중") : status?.state === "queued" ? `순서를 기다리는 중${status.position ? ` (${status.position}번째)` : ""}` : "주인공을 바꾸는 중";
+  const label: MsgKey = checking ? "work.checking"
+    : !jobId ? (retried.current ? "work.again" : "work.sending")
+    : status?.state === "queued" ? "work.queued"
+    : LINES[Math.floor(elapsed / 12) % LINES.length];
   return (
-    <div className="panel progress" role="status" aria-live="polite">
-      <div className="spinner" aria-hidden />
-      <h2>{label}</h2>
-      <p className="muted">보통 2~5분 걸려요. 이 화면을 닫지 말고 기다려 주세요.</p>
-      <span className="timer">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
+    <div className="making" role="status" aria-live="polite">
+      <video className="bg-video" src={videoSrc} muted loop autoPlay playsInline aria-hidden />
+      <span className="rec">REC</span>
+      <div className="clock">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</div>
+      <h2 key={label}>{t(label)}</h2>
+      <p>{t("work.wait")}</p>
+      <div className="bar"><i /></div>
     </div>
   );
 }
 
 function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: string; onRetry: () => void }) {
+  const { t } = useLang();
   const [original, setOriginal] = useState(false);
   return (
     <>
-      <h1>완성됐어요!</h1>
-      <video key={original ? "o" : "r"} src={original ? video.src : resultUrl} controls playsInline autoPlay loop />
-      <div className="btns">
-        <a className="btn" href={resultUrl} download target="_blank" rel="noopener">영상 저장하기</a>
-        <button className="btn ghost" onClick={() => setOriginal(!original)}>{original ? "내 영상 보기" : "원본과 비교하기"}</button>
-        <button className="btn ghost" onClick={onRetry}>다시 찍어서 해보기</button>
-        <Link className="btn ghost" href="/">다른 영상 해보기</Link>
+      <section className="result">
+        <video key={original ? "o" : "r"} src={original ? video.src : resultUrl} playsInline autoPlay loop muted />
+        <div className="stage-body">
+          <div className="kicker">{t("done.kicker")}</div>
+          <h1 className="title-xl">{t("done.title")}</h1>
+          <div className="seg" role="group">
+            <button aria-pressed={!original} onClick={() => setOriginal(false)}>{t("done.after")}</button>
+            <button aria-pressed={original} onClick={() => setOriginal(true)}>{t("done.before")}</button>
+          </div>
+        </div>
+      </section>
+      <div className="foot btns">
+        <a className="btn" href={resultUrl} download target="_blank" rel="noopener">{t("done.save")}</a>
+        <div className="two">
+          <button className="btn ghost" onClick={onRetry}>{t("done.retry")}</button>
+          <Link className="btn ghost" href="/">{t("done.other")}</Link>
+        </div>
+        <p className="small">{t("done.keep")}</p>
       </div>
-      <p className="muted" style={{ marginTop: 14 }}>영상 링크는 시간이 지나면 열리지 않을 수 있어요. 마음에 들면 지금 저장해 주세요.</p>
     </>
   );
 }

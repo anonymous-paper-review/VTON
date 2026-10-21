@@ -13,7 +13,7 @@ export type JobStatus =
   | { state: "queued"; position?: number }
   | { state: "running" }
   | { state: "done"; videoUrl: string }
-  | { state: "failed"; error: string };
+  | { state: "failed"; code: string };
 
 /** 클라이언트에 넘기는 job id: 엔진과 fal request id를 묶어 상태 조회 때 엔드포인트를 알 수 있게 한다. */
 const encodeId = (engine: EngineKey, requestId: string) => `${engine}.${requestId}`;
@@ -59,7 +59,7 @@ export async function jobStatus(id: string): Promise<JobStatus> {
     return { state: "done", videoUrl: video };
   }
   const parsed = decodeId(id);
-  if (!parsed) return { state: "failed", error: "잘못된 작업 번호예요." };
+  if (!parsed) return { state: "failed", code: "generic" };
   const { endpoint } = ENGINES[parsed.engine];
 
   const status = await fal.queue.status(endpoint, { requestId: parsed.requestId, logs: false });
@@ -68,16 +68,17 @@ export async function jobStatus(id: string): Promise<JobStatus> {
   try {
     const result = await fal.queue.result(endpoint, { requestId: parsed.requestId });
     const url = (result.data as { video?: { url?: string } })?.video?.url;
-    return url ? { state: "done", videoUrl: url } : { state: "failed", error: "결과 영상이 없어요." };
+    return url ? { state: "done", videoUrl: url } : { state: "failed", code: "generic" };
   } catch (e) {
-    return { state: "failed", error: describeFalError(e) };
+    return { state: "failed", code: falErrorCode(e) };
   }
 }
 
-export function describeFalError(e: unknown): string {
+/** fal 오류 → 화면 문구 코드 (lib/i18n.ts의 err.*) */
+export function falErrorCode(e: unknown): "safety" | "config" | "generic" {
   const body = JSON.stringify((e as { body?: unknown })?.body ?? "");
-  if (/safety|content/i.test(body)) return "안전 필터에 걸렸어요. 얼굴이 잘 보이는 사진으로 다시 찍어 주세요.";
+  if (/safety|content/i.test(body)) return "safety";
   const status = (e as { status?: number })?.status;
-  if (status === 401 || status === 403) return "서버 설정 문제로 지금은 만들 수 없어요.";
-  return "영상을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.";
+  if (status === 401 || status === 403) return "config";
+  return "generic";
 }
