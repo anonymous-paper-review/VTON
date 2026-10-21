@@ -17,7 +17,7 @@ export function TopBar({ back }: { back?: { label: string; href?: string; onClic
       ) : back ? (
         <button className="icon-btn" onClick={back.onClick} aria-label={back.label}><Chevron /></button>
       ) : (
-        <span className="brand">You<b>/</b>Lead</span>
+        <span className="brand">Hwagae<b>/</b>Market</span>
       )}
       <LangSwitch />
     </header>
@@ -28,6 +28,15 @@ export const Arrow = () => (
   <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
 );
 
+/** 화개장터 주인공 컨셉의 큰 타이틀. 영화 크레딧처럼 언어와 관계없이 영어로 둔다. */
+export const Mega = () => (
+  <h1 className="mega" aria-label="Hwagae, starring you">
+    <span>Hwagae</span>
+    <span className="outline">Starring</span>
+    <span className="hot">You.</span>
+  </h1>
+);
+
 export default function HomeView({ videos }: { videos: Video[] }) {
   const { t, pick } = useLang();
   return (
@@ -35,10 +44,8 @@ export default function HomeView({ videos }: { videos: Video[] }) {
       <TopBar />
       <section className="hero">
         <div className="kicker">{t("home.kicker")}</div>
-        <h1 className="mega">
-          <span>{t("home.hero1")}</span>
-          <span className="outline">{t("home.hero2")}</span>
-        </h1>
+        <Mega />
+        <h2 className="hero-title">{t("home.title")}</h2>
         <p>{t("home.sub")}</p>
         <span className="free">{t("home.free")}</span>
       </section>

@@ -3,8 +3,8 @@ import { LangProvider } from "./LangProvider";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "YOU ARE THE LEAD",
-  description: "셀카 한 장으로 영상 속 주인공이 되어 보세요.",
+  title: "화개장터 주인공 되기 · HWAGAE STARRING YOU",
+  description: "셀카 한 장으로 화개장터 영상 속 주인공이 되어 보세요.",
 };
 
 export const viewport: Viewport = {

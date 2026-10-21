@@ -21,30 +21,24 @@ export function detectLang(nav: string | undefined): Lang {
 }
 
 const dict = {
-  "home.kicker": { ko: "셀카 한 장이면 충분해요", zh: "一张自拍就够了", en: "One selfie is all it takes", ja: "自撮り1枚でOK" },
-  "home.hero1": { ko: "YOU ARE", zh: "YOU ARE", en: "YOU ARE", ja: "YOU ARE" },
-  "home.hero2": { ko: "THE LEAD", zh: "THE LEAD", en: "THE LEAD", ja: "THE LEAD" },
-  "home.sub": {
-    ko: "장면을 고르고 셀카를 찍으면, 영상 속 주인공이 당신으로 바뀌어요.",
-    zh: "选择场景并拍一张自拍，视频里的主角就会变成你。",
-    en: "Pick a scene, take a selfie, and the lead in the film becomes you.",
-    ja: "シーンを選んで自撮りすると、映像の主人公があなたに変わります。",
-  },
-  "home.scenes": { ko: "장면 고르기", zh: "选择场景", en: "Choose a scene", ja: "シーンを選ぶ" },
+  "home.kicker": { ko: "화개장터에서, 셀카 한 장으로", zh: "在花开市场，只需一张自拍", en: "At Hwagae Market, with one selfie", ja: "花開（ファゲ）市場で、自撮り1枚で" },
+  "home.title": { ko: "화개장터의 주인공은 당신", zh: "花开市场的主角就是你", en: "You're the star of Hwagae Market", ja: "花開市場の主人公は、あなた" },
+  "home.sub": { ko: "장면을 고르고 셀카를 찍으면, 화개장터 영상 속 주인공이 당신으로 바뀌어요.", zh: "选一个场景，拍一张自拍，花开市场视频里的主角就会变成你。", en: "Pick a scene, take a selfie, and the lead of the Hwagae Market film becomes you.", ja: "シーンを選んで自撮りすると、花開市場の映像の主人公があなたに変わります。" },
+  "home.scenes": { ko: "화개장터 장면", zh: "花开市场场景", en: "Hwagae Market scenes", ja: "花開市場のシーン" },
   "home.free": { ko: "무료 시범 서비스", zh: "免费试用服务", en: "Free pilot service", ja: "無料パイロットサービス" },
   "common.sec": { ko: "초", zh: "秒", en: "s", ja: "秒" },
   "common.back": { ko: "뒤로", zh: "返回", en: "Back", ja: "戻る" },
   "common.list": { ko: "장면 목록", zh: "场景列表", en: "All scenes", ja: "シーン一覧" },
 
   "intro.who": { ko: "누가 되어 볼까요?", zh: "你想成为谁？", en: "Who will you be?", ja: "誰になってみる？" },
-  "intro.whoSingle": { ko: "주인공이 되어 볼까요?", zh: "要成为主角吗？", en: "Ready to be the lead?", ja: "主人公になってみる？" },
+  "intro.whoSingle": { ko: "화개장터의 주인공이 되어 볼까요?", zh: "要成为花开市场的主角吗？", en: "Ready to star in Hwagae Market?", ja: "花開市場の主人公になってみる？" },
   "intro.note": {
     ko: "셀카 한 장으로 고른 인물이 당신으로 바뀌어요. 3~4분 정도 걸리고, 옷차림도 셀카를 따라 바뀔 수 있어요.",
     zh: "只需一张自拍，所选人物就会变成你。大约需要3~4分钟，服装也可能随自拍改变。",
     en: "One selfie turns the chosen character into you. It takes about 3–4 minutes, and the outfit may follow your selfie too.",
     ja: "自撮り1枚で選んだ人物があなたに変わります。3〜4分ほどかかり、服装も自撮りに合わせて変わることがあります。",
   },
-  "intro.start": { ko: "주인공 되기", zh: "成为主角", en: "Be the lead", ja: "主人公になる" },
+  "intro.start": { ko: "화개장터 주인공 되기", zh: "成为花开市场的主角", en: "Star in Hwagae Market", ja: "花開市場の主人公になる" },
   "intro.become": { ko: "이 사람 되기", zh: "成为TA", en: "Become", ja: "この人になる" },
 
   "step.consent": { ko: "동의", zh: "同意", en: "Consent", ja: "同意" },
@@ -86,9 +80,9 @@ const dict = {
   "work.again": { ko: "한 번 더 다듬는 중", zh: "正在再次优化", en: "Giving it another take", ja: "もう一度撮り直し中" },
   "work.queued": { ko: "촬영 순서를 기다리는 중", zh: "正在排队等待", en: "Waiting for your turn", ja: "順番待ち" },
   "work.checking": { ko: "결과를 확인하는 중", zh: "正在检查结果", en: "Checking the result", ja: "結果を確認中" },
-  "work.line1": { ko: "조명을 맞추는 중", zh: "正在调整灯光", en: "Setting the lights", ja: "照明を調整中" },
-  "work.line2": { ko: "당신을 캐스팅하는 중", zh: "正在为你选角", en: "Casting you", ja: "あなたをキャスティング中" },
-  "work.line3": { ko: "카메라가 다시 도는 중", zh: "摄影机重新开拍", en: "Rolling the camera", ja: "カメラを回しています" },
+  "work.line1": { ko: "화개장터에 조명을 맞추는 중", zh: "正在为花开市场布光", en: "Lighting up Hwagae Market", ja: "花開市場に照明をセット中" },
+  "work.line2": { ko: "당신을 주인공으로 캐스팅하는 중", zh: "正在选你当主角", en: "Casting you as the lead", ja: "あなたを主人公にキャスティング中" },
+  "work.line3": { ko: "장터에서 카메라가 도는 중", zh: "摄影机正在市场里开拍", en: "Cameras rolling in the market", ja: "市場でカメラが回っています" },
   "work.line4": { ko: "마지막 컷을 편집하는 중", zh: "正在剪辑最后一幕", en: "Cutting the final take", ja: "最後のカットを編集中" },
   "work.wait": {
     ko: "보통 3~4분 걸려요. 화면을 닫지 말고 기다려 주세요.",
@@ -99,8 +93,8 @@ const dict = {
   "work.failTitle": { ko: "이번 컷은 실패했어요", zh: "这一幕没有成功", en: "That take didn't work", ja: "今回のテイクは失敗しました" },
   "work.retry": { ko: "다시 찍어서 해보기", zh: "重新拍摄再试", en: "Retake and try again", ja: "撮り直して再挑戦" },
 
-  "done.kicker": { ko: "YOUR SCENE", zh: "YOUR SCENE", en: "YOUR SCENE", ja: "YOUR SCENE" },
-  "done.title": { ko: "주인공이 되었어요", zh: "你成为了主角", en: "You're the lead now", ja: "主人公になりました" },
+  "done.kicker": { ko: "STARRING YOU", zh: "STARRING YOU", en: "STARRING YOU", ja: "STARRING YOU" },
+  "done.title": { ko: "화개장터의 주인공이 되었어요", zh: "你成为了花开市场的主角", en: "You're the star of Hwagae Market", ja: "花開市場の主人公になりました" },
   "done.after": { ko: "결과", zh: "结果", en: "After", ja: "結果" },
   "done.before": { ko: "원본", zh: "原片", en: "Before", ja: "元の映像" },
   "done.save": { ko: "영상 저장하기", zh: "保存视频", en: "Save video", ja: "動画を保存" },
@@ -113,7 +107,7 @@ const dict = {
     ja: "動画のリンクは時間が経つと開けなくなることがあります。気に入ったら今すぐ保存してください。",
   },
 
-  "qr.title": { ko: "스캔하고 주인공 되기", zh: "扫码成为主角", en: "Scan to be the lead", ja: "スキャンして主人公に" },
+  "qr.title": { ko: "스캔하고 화개장터 주인공 되기", zh: "扫码成为花开市场的主角", en: "Scan to star in Hwagae Market", ja: "スキャンして花開市場の主人公に" },
 
   "err.video": { ko: "장면을 찾을 수 없어요.", zh: "找不到该场景。", en: "Scene not found.", ja: "シーンが見つかりません。" },
   "err.role": { ko: "바꿀 인물을 골라 주세요.", zh: "请选择要替换的人物。", en: "Please choose a character.", ja: "人物を選んでください。" },
