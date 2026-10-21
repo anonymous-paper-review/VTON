@@ -1,5 +1,16 @@
 import list from "@/data/videos.json";
 
+/** 영상 속 인물. cast 배열은 화면 왼쪽부터 순서대로 둔다 (MiniMax가 참고 사진을 왼쪽부터 대응시킨다). */
+export type CastMember = {
+  id: string;
+  /** 고르는 버튼에 보일 이름 (예: "여자 주인공") */
+  label: string;
+  /** 프롬프트에서 이 인물을 특정하는 말 (예: "the woman in the red coat") */
+  target: string;
+  /** 원본 속 이 인물의 얼굴 사진. 오른쪽 인물을 바꿀 때 이 인물을 그대로 두려고 MiniMax에 함께 넣는다. */
+  still?: string;
+};
+
 export type Video = {
   id: string;
   title: string;
@@ -8,8 +19,7 @@ export type Video = {
   src: string;
   poster?: string;
   seconds: number;
-  /** 교체할 인물을 프롬프트에서 특정하는 말 (예: "the woman in the red coat") */
-  target: string;
+  cast: CastMember[];
 };
 
 export const videos: Video[] = list;

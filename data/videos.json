@@ -2,10 +2,13 @@
   {
     "id": "rain-alley",
     "title": "비 갠 골목",
-    "description": "비 그친 골목에서 우산 쓴 그녀와 마주친 그. 셀카로 남자 주인공이 되어 보세요.",
+    "description": "비 그친 골목에서 우산 쓴 그녀와 마주친 그. 셀카로 둘 중 한 사람이 되어 보세요.",
     "src": "/videos/rain-alley.mp4",
     "poster": "/videos/rain-alley.jpg",
     "seconds": 8,
-    "target": "the man on the left"
+    "cast": [
+      { "id": "man", "label": "남자 주인공", "target": "the man on the left", "still": "/videos/rain-alley-man.jpg" },
+      { "id": "woman", "label": "여자 주인공", "target": "the woman on the right" }
+    ]
   }
 ]

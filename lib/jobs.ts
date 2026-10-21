@@ -27,6 +27,8 @@ export async function submitJob(opts: {
   engine: EngineKey;
   videoUrl: string;
   target: string;
+  /** 바꿀 인물보다 왼쪽에 있어 그대로 둘 인물들 (원본 얼굴 사진) */
+  keep: { target: string; imageUrl: string }[];
   selfie: File;
 }): Promise<string> {
   if (MOCK) {
@@ -38,7 +40,12 @@ export async function submitJob(opts: {
   const faceUrl = `data:${opts.selfie.type};base64,${Buffer.from(await opts.selfie.arrayBuffer()).toString("base64")}`;
   const engine = ENGINES[opts.engine];
   const { request_id } = await fal.queue.submit(engine.endpoint, {
-    input: engine.build({ videoUrl: opts.videoUrl, faceUrl, target: opts.target }),
+    input: engine.build({
+      videoUrl: opts.videoUrl,
+      faceUrl,
+      target: opts.target,
+      lineup: [...opts.keep.map((k) => ({ ...k, swap: false })), { target: opts.target, imageUrl: faceUrl, swap: true }],
+    }),
   });
   return encodeId(opts.engine, request_id);
 }

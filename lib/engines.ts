@@ -7,7 +7,11 @@
 
 export type EngineKey = "minimax-h3" | "kling-o3" | "kling-o1" | "wan";
 
-type BuildArgs = { videoUrl: string; faceUrl: string; target: string };
+/**
+ * target: 바꿀 인물을 특정하는 말.
+ * lineup: 화면 왼쪽부터 바꿀 인물까지의 인물별 참고 사진 (바꿀 인물은 셀카, 그 왼쪽 인물은 원본 얼굴).
+ */
+type BuildArgs = { videoUrl: string; faceUrl: string; target: string; lineup: { target: string; imageUrl: string; swap: boolean }[] };
 
 type Engine = {
   endpoint: string;
@@ -22,17 +26,21 @@ const klingPrompt = (videoRef: string, target: string) =>
   "Do not change the background or any other people in the scene.";
 
 export const ENGINES: Record<EngineKey, Engine> = {
-  // 사진 1장이 화면의 주요 인물(여럿이면 왼쪽부터)에 대응한다. 배경은 다시 그려지지만 눈으로는 거의 같다.
-  // 실험은 1080P($0.45/초)로 했다. 768P는 $0.30/초.
+  // 참고 사진이 화면의 주요 인물에 왼쪽부터 대응한다. 오른쪽 인물을 바꿀 땐 왼쪽 인물의 원본 얼굴을 앞에 넣어
+  // 그대로 두게 한다 (실험: 원본 유지 ArcFace 0.85, 바뀐 인물 0.59). 인물 전체를 다시 그려서 옷·성별도 셀카를 따라간다.
+  // 배경은 다시 그려지지만 눈으로는 거의 같다. 실험은 1080P($0.45/초)로 했다. 768P는 $0.30/초.
   "minimax-h3": {
     endpoint: "minimax/h3-max/recast",
     minSeconds: 5,
     maxSeconds: 30,
-    build: ({ videoUrl, faceUrl, target }) => ({
+    build: ({ videoUrl, lineup }) => ({
       video_url: videoUrl,
-      reference_image_urls: [faceUrl],
+      reference_image_urls: lineup.map((p) => p.imageUrl),
       resolution: "1080P",
-      prompt: `Recast ${target} as the person in the reference photo. Keep everything else unchanged.`,
+      prompt:
+        lineup
+          .map((p, i) => (p.swap ? `${p.target} becomes the person in photo ${i + 1}` : `${p.target} stays the same person as in photo ${i + 1}`))
+          .join("; ") + ". Keep everything else unchanged.",
     }),
   },
   "kling-o3": {

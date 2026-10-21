@@ -22,6 +22,8 @@ npm run dev
 
 `VTON_MOCK=1`이면 fal을 부르지 않고 몇 초 뒤 원본 영상을 결과로 돌려준다. 화면 흐름 확인용.
 
+Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는 곳에서는 `FAL_KEY` 없이 `NODE_USE_ENV_PROXY=1 npm start`로 띄운다 (Node 내장 fetch는 이 설정 없이는 `HTTPS_PROXY`를 무시한다). 이때 fal이 원본 영상을 받아갈 수 있도록 `videos.json`의 `src`를 공개 URL로 바꿔야 한다.
+
 ## 설정
 
 | 변수 | 설명 |
@@ -33,7 +35,7 @@ npm run dev
 
 ## 영상 추가
 
-`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `target`은 프롬프트에서 교체할 인물을 특정하는 말이다 (예: `"the woman in the red coat"`). 영상은 휴대폰에서 바로 재생되도록 720p H.264, faststart로 넣는다 (예: `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -movflags +faststart -c:a aac out.mp4`). 지금 들어 있는 `rain-alley`는 엔진 실험용으로 생성한 가상 인물 영상이다.
+`data/videos.json`에 항목을 넣는다. `src`는 fal이 받아갈 수 있는 공개 URL이어야 한다 (`/public` 경로는 배포 주소 기준으로 바뀐다). `cast`에는 고를 수 있는 인물을 화면 왼쪽부터 순서대로 넣는다. `target`은 프롬프트에서 그 인물을 특정하는 말(예: `"the woman in the red coat"`), `still`은 원본 속 그 인물의 얼굴 사진이다. 오른쪽 인물을 바꿀 때 왼쪽 인물들을 그대로 두려고 MiniMax에 함께 넣으므로, 맨 오른쪽이 아닌 인물에는 `still`이 필요하다. 인물이 둘 이상이면 "남자 주인공 되기"처럼 고르는 버튼이 나온다. 영상은 휴대폰에서 바로 재생되도록 720p H.264, faststart로 넣는다 (예: `ffmpeg -i in.mp4 -vf scale=-2:720 -c:v libx264 -crf 23 -movflags +faststart -c:a aac out.mp4`). 지금 들어 있는 `rain-alley`는 엔진 실험용으로 생성한 가상 인물 영상이다.
 
 ## 엔진
 

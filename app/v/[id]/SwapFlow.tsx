@@ -24,6 +24,7 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   const [step, setStep] = useState<Step>("intro");
   const [agreed, setAgreed] = useState<string[]>([]);
   const [selfie, setSelfie] = useState<Blob | null>(null);
+  const [role, setRole] = useState(video.cast[0].id);
   const [jobId, setJobId] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
 
@@ -53,8 +54,15 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
           <div className="panel">
             <h2>얼굴 바꾸기 해볼까요?</h2>
             <p className="muted">셀카 한 장을 찍으면 이 영상의 주인공이 내 얼굴로 바뀐 영상을 만들어 드려요. 몇 분 정도 걸려요.</p>
+            {video.cast.length > 1 && <p className="muted">고른 인물은 얼굴뿐 아니라 옷차림까지 셀카를 따라 바뀔 수 있어요.</p>}
             <div className="btns">
-              <button className="btn" onClick={() => setStep("consent")}>네, 해볼게요</button>
+              {video.cast.length > 1 ? (
+                video.cast.map((c) => (
+                  <button key={c.id} className="btn" onClick={() => { setRole(c.id); setStep("consent"); }}>{c.label} 되기</button>
+                ))
+              ) : (
+                <button className="btn" onClick={() => setStep("consent")}>네, 해볼게요</button>
+              )}
               <Link className="btn ghost" href="/">다른 영상 볼게요</Link>
             </div>
           </div>
@@ -76,6 +84,7 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
         <WorkingStep
           videoId={video.id}
           videoSrc={video.src}
+          role={role}
           consentVersion={consent.version}
           agreed={agreed}
           selfie={selfie}
@@ -210,8 +219,8 @@ function SelfieStep({ onDone, onBack }: { onDone: (b: Blob) => void; onBack: () 
   );
 }
 
-function WorkingStep({ videoId, videoSrc, consentVersion, agreed, selfie, jobId, setJobId, onDone, onRetry }: {
-  videoId: string; videoSrc: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
+function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, jobId, setJobId, onDone, onRetry }: {
+  videoId: string; videoSrc: string; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
   setJobId: (id: string | null) => void; onDone: (url: string) => void; onRetry: () => void;
 }) {
   const [status, setStatus] = useState<Status | null>(null);
@@ -230,6 +239,7 @@ function WorkingStep({ videoId, videoSrc, consentVersion, agreed, selfie, jobId,
     submitted.current = true;
     const fd = new FormData();
     fd.append("videoId", videoId);
+    fd.append("role", role);
     fd.append("consentVersion", consentVersion);
     agreed.forEach((a) => fd.append("consent", a));
     fd.append("selfie", selfie, "selfie.jpg");
@@ -240,7 +250,7 @@ function WorkingStep({ videoId, videoSrc, consentVersion, agreed, selfie, jobId,
         setJobId(j.jobId);
       })
       .catch((e) => setError(e.message));
-  }, [jobId, selfie, videoId, consentVersion, agreed, setJobId]);
+  }, [jobId, selfie, videoId, role, consentVersion, agreed, setJobId]);
 
   // 상태 조회
   useEffect(() => {
