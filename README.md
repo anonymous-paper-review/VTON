@@ -43,14 +43,24 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 
 ## 배포 (Vercel)
 
-1. Vercel에서 이 저장소를 Import (Framework: Next.js, 설정 변경 없음)
-2. Environment Variables에 `FAL_KEY`, `NEXT_PUBLIC_SITE_URL`(배포 주소) 추가. 엔진을 바꿀 땐 `VTON_ENGINE`
-3. 배포 후 `/qr`을 열어 인쇄
+1. vercel.com에 로그인 → **Add New… → Project** → GitHub의 `anonymous-paper-review/VTON` **Import**
+   (목록에 없으면 "Adjust GitHub App Permissions"에서 이 저장소를 허용)
+2. Framework는 Next.js로 자동 인식된다. Build·Output 설정은 그대로 둔다.
+3. **Environment Variables**에 추가 후 **Deploy**
+   - `FAL_KEY`: fal 대시보드(fal.ai/dashboard/keys)에서 만든 키
+   - `VTON_ENGINE`: 비워 두면 `minimax-h3`. 비용을 줄이려면 `kling-o3`
+4. 배포가 끝나면 나오는 `https://<프로젝트>.vercel.app` 주소를 `NEXT_PUBLIC_SITE_URL`로 넣고 **Redeploy** (QR에 들어갈 주소 고정)
+5. `https://<프로젝트>.vercel.app/qr`을 열어 인쇄하거나 캡처해서 현장에 붙인다.
 
-fal이 원본 영상을 `https://<배포 주소>/videos/...`에서 받아가므로 배포 주소가 공개되어 있어야 한다 (Vercel 비밀번호 보호를 켜면 fal이 영상을 못 받는다).
+참고
+- 영상 생성은 fal 큐에서 따로 돌고 서버 함수는 등록·조회만 하므로(몇 초), 함수 실행 시간이나 리전 설정은 바꿀 필요가 없다.
+- 운영 주소(Production)는 공개 상태여야 한다. fal이 `https://<주소>/videos/...`에서 원본 영상을 받아간다. Vercel 기본 설정(Standard Protection)은 프리뷰 주소만 막으므로 그대로 두면 된다.
+- 자기 도메인을 쓰려면 Project → Settings → Domains에서 추가하고, `NEXT_PUBLIC_SITE_URL`도 그 주소로 바꾼 뒤 Redeploy.
+- QR만 있으면 누구나 생성을 돌릴 수 있으니 fal 대시보드에서 사용 한도(Usage limit)를 걸어 두는 게 안전하다. MiniMax 기준 8초 영상 한 편에 약 $3.6.
+- Vercel Hobby(무료) 요금제는 비상업 개인 용도 조건이 있어, 회사 실증이면 Pro를 검토한다.
 
 ## 남은 일
 
-- 동의 기록·24시간 삭제를 DB(Supabase)와 예약 작업으로 옮기기 (지금은 서버 로그에만 남김)
-- 동의 문구 법무 검토
+- 동의 기록을 DB(Supabase)에 남기기 (지금은 서버 로그에만 남김)
+- 정식 서비스로 넘어갈 때 동의 문구 법무 검토
 - 목소리 교체

@@ -108,7 +108,7 @@ function ConsentStep({ consent, agreed, setAgreed, onNext, onBack }: {
   return (
     <>
       <h1>개인정보 동의</h1>
-      <p className="muted">얼굴 사진은 영상을 만드는 데에만 쓰고, 정해진 기간이 지나면 지워요.</p>
+      <p className="muted">무료 시범 서비스예요. 얼굴 사진은 영상을 만드는 데에만 쓰고, 서비스 서버에는 저장하지 않아요.</p>
       <label className="all">
         <input type="checkbox" checked={all} onChange={() => setAgreed(all ? [] : consent.items.map((c) => c.id))} />
         모두 동의해요
@@ -325,7 +325,7 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
         <button className="btn ghost" onClick={onRetry}>다시 찍어서 해보기</button>
         <Link className="btn ghost" href="/">다른 영상 해보기</Link>
       </div>
-      <p className="muted" style={{ marginTop: 14 }}>영상은 24시간 동안만 보관돼요. 필요하면 지금 저장해 주세요.</p>
+      <p className="muted" style={{ marginTop: 14 }}>영상 링크는 시간이 지나면 열리지 않을 수 있어요. 마음에 들면 지금 저장해 주세요.</p>
     </>
   );
 }
