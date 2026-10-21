@@ -84,7 +84,7 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .stage { position: relative; min-height: 88svh; display: flex; flex-direction: column; justify-content: flex-end; isolation: isolate; overflow: hidden; }
 .stage::after { content: ""; position: absolute; inset: 0; z-index: -1; background: linear-gradient(180deg, rgba(20,18,15,.5) 0%, rgba(20,18,15,0) 25%, rgba(20,18,15,.2) 50%, var(--bg) 96%); }
 .stage-body { padding: 0 var(--pad) 8px; }
-.title-xl { font: 900 clamp(40px, 12vw, 64px)/1.08 var(--display); letter-spacing: -.04em; margin: 10px 0 0; }
+.title-xl { font: 900 clamp(40px, 12vw, 64px)/1.08 var(--display); letter-spacing: -.04em; margin: 10px 0 0; text-shadow: 0 2px 24px rgba(20,18,15,.6); }
 .stage-body p { color: var(--dim); margin: 14px 0 0; max-width: 36ch; }
 
 .cast-h { font: 900 26px/1.2 var(--sans); letter-spacing: -.02em; margin: 34px var(--pad) 6px; }

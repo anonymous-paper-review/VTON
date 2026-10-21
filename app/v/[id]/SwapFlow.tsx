@@ -104,7 +104,7 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
       <section className="stage">
         <video className="bg-video" src={video.src} poster={video.poster} muted loop autoPlay playsInline aria-hidden />
         <div className="stage-body">
-          <div className="kicker">{video.seconds}{t("common.sec")} · No.01</div>
+          <div className="kicker">{video.seconds}{t("common.sec")}</div>
           <h1 className="title-xl">{pick(video.title)}</h1>
           <p>{pick(video.description)}</p>
         </div>
