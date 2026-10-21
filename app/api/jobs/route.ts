@@ -21,8 +21,9 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: "사진이 너무 커요." }, { status: 413 });
 
   const engine = engineKey();
-  if (video.seconds > ENGINES[engine].maxSeconds)
-    return NextResponse.json({ error: "이 영상은 지금 엔진으로 처리하기엔 길어요." }, { status: 422 });
+  const { minSeconds, maxSeconds } = ENGINES[engine];
+  if (video.seconds < minSeconds || video.seconds > maxSeconds)
+    return NextResponse.json({ error: "이 영상은 지금 엔진으로 처리할 수 없는 길이예요." }, { status: 422 });
 
   // 동의 기록. 지금은 서버 로그에만 남긴다 (사진·개인 식별 정보는 남기지 않음).
   console.info("consent", JSON.stringify({ version: CONSENT_VERSION, agreedAt: new Date().toISOString(), items: agreed, videoId: video.id }));

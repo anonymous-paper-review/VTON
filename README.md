@@ -27,7 +27,7 @@ npm run dev
 | 변수 | 설명 |
 | --- | --- |
 | `FAL_KEY` | fal API 키. 서버에서만 쓴다. |
-| `VTON_ENGINE` | `kling-o3`(기본) · `kling-o1` · `wan` |
+| `VTON_ENGINE` | `minimax-h3`(기본) · `kling-o3` · `kling-o1` · `wan` |
 | `VTON_MOCK` | `1`이면 모의 모드 |
 | `NEXT_PUBLIC_SITE_URL` | QR에 넣을 배포 주소 |
 
@@ -37,7 +37,7 @@ npm run dev
 
 ## 엔진
 
-2026-10-21 비교 실험 기준 Kling O3 Edit가 기본이다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
+2026-10-21 2차 비교 기준 MiniMax H3 Max Recast(1080P)가 기본이다. 닮음 점수가 가장 높고 3분 정도 걸리지만 초당 $0.45로 Kling O3(약 $0.168)의 2.5배라, 비용을 줄일 땐 `VTON_ENGINE=kling-o3`로 바꾼다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
 
 ## 남은 일
 
