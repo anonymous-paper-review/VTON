@@ -1,0 +1,20 @@
+[
+  {
+    "id": "sample-1",
+    "title": "화개장터의 오후",
+    "description": "장터 골목을 걷는 주인공. 셀카로 주인공이 되어 보세요.",
+    "src": "/videos/sample-1.mp4",
+    "poster": "/videos/sample-1.jpg",
+    "seconds": 8,
+    "target": "the main person walking in the center"
+  },
+  {
+    "id": "sample-2",
+    "title": "섬진강 노을",
+    "description": "강가에서 노을을 바라보는 장면.",
+    "src": "/videos/sample-2.mp4",
+    "poster": "/videos/sample-2.jpg",
+    "seconds": 6,
+    "target": "the person standing by the river"
+  }
+]
