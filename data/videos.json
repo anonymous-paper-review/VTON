@@ -1,6 +1,7 @@
 [
   {
     "id": "simni-walk",
+    "group": "simni",
     "title": {
       "ko": "십리벚꽃길을 걷다",
       "zh": "漫步十里樱花路",
@@ -44,6 +45,7 @@
   },
   {
     "id": "simni-petal",
+    "group": "simni",
     "title": {
       "ko": "머리 위 벚꽃잎 하나",
       "zh": "发间的一片樱花",
@@ -87,6 +89,7 @@
   },
   {
     "id": "simni-stream",
+    "group": "simni",
     "title": {
       "ko": "화개천 노을 아래",
       "zh": "花开川的夕阳下",
@@ -125,6 +128,138 @@
         },
         "target": "the woman on the right",
         "photo": "/videos/simni-stream-woman.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hwagae-tea",
+    "group": "market",
+    "title": {
+      "ko": "화개장터 찻집에서",
+      "zh": "花开市场的茶铺",
+      "en": "Tea at Hwagae Market",
+      "ja": "花開（ファゲ）市場の茶店で"
+    },
+    "description": {
+      "ko": "화개장터 녹차 가게, 갓 우린 녹차 한 잔에 웃음이 번지는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "在花开市场的茶铺，一杯现泡的绿茶让两人相视而笑。成为其中一人吧。",
+      "en": "At a green tea shop in Hwagae Market, a fresh cup of green tea brings a smile. Step into either role.",
+      "ja": "花開（ファゲ）市場の緑茶の店、淹れたての緑茶に笑みがこぼれる二人。どちらかになってみよう。"
+    },
+    "src": "/videos/hwagae-tea.mp4",
+    "poster": "/videos/hwagae-tea.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the man on the left",
+        "still": "/videos/hwagae-tea-man.jpg",
+        "photo": "/videos/hwagae-tea-man.jpg"
+      },
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the woman on the right",
+        "photo": "/videos/hwagae-tea-woman.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hwagae-food",
+    "group": "market",
+    "title": {
+      "ko": "화개장터 먹거리 골목",
+      "zh": "花开市场美食街",
+      "en": "Hwagae Market Food Lane",
+      "ja": "花開（ファゲ）市場の屋台通り"
+    },
+    "description": {
+      "ko": "김이 오르는 화개장터 먹거리 골목, 구운 떡꼬치와 엿을 나눠 먹는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "热气腾腾的花开市场美食街，两人分享烤年糕串和传统麦芽糖。成为其中一人吧。",
+      "en": "Steam rises in Hwagae Market's food lane as two friends share grilled rice cakes and yeot. Step into either role.",
+      "ja": "湯気の立つ花開（ファゲ）市場の屋台通り、焼き餅の串と飴を分け合う二人。どちらかになってみよう。"
+    },
+    "src": "/videos/hwagae-food.mp4",
+    "poster": "/videos/hwagae-food.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the man on the left",
+        "still": "/videos/hwagae-food-man.jpg",
+        "photo": "/videos/hwagae-food-man.jpg"
+      },
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the woman on the right",
+        "photo": "/videos/hwagae-food-woman.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hwagae-river",
+    "group": "market",
+    "title": {
+      "ko": "섬진강변 화개장터",
+      "zh": "蟾津江畔的花开市场",
+      "en": "Hwagae Market by the Seomjin River",
+      "ja": "蟾津江（ソムジンガン）沿いの花開市場"
+    },
+    "description": {
+      "ko": "지리산과 섬진강이 만나는 화개장터 강변길, 산나물과 녹차를 손에 든 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "智异山与蟾津江交汇处的花开市场江边路，两人手提山野菜和绿茶。成为其中一人吧。",
+      "en": "On Hwagae Market's riverside walk, where Jirisan meets the Seomjin River, two visitors carry mountain greens and green tea. Step into either role.",
+      "ja": "智異山（チリサン）と蟾津江が出会う花開（ファゲ）市場の川沿い、山菜と緑茶を手にした二人。どちらかになってみよう。"
+    },
+    "src": "/videos/hwagae-river.mp4",
+    "poster": "/videos/hwagae-river.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the man on the left",
+        "still": "/videos/hwagae-river-man.jpg",
+        "photo": "/videos/hwagae-river-man.jpg"
+      },
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the woman on the right",
+        "photo": "/videos/hwagae-river-woman.jpg"
       }
     ]
   }

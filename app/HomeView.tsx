@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { Video } from "@/lib/videos";
+import { useState } from "react";
+import { GROUPS, type Group, type Video } from "@/lib/videos";
 import { LangSwitch, useLang } from "./LangProvider";
 
 const Chevron = () => (
@@ -48,6 +49,8 @@ export function Frame({ poster, className, children }: { poster?: string; classN
 
 export default function HomeView({ videos }: { videos: Video[] }) {
   const { t, pick } = useLang();
+  const [tab, setTab] = useState<Group>("simni");
+  const shown = videos.filter((v) => v.group === tab);
   return (
     <div className="page">
       <TopBar />
@@ -58,12 +61,20 @@ export default function HomeView({ videos }: { videos: Video[] }) {
         <span className="free">{t("home.free")}</span>
       </section>
 
+      <div className="tabs" role="tablist">
+        {GROUPS.map((g) => (
+          <button key={g} role="tab" aria-selected={tab === g} onClick={() => setTab(g)}>
+            {t(`tab.${g}`)}
+            <small>{g === "simni" ? "9:16" : "16:9"}</small>
+          </button>
+        ))}
+      </div>
       <div className="section-h">
         <span>{t("home.scenes")}</span>
-        <span>{String(videos.length).padStart(2, "0")}</span>
+        <span>{String(shown.length).padStart(2, "0")}</span>
       </div>
       <ul className="scenes">
-        {videos.map((v, i) => (
+        {shown.map((v, i) => (
           <li key={v.id}>
             <Link className="scene" href={`/v/${v.id}`}>
               <Frame poster={v.poster}>
