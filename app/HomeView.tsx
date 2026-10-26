@@ -37,6 +37,15 @@ export const Mega = ({ lines }: { lines: [string, string, string] }) => (
   </h1>
 );
 
+/** 영상을 자르지 않고 원래 비율 그대로 보여 준다 (가로·세로 모두). 남는 자리는 포스터를 흐리게 깐다. */
+export function Frame({ poster, className, children }: { poster?: string; className?: string; children: React.ReactNode }) {
+  return (
+    <div className={`frame${className ? ` ${className}` : ""}`} style={poster ? ({ "--poster": `url(${poster})` } as React.CSSProperties) : undefined}>
+      {children}
+    </div>
+  );
+}
+
 export default function HomeView({ videos }: { videos: Video[] }) {
   const { t, pick } = useLang();
   return (
@@ -56,10 +65,12 @@ export default function HomeView({ videos }: { videos: Video[] }) {
       <ul className="scenes">
         {videos.map((v, i) => (
           <li key={v.id}>
-            <Link className="scene" href={`/v/${v.id}`} style={v.poster ? { backgroundImage: `url(${v.poster})` } : undefined}>
-              <video src={v.src} poster={v.poster} muted loop autoPlay playsInline preload="metadata" aria-hidden />
-              <span className="no">No.{String(i + 1).padStart(2, "0")}</span>
-              <span className="len">{v.seconds}{t("common.sec")}</span>
+            <Link className="scene" href={`/v/${v.id}`}>
+              <Frame poster={v.poster}>
+                <video src={v.src} poster={v.poster} muted loop autoPlay playsInline preload="metadata" aria-hidden />
+                <span className="no">No.{String(i + 1).padStart(2, "0")}</span>
+                <span className="len">{v.seconds}{t("common.sec")}</span>
+              </Frame>
               <div className="meta">
                 <div style={{ flex: 1 }}>
                   <h2>{pick(v.title)}</h2>
