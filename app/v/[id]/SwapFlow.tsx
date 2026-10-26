@@ -6,7 +6,7 @@ import type { Video } from "@/lib/videos";
 import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
-import { Arrow, TopBar } from "../../HomeView";
+import { Arrow, Frame, TopBar } from "../../HomeView";
 import { useLang } from "../../LangProvider";
 
 type ConsentProps = { version: string; items: { id: string; title: Localized; body: Localized[] }[] };
@@ -102,7 +102,9 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
   return (
     <>
       <section className="stage">
-        <video className="bg-video" src={video.src} poster={video.poster} muted loop autoPlay playsInline aria-hidden />
+        <Frame poster={video.poster}>
+          <video src={video.src} poster={video.poster} muted loop autoPlay playsInline aria-hidden />
+        </Frame>
         <div className="stage-body">
           <div className="kicker">{video.seconds}{t("common.sec")}</div>
           <h1 className="title-xl">{pick(video.title)}</h1>
@@ -386,7 +388,9 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
   return (
     <>
       <section className="result">
-        <video key={original ? "o" : "r"} src={original ? video.src : resultUrl} playsInline autoPlay loop muted />
+        <Frame poster={video.poster}>
+          <video key={original ? "o" : "r"} src={original ? video.src : resultUrl} playsInline autoPlay loop muted />
+        </Frame>
         <div className="stage-body">
           <div className="kicker">{t("done.kicker")}</div>
           <h1 className="title-xl">{t("done.title")}</h1>
