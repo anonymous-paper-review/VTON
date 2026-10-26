@@ -1,20 +1,20 @@
 [
   {
-    "id": "hwagae-tea",
+    "id": "simni-walk",
     "title": {
-      "ko": "화개장터 찻집에서",
-      "zh": "花开市场的茶铺",
-      "en": "Tea at Hwagae Market",
-      "ja": "花開（ファゲ）市場の茶店で"
+      "ko": "십리벚꽃길을 걷다",
+      "zh": "漫步十里樱花路",
+      "en": "A Walk on the Cherry Blossom Road",
+      "ja": "十里桜並木を歩く"
     },
     "description": {
-      "ko": "화개장터 녹차 가게, 갓 우린 녹차 한 잔에 웃음이 번지는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "在花开市场的茶铺，一杯现泡的绿茶让两人相视而笑。成为其中一人吧。",
-      "en": "At a green tea shop in Hwagae Market, a fresh cup of green tea brings a smile. Step into either role.",
-      "ja": "花開（ファゲ）市場の緑茶の店、淹れたての緑茶に笑みがこぼれる二人。どちらかになってみよう。"
+      "ko": "화개장터 앞 십리벚꽃길, 꽃잎 아래 나란히 걷는 두 사람. 그 길의 주인공이 되어 보세요.",
+      "zh": "花开市场前的十里樱花路，两人在飘落的花瓣下并肩而行。成为这条路上的主角吧。",
+      "en": "On the Simni Cherry Blossom Road by Hwagae Market, two people walk side by side under falling petals. Become the star of that road.",
+      "ja": "花開（ファゲ）市場の前に続く十里桜並木、花びらの下を並んで歩く二人。その道の主人公になってみよう。"
     },
-    "src": "/videos/hwagae-tea.mp4",
-    "poster": "/videos/hwagae-tea.jpg",
+    "src": "/videos/simni-walk.mp4",
+    "poster": "/videos/simni-walk.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -26,8 +26,8 @@
           "ja": "彼"
         },
         "target": "the man on the left",
-        "still": "/videos/hwagae-tea-man.jpg",
-        "photo": "/videos/hwagae-tea-man.jpg"
+        "still": "/videos/simni-walk-man.jpg",
+        "photo": "/videos/simni-walk-man.jpg"
       },
       {
         "id": "woman",
@@ -38,26 +38,26 @@
           "ja": "彼女"
         },
         "target": "the woman on the right",
-        "photo": "/videos/hwagae-tea-woman.jpg"
+        "photo": "/videos/simni-walk-woman.jpg"
       }
     ]
   },
   {
-    "id": "hwagae-food",
+    "id": "simni-petal",
     "title": {
-      "ko": "화개장터 먹거리 골목",
-      "zh": "花开市场美食街",
-      "en": "Hwagae Market Food Lane",
-      "ja": "花開（ファゲ）市場の屋台通り"
+      "ko": "머리 위 벚꽃잎 하나",
+      "zh": "发间的一片樱花",
+      "en": "A Petal in Her Hair",
+      "ja": "髪にひとひらの桜"
     },
     "description": {
-      "ko": "김이 오르는 화개장터 먹거리 골목, 구운 떡꼬치와 엿을 나눠 먹는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "热气腾腾的花开市场美食街，两人分享烤年糕串和传统麦芽糖。成为其中一人吧。",
-      "en": "Steam rises in Hwagae Market's food lane as two friends share grilled rice cakes and yeot. Step into either role.",
-      "ja": "湯気の立つ花開（ファゲ）市場の屋台通り、焼き餅の串と飴を分け合う二人。どちらかになってみよう。"
+      "ko": "십리벚꽃길에서 그녀 머리에 내려앉은 꽃잎을 떼어 주는 그. 둘 중 한 사람이 되어 보세요.",
+      "zh": "在十里樱花路上，他轻轻摘下落在她发间的花瓣。成为其中一人吧。",
+      "en": "On the Simni Cherry Blossom Road near Hwagae Market, he picks a petal from her hair. Step into either role.",
+      "ja": "十里桜並木で、彼女の髪に舞い降りた花びらをそっと取る彼。どちらかになってみよう。"
     },
-    "src": "/videos/hwagae-food.mp4",
-    "poster": "/videos/hwagae-food.jpg",
+    "src": "/videos/simni-petal.mp4",
+    "poster": "/videos/simni-petal.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -69,8 +69,8 @@
           "ja": "彼"
         },
         "target": "the man on the left",
-        "still": "/videos/hwagae-food-man.jpg",
-        "photo": "/videos/hwagae-food-man.jpg"
+        "still": "/videos/simni-petal-man.jpg",
+        "photo": "/videos/simni-petal-man.jpg"
       },
       {
         "id": "woman",
@@ -81,26 +81,26 @@
           "ja": "彼女"
         },
         "target": "the woman on the right",
-        "photo": "/videos/hwagae-food-woman.jpg"
+        "photo": "/videos/simni-petal-woman.jpg"
       }
     ]
   },
   {
-    "id": "hwagae-river",
+    "id": "simni-stream",
     "title": {
-      "ko": "섬진강변 화개장터",
-      "zh": "蟾津江畔的花开市场",
-      "en": "Hwagae Market by the Seomjin River",
-      "ja": "蟾津江（ソムジンガン）沿いの花開市場"
+      "ko": "화개천 노을 아래",
+      "zh": "花开川的夕阳下",
+      "en": "Sunset by the Hwagae Stream",
+      "ja": "花開川（ファゲチョン）の夕暮れ"
     },
     "description": {
-      "ko": "지리산과 섬진강이 만나는 화개장터 강변길, 산나물과 녹차를 손에 든 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "智异山与蟾津江交汇处的花开市场江边路，两人手提山野菜和绿茶。成为其中一人吧。",
-      "en": "On Hwagae Market's riverside walk, where Jirisan meets the Seomjin River, two visitors carry mountain greens and green tea. Step into either role.",
-      "ja": "智異山（チリサン）と蟾津江が出会う花開（ファゲ）市場の川沿い、山菜と緑茶を手にした二人。どちらかになってみよう。"
+      "ko": "벚꽃이 흩날리는 화개천 난간, 노을빛 속에 웃음 짓는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "樱花飞舞的花开川栏杆旁，两人在晚霞中相视而笑。成为其中一人吧。",
+      "en": "At the railing of the Hwagae stream, blossoms drifting in the sunset light, two people share a laugh. Step into either role.",
+      "ja": "桜が舞う花開川（ファゲチョン）のほとり、夕暮れの光の中で笑い合う二人。どちらかになってみよう。"
     },
-    "src": "/videos/hwagae-river.mp4",
-    "poster": "/videos/hwagae-river.jpg",
+    "src": "/videos/simni-stream.mp4",
+    "poster": "/videos/simni-stream.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -112,8 +112,8 @@
           "ja": "彼"
         },
         "target": "the man on the left",
-        "still": "/videos/hwagae-river-man.jpg",
-        "photo": "/videos/hwagae-river-man.jpg"
+        "still": "/videos/simni-stream-man.jpg",
+        "photo": "/videos/simni-stream-man.jpg"
       },
       {
         "id": "woman",
@@ -124,7 +124,7 @@
           "ja": "彼女"
         },
         "target": "the woman on the right",
-        "photo": "/videos/hwagae-river-woman.jpg"
+        "photo": "/videos/simni-stream-woman.jpg"
       }
     ]
   }
