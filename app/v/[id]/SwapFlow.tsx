@@ -6,6 +6,7 @@ import type { Video } from "@/lib/videos";
 import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
+import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
 import { Arrow, Frame, TopBar } from "../../HomeView";
 import { useLang } from "../../LangProvider";
 
@@ -16,14 +17,6 @@ type Status = { state: "queued"; position?: number } | { state: "running" } | { 
 const POLL_MS = 4000;
 const SELFIE_MAX_PX = 1280;
 const LINES: MsgKey[] = ["work.line1", "work.line2", "work.line3", "work.line4"];
-const jobKey = (videoId: string) => `vton.job.${videoId}`;
-
-// 새로고침해도 진행 중인 작업을 이어 보도록 sessionStorage에 job id를 둔다 (없어도 동작).
-const store = {
-  get: (k: string) => { try { return sessionStorage.getItem(k); } catch { return null; } },
-  set: (k: string, v: string) => { try { sessionStorage.setItem(k, v); } catch {} },
-  del: (k: string) => { try { sessionStorage.removeItem(k); } catch {} },
-};
 
 export default function SwapFlow({ video, consent }: { video: Video; consent: ConsentProps }) {
   const { t } = useLang();
@@ -33,23 +26,30 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   const [role, setRole] = useState(video.cast[0].id);
   const [jobId, setJobId] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
+  const [startedAt, setStartedAt] = useState<number | null>(null);
 
+  // 앱을 닫았다 다시 열어도 이어 보기: ?job= 링크가 먼저, 없으면 이 기기에서 이 장면으로 만든 마지막 작업
   useEffect(() => {
-    const saved = store.get(jobKey(video.id));
-    if (saved) { setJobId(saved); setStep("working"); }
+    const fromLink = new URLSearchParams(location.search).get("job");
+    const saved = latestJobFor(video.id);
+    const job = fromLink && fromLink !== saved?.jobId ? { jobId: fromLink, resultUrl: undefined, at: undefined } : saved;
+    if (!job) return;
+    setJobId(job.jobId);
+    if (job.at) setStartedAt(job.at);
+    if (job.resultUrl) { setResultUrl(job.resultUrl); setStep("done"); }
+    else setStep("working");
   }, [video.id]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [step]);
 
   const saveJobId = useCallback((id: string | null) => {
     setJobId(id);
-    if (id) store.set(jobKey(video.id), id);
-    else store.del(jobKey(video.id));
+    if (id) saveJob({ jobId: id, videoId: video.id });
   }, [video.id]);
 
   const reset = () => {
-    store.del(jobKey(video.id));
-    setJobId(null); setResultUrl(null); setSelfie(null); setStep("selfie");
+    forgetJobsFor(video.id);
+    setJobId(null); setResultUrl(null); setSelfie(null); setStartedAt(null); setStep("selfie");
   };
 
   const back = step === "consent" ? () => setStep("intro") : step === "selfie" ? () => setStep("consent") : undefined;
@@ -75,8 +75,9 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
           agreed={agreed}
           selfie={selfie}
           jobId={jobId}
+          startedAt={startedAt}
           setJobId={saveJobId}
-          onDone={(url) => { setResultUrl(url); store.del(jobKey(video.id)); setStep("done"); }}
+          onDone={(url) => { setResultUrl(url); if (jobId) saveJob({ jobId, videoId: video.id, resultUrl: url }); setStep("done"); }}
           onRetry={reset}
         />
       )}
@@ -278,9 +279,9 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
   );
 }
 
-function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, jobId, setJobId, onDone, onRetry }: {
+function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, jobId, startedAt, setJobId, onDone, onRetry }: {
   videoId: string; videoSrc: string; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
-  setJobId: (id: string | null) => void; onDone: (url: string) => void; onRetry: () => void;
+  startedAt: number | null; setJobId: (id: string | null) => void; onDone: (url: string) => void; onRetry: () => void;
 }) {
   const { t } = useLang();
   const [status, setStatus] = useState<Status | null>(null);
@@ -288,6 +289,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const retried = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const [copied, setCopied] = useState(false);
   const submitted = useRef(false);
   // 부모가 매 렌더마다 새 콜백을 넘겨도 조회 루프가 다시 시작되지 않게 ref로 둔다
   const onDoneRef = useRef(onDone);
@@ -347,10 +349,21 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
 
   useEffect(() => {
     if (error) return;
-    const t0 = Date.now();
+    const t0 = startedAt ?? Date.now();
     const id = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 1000);
     return () => clearInterval(id);
-  }, [error]);
+  }, [error, startedAt]);
+
+  // 다른 브라우저나 기기에서도 이어 볼 수 있도록 링크를 넘긴다
+  const shareLink = async () => {
+    if (!jobId) return;
+    const url = resumeUrl(videoId, jobId);
+    try {
+      if (navigator.share) return await navigator.share({ url });
+      await navigator.clipboard.writeText(url);
+      setCopied(true);
+    } catch {}
+  };
 
   if (error) {
     return (
@@ -378,13 +391,46 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
       <h2 key={label}>{t(label)}</h2>
       <p>{t("work.wait")}</p>
       <div className="bar"><i /></div>
+      <p className="bg-note">{t("work.bg")}</p>
+      {jobId && <button className="btn ghost link-btn" onClick={shareLink}>{t(copied ? "work.copied" : "work.link")}</button>}
     </div>
   );
+}
+
+/** 결과 영상을 같은 출처 Blob으로 받아 둔다. 다른 출처 링크는 휴대폰에서 저장 대신 새 탭으로 열리기 때문. */
+function useResultFile(resultUrl: string) {
+  const [file, setFile] = useState<File | null>(null);
+  useEffect(() => {
+    let alive = true;
+    const sameOrigin = new URL(resultUrl, location.href).origin === location.origin;
+    const src = sameOrigin ? resultUrl : `/api/download?url=${encodeURIComponent(resultUrl)}`;
+    fetch(src)
+      .then((r) => (r.ok ? r.blob() : Promise.reject()))
+      .then((b) => { if (alive) setFile(new File([b], "hwagae-starring-me.mp4", { type: b.type || "video/mp4" })); })
+      .catch(() => {});
+    return () => { alive = false; };
+  }, [resultUrl]);
+  return file;
 }
 
 function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: string; onRetry: () => void }) {
   const { t } = useLang();
   const [original, setOriginal] = useState(false);
+  const file = useResultFile(resultUrl);
+  const canShare = !!file && typeof navigator !== "undefined" && !!navigator.canShare?.({ files: [file] });
+
+  // 휴대폰은 공유 시트의 "동영상 저장"이 갤러리로 가는 길이다. 공유가 안 되는 브라우저는 파일 다운로드로.
+  const save = async () => {
+    if (!file) return void window.open(resultUrl, "_blank", "noopener");
+    if (canShare) {
+      try { return await navigator.share({ files: [file] }); } catch (e) { if ((e as Error).name === "AbortError") return; }
+    }
+    const a = document.createElement("a");
+    a.href = URL.createObjectURL(file);
+    a.download = file.name;
+    a.click();
+    setTimeout(() => URL.revokeObjectURL(a.href), 10_000);
+  };
   return (
     <>
       <section className="result">
@@ -401,7 +447,8 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
         </div>
       </section>
       <div className="foot btns">
-        <a className="btn" href={resultUrl} download target="_blank" rel="noopener">{t("done.save")}</a>
+        <button className="btn" onClick={save} disabled={!file}>{t(file ? "done.save" : "done.preparing")}</button>
+        {canShare && <p className="small" style={{ marginTop: 0 }}>{t("done.saveHint")}</p>}
         <div className="two">
           <button className="btn ghost" onClick={onRetry}>{t("done.retry")}</button>
           <Link className="btn ghost" href="/">{t("done.other")}</Link>

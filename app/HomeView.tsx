@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
+import { listJobs, type MyJob } from "@/lib/myJobs";
 import { GROUPS, type Group, type Video } from "@/lib/videos";
 import { LangSwitch, useLang } from "./LangProvider";
 
@@ -51,6 +52,9 @@ export default function HomeView({ videos }: { videos: Video[] }) {
   const { t, pick } = useLang();
   const [tab, setTab] = useState<Group>("simni");
   const shown = videos.filter((v) => v.group === tab);
+  // 앱을 닫았다 다시 QR로 들어온 사람에게 만들던 영상을 바로 보여 준다
+  const [mine, setMine] = useState<MyJob[]>([]);
+  useEffect(() => { setMine(listJobs().slice(0, 3)); }, []);
   return (
     <div className="page">
       <TopBar />
@@ -60,6 +64,24 @@ export default function HomeView({ videos }: { videos: Video[] }) {
         <p>{t("home.sub")}</p>
         <span className="free">{t("home.free")}</span>
       </section>
+
+      {mine.length > 0 && (
+        <section className="mine">
+          <div className="section-h"><span>{t("home.mine")}</span></div>
+          {mine.map((j) => {
+            const v = videos.find((x) => x.id === j.videoId);
+            if (!v) return null;
+            return (
+              <Link key={j.jobId} className="mine-row" href={`/v/${v.id}?job=${encodeURIComponent(j.jobId)}`}>
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                {v.poster && <img src={v.poster} alt="" />}
+                <span className="mine-title">{pick(v.title)}</span>
+                <span className={j.resultUrl ? "badge ready" : "badge"}>{t(j.resultUrl ? "home.ready" : "home.making")}</span>
+              </Link>
+            );
+          })}
+        </section>
+      )}
 
       <div className="tabs" role="tablist">
         {GROUPS.map((g) => (

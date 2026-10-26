@@ -65,6 +65,12 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .hero p { color: var(--dim); max-width: 34ch; margin: 20px 0 0; font-size: 16px; }
 .free { display: inline-block; margin-top: 18px; font-size: 12px; font-weight: 900; border: 1px solid var(--faint); border-radius: 999px; padding: 5px 11px; color: var(--dim); }
 
+.mine { padding: 0 0 10px; }
+.mine-row { display: flex; align-items: center; gap: 12px; margin: 0 var(--pad) 8px; padding: 8px 12px 8px 8px; border-radius: 14px; border: 1.5px solid var(--gold); background: rgba(196,164,102,.08); }
+.mine-row img { width: 44px; height: 44px; border-radius: 10px; object-fit: cover; flex: none; }
+.mine-title { flex: 1; font: 900 16px/1.25 var(--display); }
+.badge { flex: none; font-size: 12px; font-weight: 900; padding: 4px 10px; border-radius: 999px; background: var(--faint); color: var(--ink); }
+.badge.ready { background: var(--hot); color: var(--hot-ink); }
 .tabs { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; padding: 6px var(--pad) 18px; }
 .tabs button { display: flex; align-items: baseline; justify-content: center; gap: 8px; min-height: 52px; border-radius: 14px; border: 1.5px solid var(--faint); background: transparent; color: var(--dim); font: 900 16px/1.2 var(--display); padding: 8px 10px; }
 .tabs button small { flex: none; white-space: nowrap; font: 700 11px var(--sans); letter-spacing: .06em; opacity: .75; }
@@ -175,6 +181,8 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .bar i { display: block; height: 100%; width: 40%; background: var(--hot); animation: slide 1.6s ease-in-out infinite; }
 @keyframes slide { 0% { transform: translateX(-100%); } 100% { transform: translateX(260%); } }
 @media (prefers-reduced-motion: reduce) { .rec::before, .bar i { animation: none; } }
+.making .bg-note { margin-top: 30px; font-size: 13px; max-width: 32ch; }
+.making .link-btn { width: auto; min-height: 44px; margin-top: 14px; font-size: 14px; padding: 0 20px; }
 .fail { position: fixed; inset: 0; display: flex; flex-direction: column; justify-content: center; padding: 0 var(--pad); }
 .fail p { color: var(--dim); }
 
