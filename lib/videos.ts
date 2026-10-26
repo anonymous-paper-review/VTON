@@ -14,7 +14,7 @@ export type CastMember = {
   photo?: string;
 };
 
-/** 목록 탭. simni = 십리벚꽃길(세로), market = 화개장터(가로) */
+/** 목록 탭. simni = 십리벚꽃길(3:4 세로), market = 화개장터(가로) */
 export const GROUPS = ["simni", "market"] as const;
 export type Group = (typeof GROUPS)[number];
 

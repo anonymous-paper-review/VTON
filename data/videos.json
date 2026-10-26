@@ -1,21 +1,21 @@
 [
   {
-    "id": "simni-walk",
+    "id": "simni-tunnel",
     "group": "simni",
     "title": {
-      "ko": "십리벚꽃길을 걷다",
-      "zh": "漫步十里樱花路",
-      "en": "A Walk on the Cherry Blossom Road",
-      "ja": "十里桜並木を歩く"
+      "ko": "십리벚꽃길, 그 봄날",
+      "zh": "十里樱花路的那个春天",
+      "en": "That Spring on the Cherry Blossom Road",
+      "ja": "十里桜並木、あの春の日"
     },
     "description": {
-      "ko": "화개장터 앞 십리벚꽃길, 꽃잎 아래 나란히 걷는 두 사람. 그 길의 주인공이 되어 보세요.",
-      "zh": "花开市场前的十里樱花路，两人在飘落的花瓣下并肩而行。成为这条路上的主角吧。",
-      "en": "On the Simni Cherry Blossom Road by Hwagae Market, two people walk side by side under falling petals. Become the star of that road.",
-      "ja": "花開（ファゲ）市場の前に続く十里桜並木、花びらの下を並んで歩く二人。その道の主人公になってみよう。"
+      "ko": "화개장터 앞 십리벚꽃길, 꽃비 속을 함께 걸어가는 두 사람. 그 봄날의 주인공이 되어 보세요.",
+      "zh": "花开市场前的十里樱花路，两人在樱花雨中并肩走远。成为那个春天的主角吧。",
+      "en": "On the Simni Cherry Blossom Road by Hwagae Market, two people walk on together through a rain of petals. Star in that spring day.",
+      "ja": "花開（ファゲ）市場の前に続く十里桜並木、花吹雪の中を寄り添って歩く二人。あの春の日の主人公になってみよう。"
     },
-    "src": "/videos/simni-walk.mp4",
-    "poster": "/videos/simni-walk.jpg",
+    "src": "/videos/simni-tunnel.mp4",
+    "poster": "/videos/simni-tunnel.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -27,8 +27,8 @@
           "ja": "彼"
         },
         "target": "the man on the left",
-        "still": "/videos/simni-walk-man.jpg",
-        "photo": "/videos/simni-walk-man.jpg"
+        "still": "/videos/simni-tunnel-man.jpg",
+        "photo": "/videos/simni-tunnel-man.jpg"
       },
       {
         "id": "woman",
@@ -39,7 +39,7 @@
           "ja": "彼女"
         },
         "target": "the woman on the right",
-        "photo": "/videos/simni-walk-woman.jpg"
+        "photo": "/videos/simni-tunnel-woman.jpg"
       }
     ]
   },
@@ -55,7 +55,7 @@
     "description": {
       "ko": "십리벚꽃길에서 그녀 머리에 내려앉은 꽃잎을 떼어 주는 그. 둘 중 한 사람이 되어 보세요.",
       "zh": "在十里樱花路上，他轻轻摘下落在她发间的花瓣。成为其中一人吧。",
-      "en": "On the Simni Cherry Blossom Road near Hwagae Market, he picks a petal from her hair. Step into either role.",
+      "en": "On the Simni Cherry Blossom Road near Hwagae Market, petals shower down and he brushes one from her hair. Step into either role.",
       "ja": "十里桜並木で、彼女の髪に舞い降りた花びらをそっと取る彼。どちらかになってみよう。"
     },
     "src": "/videos/simni-petal.mp4",
@@ -97,10 +97,10 @@
       "ja": "花開川（ファゲチョン）の夕暮れ"
     },
     "description": {
-      "ko": "벚꽃이 흩날리는 화개천 난간, 노을빛 속에 웃음 짓는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "樱花飞舞的花开川栏杆旁，两人在晚霞中相视而笑。成为其中一人吧。",
-      "en": "At the railing of the Hwagae stream, blossoms drifting in the sunset light, two people share a laugh. Step into either role.",
-      "ja": "桜が舞う花開川（ファゲチョン）のほとり、夕暮れの光の中で笑い合う二人。どちらかになってみよう。"
+      "ko": "노을 지는 화개천 벚꽃길, 서로를 바라보며 웃음 짓는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "夕阳下的花开川樱花路，两人相视而笑。成为其中一人吧。",
+      "en": "On the cherry blossom road by the Hwagae stream at sunset, two people share a smile. Step into either role.",
+      "ja": "夕暮れの花開川（ファゲチョン）の桜並木、見つめ合って微笑む二人。どちらかになってみよう。"
     },
     "src": "/videos/simni-stream.mp4",
     "poster": "/videos/simni-stream.jpg",
