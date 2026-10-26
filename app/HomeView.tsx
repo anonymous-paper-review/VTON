@@ -65,7 +65,7 @@ export default function HomeView({ videos }: { videos: Video[] }) {
         {GROUPS.map((g) => (
           <button key={g} role="tab" aria-selected={tab === g} onClick={() => setTab(g)}>
             {t(`tab.${g}`)}
-            <small>{g === "simni" ? "9:16" : "16:9"}</small>
+            <small>{g === "simni" ? "3:4" : "16:9"}</small>
           </button>
         ))}
       </div>
