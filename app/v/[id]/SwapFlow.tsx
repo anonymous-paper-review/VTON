@@ -17,9 +17,13 @@ type Step = "intro" | "consent" | "selfie" | "working" | "done";
 type Status = { state: "queued"; position?: number } | { state: "running" } | { state: "done"; videoUrl: string } | { state: "failed"; code: string };
 
 const POLL_MS = 4000;
-// 보통 3~6분. 그보다 길면 대기열이 밀린 것이라 안내를 바꾸고, 25분이 지나도 안 끝나면 포기하고 대기열에서 뺀다.
+// 보통 3~6분. 그보다 길면 대기열이 밀린 것이라 안내를 바꾼다.
+// 한 작업이 10분이 지나도 아직 대기열이면 포기하고 대기열에서 뺀다 (시작 전이라 요금 없음).
+// 이미 만들기 시작한 작업은 취소해도 요금이 나가고 보통 4~5분이면 끝나므로 15분까지는 기다린다.
+// 시간은 작업마다 따로 잰다: 무변화·오류 자동 재시도로 새 작업을 맡기면 다시 10분을 준다.
 const SLOW_S = 6 * 60;
-const GIVE_UP_S = 25 * 60;
+const GIVE_UP_QUEUED_S = 10 * 60;
+const GIVE_UP_RUNNING_S = 15 * 60;
 // 다시 찍을 필요 없이 같은 사진으로 다시 해 볼 만한 실패 (서버 오류·혼잡·시간 초과)
 const RETRYABLE = new Set(["generic", "busy", "timeout"]);
 const SELFIE_MAX_PX = 1280;
@@ -306,6 +310,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const t0 = useRef(startedAt ?? Date.now());
+  const jobT0 = useRef(startedAt ?? Date.now());
   const [toast, toastNode] = useToast();
   const submitted = useRef(false);
   // 부모가 매 렌더마다 새 콜백을 넘겨도 조회 루프가 다시 시작되지 않게 ref로 둔다
@@ -326,6 +331,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
       .then(async (r) => {
         const j = await r.json().catch(() => ({}));
         if (!r.ok) return setError(j.code ?? "generic");
+        jobT0.current = Date.now();
         setJobId(j.jobId);
       })
       .catch(() => setError("generic"));
@@ -363,7 +369,8 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           if (RETRYABLE.has(s.code) && !retried.current && selfie) return again();
           return setError(s.code);
         }
-        if ((Date.now() - t0.current) / 1000 > GIVE_UP_S) {
+        const age = (Date.now() - jobT0.current) / 1000;
+        if (age > (s.state === "queued" ? GIVE_UP_QUEUED_S : GIVE_UP_RUNNING_S)) {
           fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { method: "DELETE" }).catch(() => {});
           return setError("timeout");
         }
