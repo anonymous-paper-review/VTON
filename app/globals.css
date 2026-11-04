@@ -138,6 +138,14 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .scene p { font: var(--label); color: var(--text-secondary); margin-top: var(--sp-1); }
 .scene .meta > svg { flex: none; color: var(--text-secondary); }
 
+/* 지도로 돌아가는 떠 있는 버튼 (가이드: 알약 모양은 지도와 이어지는 떠 있는 버튼에만) */
+.map-btn {
+  position: fixed; z-index: 45; bottom: calc(var(--sp-5) + var(--safe-b)); right: max(var(--page-x), calc((100vw - 560px) / 2 + var(--page-x)));
+  height: var(--h-btn); padding: 0 var(--sp-4); border-radius: var(--r-pill); display: flex; align-items: center; gap: var(--sp-2);
+  background: var(--grey-900); color: var(--text-inverse); font: var(--sub-m); box-shadow: 0 4px 12px rgba(42,35,31,.24);
+}
+.page:has(.map-btn) .scenes { padding-bottom: 88px; }
+
 /* ── 진행 막대 · 칸 나눔 ───────────────────────────────────── */
 .steps { padding: var(--sp-4) var(--page-x) 0; }
 .steps .cells { display: grid; grid-auto-flow: column; grid-auto-columns: 1fr; gap: var(--sp-1); }
