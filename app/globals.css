@@ -32,13 +32,13 @@ h1, h2, h3, p { margin: 0; }
 /* ── 헤더 · 56 · ← + 가운데 제목 + 언어 ───────────────────── */
 .top {
   position: sticky; top: 0; z-index: 40;
-  display: grid; grid-template-columns: 56px 1fr 56px; align-items: center;
+  display: grid; grid-template-columns: minmax(76px, 1fr) minmax(0, auto) minmax(76px, 1fr); align-items: center;
   height: calc(var(--h-header) + var(--safe-t)); padding: var(--safe-t) var(--sp-1) 0;
   background: var(--fill-page); border-bottom: 1px solid var(--border-weak);
 }
 .top h1 { font: var(--head-s); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-.icon-btn { width: 44px; height: 44px; margin: 0 auto; display: grid; place-items: center; border: 0; background: none; color: var(--text-primary); border-radius: var(--r-field); padding: 0; }
-.lang-btn { height: 44px; border: 0; background: none; padding: 0 var(--sp-1); display: flex; align-items: center; justify-content: center; gap: var(--sp-1); font: var(--sub-m); color: var(--text-primary); }
+.icon-btn { justify-self: start; width: 44px; height: 44px; margin: 0 0 0 var(--sp-1); display: grid; place-items: center; border: 0; background: none; color: var(--text-primary); border-radius: var(--r-field); padding: 0; }
+.lang-btn { white-space: nowrap; justify-self: end; margin-right: var(--sp-2); height: 44px; border: 0; background: none; padding: 0 var(--sp-1); display: flex; align-items: center; justify-content: center; gap: var(--sp-1); font: var(--sub-m); color: var(--text-primary); }
 .lang-btn svg { color: var(--text-secondary); }
 
 /* ── 아래에서 올라오는 시트 (언어 고르기) ───────────────────── */
@@ -138,13 +138,11 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .scene p { font: var(--label); color: var(--text-secondary); margin-top: var(--sp-1); }
 .scene .meta > svg { flex: none; color: var(--text-secondary); }
 
-/* 지도로 돌아가는 떠 있는 버튼 (가이드: 알약 모양은 지도와 이어지는 떠 있는 버튼에만) */
+/* 지도로 돌아가는 버튼: 홈 헤더 왼쪽(← 자리가 비는 화면). 협업사 앱의 검정 「지도 보기」와 같은 결 */
 .map-btn {
-  position: fixed; z-index: 45; bottom: calc(var(--sp-5) + var(--safe-b)); right: max(var(--page-x), calc((100vw - 560px) / 2 + var(--page-x)));
-  height: var(--h-btn); padding: 0 var(--sp-4); border-radius: var(--r-pill); display: flex; align-items: center; gap: var(--sp-2);
-  background: var(--grey-900); color: var(--text-inverse); font: var(--sub-m); box-shadow: 0 4px 12px rgba(42,35,31,.24);
+  justify-self: start; margin-left: var(--sp-3); height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-pill);
+  display: flex; align-items: center; gap: var(--sp-1); background: var(--grey-900); color: var(--text-inverse); font: 600 13px/20px var(--font); white-space: nowrap;
 }
-.page:has(.map-btn) .scenes { padding-bottom: 88px; }
 
 /* ── 진행 막대 · 칸 나눔 ───────────────────────────────────── */
 .steps { padding: var(--sp-4) var(--page-x) 0; }
