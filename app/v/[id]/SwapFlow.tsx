@@ -59,9 +59,12 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
     if (id) saveJob({ jobId: id, videoId: video.id });
   }, [video.id]);
 
+  // 앱을 다시 열어 이어 본 경우엔 동의와 고른 인물이 남아 있지 않으므로 인물 고르기부터 다시 한다
+  // (그대로 셀카로 가면 서버가 동의 없음으로 거절한다)
   const reset = () => {
     forgetJobsFor(video.id);
-    setJobId(null); setResultUrl(null); setSelfie(null); setStartedAt(null); setStep("selfie");
+    const consented = consent.items.every((c) => agreed.includes(c.id));
+    setJobId(null); setResultUrl(null); setSelfie(null); setStartedAt(null); setStep(consented ? "selfie" : "intro");
   };
 
   const back = step === "consent" ? () => setStep("intro") : step === "selfie" ? () => setStep("consent") : undefined;
@@ -222,9 +225,12 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
       .catch(() => setCamFailed(true)) ?? setCamFailed(true);
   }, []);
   useEffect(() => {
-    if (videoRef.current && stream) videoRef.current.srcObject = stream;
     return () => stream?.getTracks().forEach((tr) => tr.stop());
   }, [stream]);
+  // 「다시 찍기」로 미리보기 <video>가 새로 그려질 때마다 카메라를 다시 붙인다 (안 그러면 검은 화면에 셔터도 안 먹음)
+  useEffect(() => {
+    if (!shot && videoRef.current && stream && videoRef.current.srcObject !== stream) videoRef.current.srcObject = stream;
+  }, [stream, shot]);
   useEffect(() => () => { if (shot) URL.revokeObjectURL(shot.url); }, [shot]);
 
   const keep = (blob: Blob | null) => { if (blob) { setError(null); setShot({ blob, url: URL.createObjectURL(blob) }); } };
@@ -350,11 +356,14 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   useEffect(() => {
     if (!jobId) return;
     let stop = false;
+    let lastState: "queued" | "running" = "running";
     const poll = async () => {
       try {
-        const s: Status = await (await fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { cache: "no-store" })).json();
+        const s: Status | { state: "unknown" } = await (await fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { cache: "no-store" })).json();
         if (stop) return;
-        setStatus(s);
+        // unknown: 상태 조회만 잠깐 실패한 것. 작업은 fal에서 계속되므로 새로 맡기지 않고 다음 조회를 기다린다
+        if (s.state !== "unknown") setStatus(s);
+        if (s.state === "queued" || s.state === "running") lastState = s.state;
         if (s.state === "done") {
           // 엔진이 원본을 거의 그대로 돌려주는 경우가 있어, 그러면 같은 셀카로 한 번 더 요청한다
           setChecking(true);
@@ -369,13 +378,15 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           if (RETRYABLE.has(s.code) && !retried.current && selfie) return again();
           return setError(s.code);
         }
-        const age = (Date.now() - jobT0.current) / 1000;
-        if (age > (s.state === "queued" ? GIVE_UP_QUEUED_S : GIVE_UP_RUNNING_S)) {
-          fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { method: "DELETE" }).catch(() => {});
-          return setError("timeout");
-        }
       } catch {
-        // 네트워크가 잠깐 끊겨도 다음 조회에서 다시 시도
+        // 네트워크가 잠깐 끊기거나 서버가 HTML 오류를 줘도 다음 조회에서 다시 시도
+      }
+      if (stop) return;
+      // 조회가 계속 실패해도 끝없이 기다리지 않게 시간 제한은 조회 성공 여부와 상관없이 본다
+      const age = (Date.now() - jobT0.current) / 1000;
+      if (age > (lastState === "queued" ? GIVE_UP_QUEUED_S : GIVE_UP_RUNNING_S)) {
+        fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { method: "DELETE" }).catch(() => {});
+        return setError("timeout");
       }
       if (!stop) setTimeout(poll, POLL_MS);
     };
@@ -452,25 +463,28 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
 }
 
 /** 결과 영상을 같은 출처 Blob으로 받아 둔다. 다른 출처 링크는 휴대폰에서 저장 대신 새 탭으로 열리기 때문. */
+// fal.media는 CORS를 열어 두어(Access-Control-Allow-Origin: *) 바로 받는다. 막히면 /api/download 통로로 받는다.
+// 둘 다 실패하면(링크 만료 등) failed를 돌려 버튼이 「준비 중」에 멈추지 않고 새 탭 열기로 넘어가게 한다.
 function useResultFile(resultUrl: string) {
   const [file, setFile] = useState<File | null>(null);
+  const [failed, setFailed] = useState(false);
   useEffect(() => {
     let alive = true;
+    setFile(null); setFailed(false);
+    const get = (u: string) => fetch(u).then((r) => (r.ok ? r.blob() : Promise.reject(new Error(String(r.status)))));
     const sameOrigin = new URL(resultUrl, location.href).origin === location.origin;
-    const src = sameOrigin ? resultUrl : `/api/download?url=${encodeURIComponent(resultUrl)}`;
-    fetch(src)
-      .then((r) => (r.ok ? r.blob() : Promise.reject()))
+    (sameOrigin ? get(resultUrl) : get(resultUrl).catch(() => get(`/api/download?url=${encodeURIComponent(resultUrl)}`)))
       .then((b) => { if (alive) setFile(new File([b], "hwagae-starring-me.mp4", { type: b.type || "video/mp4" })); })
-      .catch(() => {});
+      .catch(() => { if (alive) setFailed(true); });
     return () => { alive = false; };
   }, [resultUrl]);
-  return file;
+  return { file, failed };
 }
 
 function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: string; onRetry: () => void }) {
   const { t } = useLang();
   const [original, setOriginal] = useState(false);
-  const file = useResultFile(resultUrl);
+  const { file, failed } = useResultFile(resultUrl);
   const [mapUrl, setMapUrl] = useState<string | null>(null);
   useEffect(() => { setMapUrl(readReturnUrl()); }, []);
   const canShare = !!file && typeof navigator !== "undefined" && !!navigator.canShare?.({ files: [file] });
@@ -504,7 +518,7 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
       </section>
       <div className="foot">
         {/* 준비 중일 때는 버튼 글자가 이유를 말하므로 회색으로 둔다 */}
-        <button className="btn" onClick={save} disabled={!file}><Save />{t(file ? "done.save" : "done.preparing")}</button>
+        <button className="btn" onClick={save} disabled={!file && !failed}><Save />{t(file || failed ? "done.save" : "done.preparing")}</button>
         {canShare && <p className="small">{t("done.saveHint")}</p>}
         <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("done.retry")}</button>
         <Link className="text-btn" href="/">{t("done.other")}</Link>

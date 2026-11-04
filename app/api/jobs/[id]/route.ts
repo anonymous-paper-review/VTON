@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { cancelJob, falErrorCode, jobStatus } from "@/lib/jobs";
+import { cancelJob, jobStatus } from "@/lib/jobs";
 
 export async function GET(_req: Request, { params }: { params: Promise<{ id: string }> }) {
   const { id } = await params;
@@ -7,7 +7,8 @@ export async function GET(_req: Request, { params }: { params: Promise<{ id: str
     return NextResponse.json(await jobStatus(id), { headers: { "Cache-Control": "no-store" } });
   } catch (e) {
     console.error("status failed", e);
-    return NextResponse.json({ state: "failed", code: falErrorCode(e) }, { status: 502 });
+    // 예상 못 한 오류도 작업 실패로 단정하지 않는다 (새 작업을 또 맡기지 않게). 화면의 시간 제한이 끝을 맺는다.
+    return NextResponse.json({ state: "unknown" }, { status: 503, headers: { "Cache-Control": "no-store" } });
   }
 }
 
