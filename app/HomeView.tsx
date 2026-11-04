@@ -9,7 +9,8 @@ import { Back, Chevron, Clock, Compass, Pin } from "./icons";
 import { readReturnUrl } from "@/lib/returnTo";
 
 /** 헤더 56 · ← + 가운데 제목 + 언어. back: 링크(href) 또는 화면 안 이전 단계(onClick). 없으면 왼쪽은 빈칸. */
-export function TopBar({ title, back }: { title: string; back?: { label: string; href?: string; onClick?: () => void } }) {
+/** 왼쪽 칸: ← (back) 이 있으면 ←, 없으면 left(예: 지도로 돌아가기), 그것도 없으면 빈칸 */
+export function TopBar({ title, back, left }: { title: string; back?: { label: string; href?: string; onClick?: () => void }; left?: React.ReactNode }) {
   return (
     <header className="top">
       {back?.href ? (
@@ -17,7 +18,7 @@ export function TopBar({ title, back }: { title: string; back?: { label: string;
       ) : back ? (
         <button className="icon-btn" onClick={back.onClick} aria-label={back.label}><Back size={24} /></button>
       ) : (
-        <span />
+        left ?? <span />
       )}
       <h1>{title}</h1>
       <LangSwitch />
@@ -43,13 +44,13 @@ export function Frame({ poster, className, children }: { poster?: string; classN
   );
 }
 
-/** 다른 앱(지도)에서 들어왔을 때만 뜨는, 그 앱으로 돌아가는 떠 있는 버튼 */
+/** 다른 앱(지도)에서 들어왔을 때만 홈 헤더 왼쪽에 뜨는, 그 앱으로 돌아가는 버튼 */
 export function MapButton() {
   const { t } = useLang();
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => { setUrl(readReturnUrl()); }, []);
   if (!url) return null;
-  return <a className="map-btn" href={url}><Compass />{t("map.back")}</a>;
+  return <a className="map-btn" href={url} aria-label={t("map.back")}><Compass size={16} />{t("map.short")}</a>;
 }
 
 export default function HomeView({ videos }: { videos: Video[] }) {
@@ -61,7 +62,7 @@ export default function HomeView({ videos }: { videos: Video[] }) {
   useEffect(() => { setMine(listJobs().slice(0, 3)); }, []);
   return (
     <div className="page">
-      <TopBar title={t("app.name")} />
+      <TopBar title={t("app.name")} left={<MapButton />} />
       <section className="hero">
         <div className="place"><Pin />{t("home.place")}</div>
         <Display lines={[t("home.mega1"), t("home.mega2"), t("home.mega3")]} />
@@ -125,7 +126,6 @@ export default function HomeView({ videos }: { videos: Video[] }) {
           </li>
         ))}
       </ul>
-      <MapButton />
     </div>
   );
 }
