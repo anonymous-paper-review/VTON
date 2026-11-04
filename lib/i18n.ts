@@ -98,6 +98,14 @@ const dict = {
   "work.line2": { ko: "당신을 주인공으로 캐스팅하는 중", zh: "正在选你当主角", en: "Casting you as the lead", ja: "あなたを主人公にキャスティング中" },
   "work.line3": { ko: "장터에서 카메라가 도는 중", zh: "摄影机正在市场里开拍", en: "Cameras rolling in the market", ja: "市場でカメラが回っています" },
   "work.line4": { ko: "마지막 컷을 편집하는 중", zh: "正在剪辑最后一幕", en: "Cutting the final take", ja: "最後のカットを編集中" },
+  "work.slow": {
+    ko: "사람이 몰려 평소보다 오래 걸리고 있어요. 앱을 닫아도 계속 만들어져요.",
+    zh: "目前排队人数较多，比平时慢一些。关闭页面也会继续生成。",
+    en: "It's busier than usual, so this is taking longer. It keeps going even if you close this page.",
+    ja: "混み合っていて、いつもより時間がかかっています。ページを閉じても制作は続きます。",
+  },
+  "work.ahead": { ko: "앞에 {n}개가 기다리고 있어요.", zh: "前面还有{n}个。", en: "{n} ahead of you.", ja: "前に{n}件待っています。" },
+  "work.again.btn": { ko: "같은 사진으로 다시 만들기", zh: "用同一张照片重新生成", en: "Try again with the same photo", ja: "同じ写真でもう一度作る" },
   "work.wait": { ko: "보통 3~6분 걸려요.", zh: "通常需要3~6分钟。", en: "Usually takes 3–6 minutes.", ja: "通常3〜6分かかります。" },
   "work.bg": {
     ko: "앱을 닫아도 영상은 계속 만들어져요. 이 페이지를 다시 열면 이어서 볼 수 있어요.",
@@ -144,6 +152,9 @@ const dict = {
   "err.length": { ko: "이 장면은 지금 처리할 수 없어요.", zh: "目前无法处理该场景。", en: "This scene can't be processed right now.", ja: "このシーンは現在処理できません。" },
   "err.safety": { ko: "안전 필터에 걸렸어요. 얼굴이 잘 보이는 사진으로 다시 찍어 주세요.", zh: "触发了安全过滤，请重新拍一张脸部清晰的照片。", en: "The safety filter blocked it. Please retake with your face clearly visible.", ja: "安全フィルターにかかりました。顔がはっきり写る写真で撮り直してください。" },
   "err.config": { ko: "서버 설정 문제로 지금은 만들 수 없어요.", zh: "由于服务器设置问题，暂时无法生成。", en: "Unavailable right now due to a server setting.", ja: "サーバー設定の問題で、現在は作成できません。" },
+  "err.face": { ko: "사진에서 얼굴을 찾지 못했어요. 정면으로, 밝은 곳에서 다시 찍어 주세요.", zh: "照片中未识别到人脸，请在明亮处正面重拍。", en: "We couldn't find a face in the photo. Please retake facing the camera in good light.", ja: "写真から顔を見つけられませんでした。明るい場所で正面から撮り直してください。" },
+  "err.busy": { ko: "지금 요청이 몰려 있어요. 잠시 뒤 다시 시도해 주세요.", zh: "目前请求较多，请稍后再试。", en: "We're very busy right now. Please try again shortly.", ja: "ただいま混み合っています。しばらくしてから再度お試しください。" },
+  "err.timeout": { ko: "너무 오래 걸려서 멈췄어요. 다시 시도해 주세요.", zh: "等待时间过长，已停止。请重试。", en: "It took too long, so we stopped. Please try again.", ja: "時間がかかりすぎたため停止しました。もう一度お試しください。" },
   "err.generic": { ko: "영상을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.", zh: "视频生成失败，请稍后再试。", en: "Couldn't make the video. Please try again shortly.", ja: "映像を作成できませんでした。しばらくしてから再度お試しください。" },
 } satisfies Record<string, Localized>;
 

@@ -17,6 +17,11 @@ type Step = "intro" | "consent" | "selfie" | "working" | "done";
 type Status = { state: "queued"; position?: number } | { state: "running" } | { state: "done"; videoUrl: string } | { state: "failed"; code: string };
 
 const POLL_MS = 4000;
+// 보통 3~6분. 그보다 길면 대기열이 밀린 것이라 안내를 바꾸고, 25분이 지나도 안 끝나면 포기하고 대기열에서 뺀다.
+const SLOW_S = 6 * 60;
+const GIVE_UP_S = 25 * 60;
+// 다시 찍을 필요 없이 같은 사진으로 다시 해 볼 만한 실패 (서버 오류·혼잡·시간 초과)
+const RETRYABLE = new Set(["generic", "busy", "timeout"]);
 const SELFIE_MAX_PX = 1280;
 const HEAD: Record<Exclude<Step, "intro">, MsgKey> = { consent: "consent.head", selfie: "selfie.head", working: "work.head", done: "done.head" };
 const LINES: MsgKey[] = ["work.line1", "work.line2", "work.line3", "work.line4"];
@@ -300,6 +305,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const retried = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
+  const t0 = useRef(startedAt ?? Date.now());
   const [toast, toastNode] = useToast();
   const submitted = useRef(false);
   // 부모가 매 렌더마다 새 콜백을 넘겨도 조회 루프가 다시 시작되지 않게 ref로 둔다
@@ -308,7 +314,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
 
   // 작업 등록 (한 번만)
   useEffect(() => {
-    if (jobId || !selfie || submitted.current) return;
+    if (jobId || !selfie || submitted.current || error) return;
     submitted.current = true;
     const fd = new FormData();
     fd.append("videoId", videoId);
@@ -323,7 +329,16 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
         setJobId(j.jobId);
       })
       .catch(() => setError("generic"));
-  }, [jobId, selfie, videoId, role, consentVersion, agreed, setJobId]);
+  }, [jobId, selfie, videoId, role, consentVersion, agreed, setJobId, error]);
+
+  // 같은 셀카로 새 작업을 맡긴다 (자동 재시도와 실패 화면의 「같은 사진으로 다시」)
+  const again = useCallback(() => {
+    retried.current = true;
+    submitted.current = false;
+    setStatus(null);
+    setError(null);
+    setJobId(null);
+  }, [setJobId]);
 
   // 상태 조회
   useEffect(() => {
@@ -340,15 +355,18 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           const db = await psnrAgainstSource(videoSrc, s.videoUrl);
           if (stop) return;
           setChecking(false);
-          if (db !== null && db > NOOP_PSNR_DB && !retried.current && selfie) {
-            retried.current = true;
-            submitted.current = false;
-            setStatus(null);
-            return setJobId(null);
-          }
+          if (db !== null && db > NOOP_PSNR_DB && !retried.current && selfie) return again();
           return onDoneRef.current(s.videoUrl);
         }
-        if (s.state === "failed") return setError(s.code);
+        if (s.state === "failed") {
+          // 서버 쪽 일시 오류는 같은 사진으로 한 번 자동으로 다시 맡긴다
+          if (RETRYABLE.has(s.code) && !retried.current && selfie) return again();
+          return setError(s.code);
+        }
+        if ((Date.now() - t0.current) / 1000 > GIVE_UP_S) {
+          fetch(`/api/jobs/${encodeURIComponent(jobId)}`, { method: "DELETE" }).catch(() => {});
+          return setError("timeout");
+        }
       } catch {
         // 네트워크가 잠깐 끊겨도 다음 조회에서 다시 시도
       }
@@ -356,14 +374,13 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     };
     poll();
     return () => { stop = true; };
-  }, [jobId, videoSrc, selfie, setJobId]);
+  }, [jobId, videoSrc, selfie, again]);
 
   useEffect(() => {
     if (error) return;
-    const t0 = startedAt ?? Date.now();
-    const id = setInterval(() => setElapsed(Math.floor((Date.now() - t0) / 1000)), 1000);
+    const id = setInterval(() => setElapsed(Math.floor((Date.now() - t0.current) / 1000)), 1000);
     return () => clearInterval(id);
-  }, [error, startedAt]);
+  }, [error]);
 
   // 다른 브라우저나 기기에서도 이어 볼 수 있도록 링크를 넘긴다
   const shareLink = async () => {
@@ -385,7 +402,14 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           <p>{t(errKey(error))}</p>
         </div>
         <div className="foot">
-          <button className="btn" onClick={onRetry}>{t("work.retry")}</button>
+          {selfie && RETRYABLE.has(error) ? (
+            <>
+              <button className="btn" onClick={() => { t0.current = Date.now(); setElapsed(0); again(); }}>{t("work.again.btn")}</button>
+              <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("work.retry")}</button>
+            </>
+          ) : (
+            <button className="btn" onClick={onRetry}>{t("work.retry")}</button>
+          )}
           <Link className="text-btn" href="/">{t("done.other")}</Link>
         </div>
       </>
@@ -405,7 +429,10 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
           <span className="elapsed"><Clock />{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
         </Frame>
         <h2 key={label}>{t(label)}</h2>
-        <p className="wait">{t("work.wait")}</p>
+        <p className="wait">
+          {status?.state === "queued" && status.position ? t("work.ahead").replace("{n}", String(status.position)) + " " : ""}
+          {t(elapsed >= SLOW_S ? "work.slow" : "work.wait")}
+        </p>
         <div className="track"><i /></div>
         <div className="notice"><Megaphone /><span>{t("work.bg")}</span></div>
       </div>
