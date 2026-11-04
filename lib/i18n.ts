@@ -21,6 +21,7 @@ export function detectLang(nav: string | undefined): Lang {
 }
 
 const dict = {
+  "map.back": { ko: "지도 보기", zh: "查看地图", en: "View Map", ja: "地図を見る" },
   "app.name": { ko: "화개장터 주인공", zh: "花开市场主角", en: "Star in Hwagae", ja: "花開市場の主人公" },
   "home.place": { ko: "화개장터 · 십리벚꽃길", zh: "花开市场 · 十里樱花路", en: "Hwagae Market · Blossom Road", ja: "花開市場 · 十里桜並木" },
   "home.resume": { ko: "이어보기", zh: "继续查看", en: "Resume", ja: "続きを見る" },

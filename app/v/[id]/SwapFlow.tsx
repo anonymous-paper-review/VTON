@@ -6,6 +6,7 @@ import type { Video } from "@/lib/videos";
 import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
+import { readReturnUrl } from "@/lib/returnTo";
 import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
 import { Frame, TopBar } from "../../HomeView";
 import { useLang, useToast } from "../../LangProvider";
@@ -436,6 +437,8 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
   const { t } = useLang();
   const [original, setOriginal] = useState(false);
   const file = useResultFile(resultUrl);
+  const [mapUrl, setMapUrl] = useState<string | null>(null);
+  useEffect(() => { setMapUrl(readReturnUrl()); }, []);
   const canShare = !!file && typeof navigator !== "undefined" && !!navigator.canShare?.({ files: [file] });
 
   // 휴대폰은 공유 시트의 "동영상 저장"이 갤러리로 가는 길이다. 공유가 안 되는 브라우저는 파일 다운로드로.
@@ -471,6 +474,7 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
         {canShare && <p className="small">{t("done.saveHint")}</p>}
         <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("done.retry")}</button>
         <Link className="text-btn" href="/">{t("done.other")}</Link>
+        {mapUrl && <a className="text-btn" href={mapUrl}>{t("map.back")}</a>}
         <p className="terms" style={{ marginTop: 16 }}>{t("done.keep")}</p>
       </div>
     </>

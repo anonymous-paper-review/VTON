@@ -5,7 +5,8 @@ import { useEffect, useState } from "react";
 import { listJobs, type MyJob } from "@/lib/myJobs";
 import { GROUPS, type Group, type Video } from "@/lib/videos";
 import { LangSwitch, useLang } from "./LangProvider";
-import { Back, Chevron, Clock, Pin } from "./icons";
+import { Back, Chevron, Clock, Compass, Pin } from "./icons";
+import { readReturnUrl } from "@/lib/returnTo";
 
 /** 헤더 56 · ← + 가운데 제목 + 언어. back: 링크(href) 또는 화면 안 이전 단계(onClick). 없으면 왼쪽은 빈칸. */
 export function TopBar({ title, back }: { title: string; back?: { label: string; href?: string; onClick?: () => void } }) {
@@ -40,6 +41,15 @@ export function Frame({ poster, className, children }: { poster?: string; classN
       {children}
     </div>
   );
+}
+
+/** 다른 앱(지도)에서 들어왔을 때만 뜨는, 그 앱으로 돌아가는 떠 있는 버튼 */
+export function MapButton() {
+  const { t } = useLang();
+  const [url, setUrl] = useState<string | null>(null);
+  useEffect(() => { setUrl(readReturnUrl()); }, []);
+  if (!url) return null;
+  return <a className="map-btn" href={url}><Compass />{t("map.back")}</a>;
 }
 
 export default function HomeView({ videos }: { videos: Video[] }) {
@@ -115,6 +125,7 @@ export default function HomeView({ videos }: { videos: Video[] }) {
           </li>
         ))}
       </ul>
+      <MapButton />
     </div>
   );
 }
