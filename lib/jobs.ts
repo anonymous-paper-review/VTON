@@ -70,15 +70,33 @@ export async function jobStatus(id: string): Promise<JobStatus> {
     const url = (result.data as { video?: { url?: string } })?.video?.url;
     return url ? { state: "done", videoUrl: url } : { state: "failed", code: "generic" };
   } catch (e) {
+    // 실패 원인을 Vercel 로그에서 볼 수 있게 남긴다 (사진은 들어 있지 않음)
+    console.error("job failed", parsed.engine, parsed.requestId, (e as { status?: number })?.status, JSON.stringify((e as { body?: unknown })?.body ?? String(e)).slice(0, 2000));
     return { state: "failed", code: falErrorCode(e) };
   }
 }
 
+/** 너무 오래 기다린 작업을 fal 대기열에서 뺀다. 이미 만들기 시작한 작업은 fal이 거절할 수 있어 실패해도 넘어간다. */
+export async function cancelJob(id: string): Promise<void> {
+  const parsed = decodeId(id);
+  if (!parsed) return;
+  try {
+    await fal.queue.cancel(ENGINES[parsed.engine].endpoint, { requestId: parsed.requestId });
+  } catch (e) {
+    console.warn("cancel failed", parsed.requestId, (e as { status?: number })?.status);
+  }
+}
+
 /** fal 오류 → 화면 문구 코드 (lib/i18n.ts의 err.*) */
-export function falErrorCode(e: unknown): "safety" | "config" | "generic" {
+export function falErrorCode(e: unknown): "safety" | "face" | "config" | "busy" | "generic" {
   const body = JSON.stringify((e as { body?: unknown })?.body ?? "");
-  if (/safety|content/i.test(body)) return "safety";
+  // 얼굴을 못 찾은 경우와 정책(실존 인물·선정성 등) 차단을 나눠 안내한다
+  if (/no (human )?face|face (was )?not|detect(ed)? (any )?face|face detection/i.test(body)) return "face";
+  if (/safety|content|policy|moderat|sensitive|nsfw|partner_validation/i.test(body)) return "safety";
   const status = (e as { status?: number })?.status;
   if (status === 401 || status === 403) return "config";
+  // 잔액 부족·사용 한도 초과
+  if (status === 402 || /balance|exhausted|locked|credit/i.test(body)) return "config";
+  if (status === 429) return "busy";
   return "generic";
 }
