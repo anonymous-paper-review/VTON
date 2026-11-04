@@ -7,8 +7,9 @@ import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
 import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
-import { Arrow, Frame, TopBar } from "../../HomeView";
-import { useLang } from "../../LangProvider";
+import { Frame, TopBar } from "../../HomeView";
+import { useLang, useToast } from "../../LangProvider";
+import { Chevron, Clock, Close, Megaphone, Photo, Save, Tick } from "../../icons";
 
 type ConsentProps = { version: string; items: { id: string; title: Localized; body: Localized[] }[] };
 type Step = "intro" | "consent" | "selfie" | "working" | "done";
@@ -16,10 +17,11 @@ type Status = { state: "queued"; position?: number } | { state: "running" } | { 
 
 const POLL_MS = 4000;
 const SELFIE_MAX_PX = 1280;
+const HEAD: Record<Exclude<Step, "intro">, MsgKey> = { consent: "consent.head", selfie: "selfie.head", working: "work.head", done: "done.head" };
 const LINES: MsgKey[] = ["work.line1", "work.line2", "work.line3", "work.line4"];
 
 export default function SwapFlow({ video, consent }: { video: Video; consent: ConsentProps }) {
-  const { t } = useLang();
+  const { t, pick } = useLang();
   const [step, setStep] = useState<Step>("intro");
   const [agreed, setAgreed] = useState<string[]>([]);
   const [selfie, setSelfie] = useState<Blob | null>(null);
@@ -56,9 +58,10 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
 
   return (
     <div className="page">
-      {step !== "working" && (
-        <TopBar back={back ? { label: t("common.back"), onClick: back } : { label: t("common.list"), href: "/" }} />
-      )}
+      <TopBar
+        title={step === "intro" ? pick(video.title) : t(HEAD[step])}
+        back={step === "working" ? undefined : back ? { label: t("common.back"), onClick: back } : { label: t("common.list"), href: "/" }}
+      />
 
       {step === "intro" && <IntroStep video={video} onPick={(id) => { setRole(id); setStep("consent"); }} />}
 
@@ -87,12 +90,14 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   );
 }
 
+/** 진행 막대: 칸을 똑같이 나눠 지나온 칸은 녹차, 남은 칸은 회색 */
 function Steps({ at }: { at: 0 | 1 | 2 }) {
   const { t } = useLang();
   const keys: MsgKey[] = ["step.consent", "step.selfie", "step.make"];
   return (
-    <div className="steps" aria-hidden>
-      {keys.map((k, i) => <div key={k} className={i <= at ? "on" : undefined}><b>0{i + 1}</b>{t(k)}</div>)}
+    <div className="steps">
+      <div className="cells" aria-hidden>{keys.map((k, i) => <i key={k} className={i <= at ? "on" : undefined} />)}</div>
+      <p><b>{at + 1}/{keys.length}</b>{t(keys[at])}</p>
     </div>
   );
 }
@@ -107,52 +112,55 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
           <video src={video.src} poster={video.poster} muted loop autoPlay playsInline aria-hidden />
         </Frame>
         <div className="stage-body">
-          <div className="kicker">{video.seconds}{t("common.sec")}</div>
-          <h1 className="title-xl">{pick(video.title)}</h1>
+          <div className="chips"><span className="chip"><Clock />{video.seconds}{t("common.sec")}</span></div>
+          <h2 className="title">{pick(video.title)}</h2>
           <p>{pick(video.description)}</p>
         </div>
       </section>
 
-      <h2 className="cast-h">{t(many ? "intro.who" : "intro.whoSingle")}</h2>
-      <p className="cast-note">{t("intro.note")}</p>
+      <div className="band" style={{ marginTop: 24 }} />
+      <div className="cast-h">
+        <h2>{t(many ? "intro.who" : "intro.whoSingle")}</h2>
+        <p>{t("intro.note")}</p>
+      </div>
       {many ? (
         <div className="cast">
           {video.cast.map((c) => (
-            <button key={c.id} className="tile" style={c.photo ? { backgroundImage: `url(${c.photo})` } : undefined} onClick={() => onPick(c.id)}>
-              <span className="who">{pick(c.label)}</span>
-              <span className="cta">{t("intro.become")}</span>
+            <button key={c.id} className="card tile" onClick={() => onPick(c.id)}>
+              <span className="ph" style={c.photo ? { backgroundImage: `url(${c.photo})` } : undefined} />
+              <span className="who">
+                <b>{pick(c.label)}</b>
+                <span>{t("intro.become")}<Chevron /></span>
+              </span>
             </button>
           ))}
         </div>
       ) : (
         <div className="solo">
-          <button className="btn" onClick={() => onPick(video.cast[0].id)}>{t("intro.start")} <Arrow /></button>
+          <button className="btn" onClick={() => onPick(video.cast[0].id)}>{t("intro.start")}</button>
         </div>
       )}
       <div className="foot">
-        <Link className="btn ghost" href="/">{t("done.other")}</Link>
+        <Link className="text-btn" href="/">{t("done.other")}</Link>
       </div>
     </>
   );
 }
 
-const Tick = () => (
-  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.4" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
-);
-
 function ConsentStep({ consent, agreed, setAgreed, onNext }: {
   consent: ConsentProps; agreed: string[]; setAgreed: (v: string[]) => void; onNext: () => void;
 }) {
   const { t, pick } = useLang();
+  const [toast, toastNode] = useToast();
   const all = consent.items.every((c) => agreed.includes(c.id));
   const toggle = (id: string) => setAgreed(agreed.includes(id) ? agreed.filter((a) => a !== id) : [...agreed, id]);
   return (
     <>
       <Steps at={0} />
       <section className="screen">
-        <h1 className="h-big">{t("consent.title")}</h1>
+        <h2 className="h-screen">{t("consent.title")}</h2>
         <p className="lead">{t("consent.sub")}</p>
-        <button className="agree-all" aria-pressed={all} onClick={() => setAgreed(all ? [] : consent.items.map((c) => c.id))}>
+        <button className="card agree-all" aria-pressed={all} onClick={() => setAgreed(all ? [] : consent.items.map((c) => c.id))}>
           <span className="check"><Tick /></span>
           {t("consent.all")}
         </button>
@@ -172,8 +180,10 @@ function ConsentStep({ consent, agreed, setAgreed, onNext }: {
         </div>
       </section>
       <div className="foot">
-        <button className="btn" disabled={!all} onClick={onNext}>{t("consent.next")} <Arrow /></button>
+        {/* 못 누르는 회색 버튼 대신, 살려 두고 누르면 무엇이 모자란지 토스트로 알린다 */}
+        <button className="btn" onClick={() => (all ? onNext() : toast(t("consent.need")))}>{t("consent.next")}</button>
       </div>
+      {toastNode}
     </>
   );
 }
@@ -228,7 +238,7 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
   const album = (
     <label className="side right">
       <span className="sq">
-        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinejoin="round"><rect x="3" y="4" width="18" height="16" rx="3" /><path d="M3 16l5-5 4 4 3-3 6 6" /><circle cx="16" cy="9" r="1.6" /></svg>
+        <Photo />
       </span>
       {t("selfie.album")}
       <input type="file" accept="image/*" hidden onChange={(e) => pickFile(e.target.files?.[0])} />
@@ -249,7 +259,7 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
         )}
         {!shot && (
           <div className="cam-copy">
-            <h1>{t("selfie.title")}</h1>
+            <h2>{t("selfie.title")}</h2>
             <p>{t("selfie.tip")}</p>
           </div>
         )}
@@ -257,9 +267,9 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
       </div>
 
       {shot ? (
-        <div className="cam-confirm btns">
-          <button className="btn" onClick={() => { stream?.getTracks().forEach((tr) => tr.stop()); onDone(shot.blob); }}>{t("selfie.use")} <Arrow /></button>
-          <button className="btn ghost" onClick={() => setShot(null)}>{t("selfie.retake")}</button>
+        <div className="cam-confirm foot">
+          <button className="btn" onClick={() => { stream?.getTracks().forEach((tr) => tr.stop()); onDone(shot.blob); }}>{t("selfie.use")}</button>
+          <button className="btn sub" onClick={() => setShot(null)}>{t("selfie.retake")}</button>
         </div>
       ) : stream ? (
         <div className="cam-bar">
@@ -289,7 +299,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const retried = useRef(false);
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
-  const [copied, setCopied] = useState(false);
+  const [toast, toastNode] = useToast();
   const submitted = useRef(false);
   // 부모가 매 렌더마다 새 콜백을 넘겨도 조회 루프가 다시 시작되지 않게 ref로 둔다
   const onDoneRef = useRef(onDone);
@@ -361,21 +371,23 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     try {
       if (navigator.share) return await navigator.share({ url });
       await navigator.clipboard.writeText(url);
-      setCopied(true);
+      toast(t("work.copied"));
     } catch {}
   };
 
   if (error) {
     return (
-      <div className="fail" role="alert">
-        <div className="kicker">CUT</div>
-        <h1 className="h-big" style={{ marginTop: 14 }}>{t("work.failTitle")}</h1>
-        <p>{t(errKey(error))}</p>
-        <div className="btns" style={{ marginTop: 18 }}>
-          <button className="btn" onClick={onRetry}>{t("work.retry")}</button>
-          <Link className="btn ghost" href="/">{t("done.other")}</Link>
+      <>
+        <div className="empty" role="alert">
+          <div className="circle"><Close /></div>
+          <h1>{t("work.failTitle")}</h1>
+          <p>{t(errKey(error))}</p>
         </div>
-      </div>
+        <div className="foot">
+          <button className="btn" onClick={onRetry}>{t("work.retry")}</button>
+          <Link className="text-btn" href="/">{t("done.other")}</Link>
+        </div>
+      </>
     );
   }
 
@@ -384,16 +396,23 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     : status?.state === "queued" ? "work.queued"
     : LINES[Math.floor(elapsed / 12) % LINES.length];
   return (
-    <div className="making" role="status" aria-live="polite">
-      <video className="bg-video" src={videoSrc} muted loop autoPlay playsInline aria-hidden />
-      <span className="rec">REC</span>
-      <div className="clock">{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</div>
-      <h2 key={label}>{t(label)}</h2>
-      <p>{t("work.wait")}</p>
-      <div className="bar"><i /></div>
-      <p className="bg-note">{t("work.bg")}</p>
-      {jobId && <button className="btn ghost link-btn" onClick={shareLink}>{t(copied ? "work.copied" : "work.link")}</button>}
-    </div>
+    <>
+      <Steps at={2} />
+      <div className="making" role="status" aria-live="polite">
+        <Frame>
+          <video src={videoSrc} muted loop autoPlay playsInline aria-hidden />
+          <span className="elapsed"><Clock />{Math.floor(elapsed / 60)}:{String(elapsed % 60).padStart(2, "0")}</span>
+        </Frame>
+        <h2 key={label}>{t(label)}</h2>
+        <p className="wait">{t("work.wait")}</p>
+        <div className="track"><i /></div>
+        <div className="notice"><Megaphone /><span>{t("work.bg")}</span></div>
+      </div>
+      <div className="foot">
+        {jobId && <button className="btn sub" onClick={shareLink}>{t("work.link")}</button>}
+      </div>
+      {toastNode}
+    </>
   );
 }
 
@@ -438,22 +457,21 @@ function ResultStep({ video, resultUrl, onRetry }: { video: Video; resultUrl: st
           <video key={original ? "o" : "r"} src={original ? video.src : resultUrl} playsInline autoPlay loop muted />
         </Frame>
         <div className="stage-body">
-          <div className="kicker">{t("done.kicker")}</div>
-          <h1 className="title-xl">{t("done.title")}</h1>
-          <div className="seg" role="group">
-            <button aria-pressed={!original} onClick={() => setOriginal(false)}>{t("done.after")}</button>
-            <button aria-pressed={original} onClick={() => setOriginal(true)}>{t("done.before")}</button>
+          <div className="chips"><span className="chip done"><Tick />{t("done.head")}</span></div>
+          <h2 className="title">{t("done.title")}</h2>
+          <div className="chips seg" role="group">
+            <button className="chip" aria-pressed={!original} onClick={() => setOriginal(false)}>{t("done.after")}</button>
+            <button className="chip" aria-pressed={original} onClick={() => setOriginal(true)}>{t("done.before")}</button>
           </div>
         </div>
       </section>
-      <div className="foot btns">
-        <button className="btn" onClick={save} disabled={!file}>{t(file ? "done.save" : "done.preparing")}</button>
-        {canShare && <p className="small" style={{ marginTop: 0 }}>{t("done.saveHint")}</p>}
-        <div className="two">
-          <button className="btn ghost" onClick={onRetry}>{t("done.retry")}</button>
-          <Link className="btn ghost" href="/">{t("done.other")}</Link>
-        </div>
-        <p className="small">{t("done.keep")}</p>
+      <div className="foot">
+        {/* 준비 중일 때는 버튼 글자가 이유를 말하므로 회색으로 둔다 */}
+        <button className="btn" onClick={save} disabled={!file}><Save />{t(file ? "done.save" : "done.preparing")}</button>
+        {canShare && <p className="small">{t("done.saveHint")}</p>}
+        <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("done.retry")}</button>
+        <Link className="text-btn" href="/">{t("done.other")}</Link>
+        <p className="terms" style={{ marginTop: 16 }}>{t("done.keep")}</p>
       </div>
     </>
   );

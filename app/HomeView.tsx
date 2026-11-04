@@ -5,38 +5,32 @@ import { useEffect, useState } from "react";
 import { listJobs, type MyJob } from "@/lib/myJobs";
 import { GROUPS, type Group, type Video } from "@/lib/videos";
 import { LangSwitch, useLang } from "./LangProvider";
+import { Back, Chevron, Clock, Pin } from "./icons";
 
-const Chevron = () => (
-  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" strokeLinejoin="round"><path d="M15 18l-6-6 6-6" /></svg>
-);
-
-/** back: 링크(href) 또는 화면 안 이전 단계(onClick) */
-export function TopBar({ back }: { back?: { label: string; href?: string; onClick?: () => void } }) {
+/** 헤더 56 · ← + 가운데 제목 + 언어. back: 링크(href) 또는 화면 안 이전 단계(onClick). 없으면 왼쪽은 빈칸. */
+export function TopBar({ title, back }: { title: string; back?: { label: string; href?: string; onClick?: () => void } }) {
   return (
     <header className="top">
       {back?.href ? (
-        <Link className="icon-btn" href={back.href} aria-label={back.label}><Chevron /></Link>
+        <Link className="icon-btn" href={back.href} aria-label={back.label}><Back size={24} /></Link>
       ) : back ? (
-        <button className="icon-btn" onClick={back.onClick} aria-label={back.label}><Chevron /></button>
+        <button className="icon-btn" onClick={back.onClick} aria-label={back.label}><Back size={24} /></button>
       ) : (
-        <span className="brand">Hwagae<b>/</b>Market</span>
+        <span />
       )}
+      <h1>{title}</h1>
       <LangSwitch />
     </header>
   );
 }
 
-export const Arrow = () => (
-  <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
-);
-
-/** 화개장터 주인공 컨셉의 큰 타이틀 (세 줄: 한지색, 금색, 주칠) */
-export const Mega = ({ lines }: { lines: [string, string, string] }) => (
-  <h1 className="mega">
+/** 화개장터 주인공 큰 제목 (세 줄, 마지막 줄만 녹차) */
+export const Display = ({ lines }: { lines: [string, string, string] }) => (
+  <h2 className="display">
     <span>{lines[0]}</span>
-    <span className="gold">{lines[1]}</span>
-    <span className="hot">{lines[2]}</span>
-  </h1>
+    <span>{lines[1]}</span>
+    <span className="brand">{lines[2]}</span>
+  </h2>
 );
 
 /** 영상을 자르지 않고 원래 비율 그대로 보여 준다 (가로·세로 모두). 남는 자리는 포스터를 흐리게 깐다. */
@@ -57,59 +51,65 @@ export default function HomeView({ videos }: { videos: Video[] }) {
   useEffect(() => { setMine(listJobs().slice(0, 3)); }, []);
   return (
     <div className="page">
-      <TopBar />
+      <TopBar title={t("app.name")} />
       <section className="hero">
-        <div className="kicker">{t("home.kicker")}</div>
-        <Mega lines={[t("home.mega1"), t("home.mega2"), t("home.mega3")]} />
+        <div className="place"><Pin />{t("home.place")}</div>
+        <Display lines={[t("home.mega1"), t("home.mega2"), t("home.mega3")]} />
         <p>{t("home.sub")}</p>
-        <span className="free">{t("home.free")}</span>
+        <div className="chips"><span className="chip">{t("home.free")}</span></div>
       </section>
 
       {mine.length > 0 && (
-        <section className="mine">
-          <div className="section-h"><span>{t("home.mine")}</span></div>
-          {mine.map((j) => {
-            const v = videos.find((x) => x.id === j.videoId);
-            if (!v) return null;
-            return (
-              <Link key={j.jobId} className="mine-row" href={`/v/${v.id}?job=${encodeURIComponent(j.jobId)}`}>
-                {/* eslint-disable-next-line @next/next/no-img-element */}
-                {v.poster && <img src={v.poster} alt="" />}
-                <span className="mine-title">{pick(v.title)}</span>
-                <span className={j.resultUrl ? "badge ready" : "badge"}>{t(j.resultUrl ? "home.ready" : "home.making")}</span>
-              </Link>
-            );
-          })}
-        </section>
+        <>
+          <div className="band" />
+          <div className="sec"><h2>{t("home.mine")}</h2></div>
+          <div className="mine">
+            {mine.map((j) => {
+              const v = videos.find((x) => x.id === j.videoId);
+              if (!v) return null;
+              return (
+                <Link key={j.jobId} className="card mine-card" href={`/v/${v.id}?job=${encodeURIComponent(j.jobId)}`} aria-label={`${pick(v.title)} · ${t("home.resume")}`}>
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  {v.poster && <img src={v.poster} alt="" />}
+                  <span className="t">
+                    <b>{pick(v.title)}</b>
+                    <span className={j.resultUrl ? "chip done" : "chip"}>{t(j.resultUrl ? "home.ready" : "home.making")}</span>
+                  </span>
+                  <Chevron />
+                </Link>
+              );
+            })}
+          </div>
+        </>
       )}
 
+      <div className="band" />
+      <div className="sec">
+        <h2>{t("home.scenes")}</h2>
+        <span>{shown.length}</span>
+      </div>
       <div className="tabs" role="tablist">
         {GROUPS.map((g) => (
-          <button key={g} role="tab" aria-selected={tab === g} onClick={() => setTab(g)}>
+          <button key={g} className="chip" role="tab" aria-selected={tab === g} onClick={() => setTab(g)}>
             {t(`tab.${g}`)}
-            <small>{g === "simni" ? "3:4" : "16:9"}</small>
           </button>
         ))}
-      </div>
-      <div className="section-h">
-        <span>{t("home.scenes")}</span>
-        <span>{String(shown.length).padStart(2, "0")}</span>
       </div>
       <ul className="scenes">
         {shown.map((v, i) => (
           <li key={v.id}>
-            <Link className="scene" href={`/v/${v.id}`}>
+            <Link className="card scene" href={`/v/${v.id}`}>
               <Frame poster={v.poster}>
                 <video src={v.src} poster={v.poster} muted loop autoPlay playsInline preload="metadata" aria-hidden />
-                <span className="no">No.{String(i + 1).padStart(2, "0")}</span>
-                <span className="len">{v.seconds}{t("common.sec")}</span>
+                <span className="chip on-video"><Clock />{v.seconds}{t("common.sec")}</span>
               </Frame>
               <div className="meta">
-                <div style={{ flex: 1 }}>
-                  <h2>{pick(v.title)}</h2>
+                <span className="num">{i + 1}</span>
+                <div>
+                  <h3>{pick(v.title)}</h3>
                   <p>{pick(v.description)}</p>
                 </div>
-                <span className="go"><Arrow /></span>
+                <Chevron />
               </div>
             </Link>
           </li>

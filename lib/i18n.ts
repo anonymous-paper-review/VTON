@@ -1,10 +1,10 @@
 // 화면 문구 4개 국어. 키를 더하면 네 언어 모두 채운다.
 
 export const LANGS = [
-  { id: "ko", label: "한" },
-  { id: "zh", label: "中" },
-  { id: "en", label: "EN" },
-  { id: "ja", label: "日" },
+  { id: "ko", label: "한", code: "KO", name: "한국어" },
+  { id: "zh", label: "中", code: "ZH", name: "中文" },
+  { id: "en", label: "EN", code: "EN", name: "English" },
+  { id: "ja", label: "日", code: "JA", name: "日本語" },
 ] as const;
 
 export type Lang = (typeof LANGS)[number]["id"];
@@ -21,6 +21,15 @@ export function detectLang(nav: string | undefined): Lang {
 }
 
 const dict = {
+  "app.name": { ko: "화개장터 주인공", zh: "花开市场主角", en: "Star in Hwagae", ja: "花開市場の主人公" },
+  "home.place": { ko: "화개장터 · 십리벚꽃길", zh: "花开市场 · 十里樱花路", en: "Hwagae Market · Blossom Road", ja: "花開市場 · 十里桜並木" },
+  "home.resume": { ko: "이어보기", zh: "继续查看", en: "Resume", ja: "続きを見る" },
+  "lang.title": { ko: "언어", zh: "语言", en: "Language", ja: "言語" },
+  "consent.head": { ko: "개인정보 동의", zh: "个人信息同意", en: "Consent", ja: "個人情報への同意" },
+  "consent.need": { ko: "필수 항목에 모두 동의해 주세요", zh: "请同意所有必填项", en: "Please agree to all required items", ja: "必須項目すべてに同意してください" },
+  "selfie.head": { ko: "셀카 찍기", zh: "拍自拍", en: "Take a selfie", ja: "自撮り" },
+  "work.head": { ko: "영상 만드는 중", zh: "正在生成视频", en: "Making your video", ja: "映像を制作中" },
+  "done.head": { ko: "완성", zh: "已完成", en: "Done", ja: "完成" },
   "home.kicker": { ko: "화개장터에서, 셀카 한 장으로", zh: "在花开市场，只需一张自拍", en: "At Hwagae Market, with one selfie", ja: "花開（ファゲ）市場で、自撮り1枚で" },
   "home.mega1": { ko: "화개장터", zh: "花开市场", en: "Star in", ja: "花開市場の" },
   "home.mega2": { ko: "주인공은", zh: "的主角", en: "Hwagae", ja: "主人公は" },
