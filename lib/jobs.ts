@@ -13,7 +13,9 @@ export type JobStatus =
   | { state: "queued"; position?: number }
   | { state: "running" }
   | { state: "done"; videoUrl: string }
-  | { state: "failed"; code: string };
+  | { state: "failed"; code: string }
+  /** 상태 조회가 잠깐 실패함. 화면은 다음 조회를 기다린다. */
+  | { state: "unknown" };
 
 /** 클라이언트에 넘기는 job id: 엔진과 fal request id를 묶어 상태 조회 때 엔드포인트를 알 수 있게 한다. */
 const encodeId = (engine: EngineKey, requestId: string) => `${engine}.${requestId}`;
@@ -51,7 +53,9 @@ export async function submitJob(opts: {
 }
 
 export async function jobStatus(id: string): Promise<JobStatus> {
+  // 모의 작업 id는 모의 모드에서만 받는다. 실서버에서 받으면 링크에 아무 영상 주소나 넣어 우리 화면에 띄울 수 있다.
   if (id.startsWith("mock.")) {
+    if (!MOCK) return { state: "failed", code: "generic" };
     const { at, video } = JSON.parse(Buffer.from(id.slice(5), "base64url").toString());
     const elapsed = (Date.now() - at) / 1000;
     if (elapsed < 2) return { state: "queued", position: 1 };
@@ -62,7 +66,18 @@ export async function jobStatus(id: string): Promise<JobStatus> {
   if (!parsed) return { state: "failed", code: "generic" };
   const { endpoint } = ENGINES[parsed.engine];
 
-  const status = await fal.queue.status(endpoint, { requestId: parsed.requestId, logs: false });
+  let status;
+  try {
+    status = await fal.queue.status(endpoint, { requestId: parsed.requestId, logs: false });
+  } catch (e) {
+    // 상태 조회만 잠깐 실패한 경우(네트워크·fal 일시 오류): 작업은 그대로 진행 중일 수 있으니 실패로 치지 않는다.
+    // 실패로 돌려주면 화면이 같은 셀카로 새 작업을 또 맡겨 요금이 두 번 나간다.
+    const code = (e as { status?: number })?.status;
+    if (code === 404 || code === 422) return { state: "failed", code: "generic" }; // 없는 작업 id
+    if (code === 401 || code === 403) return { state: "failed", code: "config" };
+    console.warn("status check failed", parsed.requestId, code);
+    return { state: "unknown" };
+  }
   if (status.status === "IN_QUEUE") return { state: "queued", position: status.queue_position };
   if (status.status === "IN_PROGRESS") return { state: "running" };
   try {
