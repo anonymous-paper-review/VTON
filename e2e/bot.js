@@ -214,6 +214,19 @@ async function failurePaths(browser) {
     await shot(page, "status-504-forever");
     await ctx.close();
   }
+  // 7) 완성 뒤 「확인 중」(원본과 같은지 비교)에서 영상을 못 받으면 멈추는가
+  // iOS Safari는 화면에 안 붙인 영상을 재생 전까지 받지 않아 loadeddata가 안 올 수 있다. 응답 없는 영상 주소로 흉내 낸다.
+  {
+    const ctx = await newCtx(browser); const page = await ctx.newPage();
+    await page.route(/\/stall\/.*\.mp4/, () => {}); // 응답하지 않음
+    await routeStatus(page, () => ({ json: { state: "done", videoUrl: "/stall/result.mp4" } }));
+    await toWorking(page);
+    const t = Date.now();
+    const done = await page.waitForSelector(".result", { timeout: 45000 }).then(() => true).catch(() => false);
+    note(done, "「확인 중」에서 영상을 못 받아도 완성 화면으로 넘어감", done ? `${Math.round((Date.now() - t) / 1000)}초` : "45초 지나도 '확인 중'");
+    await shot(page, "check-stall");
+    await ctx.close();
+  }
 }
 
 async function resumePaths(browser) {
