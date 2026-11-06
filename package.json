@@ -6,7 +6,9 @@
     "build": "next build",
     "start": "next start",
     "typecheck": "tsc --noEmit",
-    "bot": "node e2e/bot.js"
+    "bot": "node e2e/bot.js",
+    "postinstall": "node scripts/copy-mediapipe.mjs",
+    "prebuild": "node scripts/copy-mediapipe.mjs"
   },
   "repository": {
     "type": "git",
@@ -14,6 +16,7 @@
   },
   "dependencies": {
     "@fal-ai/client": "^1.10.1",
+    "@mediapipe/tasks-vision": "0.10.21",
     "next": "^16.4.2",
     "qrcode": "^1.5.4",
     "react": "^19.3.1",
