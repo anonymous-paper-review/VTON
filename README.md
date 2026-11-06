@@ -67,6 +67,8 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 - 운영 주소(Production)는 공개 상태여야 한다. fal이 `https://<주소>/videos/...`에서 원본 영상을 받아간다. Vercel 기본 설정(Standard Protection)은 프리뷰 주소만 막으므로 그대로 두면 된다.
 - 자기 도메인을 쓰려면 Project → Settings → Domains에서 추가하고, `NEXT_PUBLIC_SITE_URL`도 그 주소로 바꾼 뒤 Redeploy.
 - QR만 있으면 누구나 생성을 돌릴 수 있으니 fal 대시보드에서 사용 한도(Usage limit)를 걸어 두는 게 안전하다. MiniMax 768P 기준 8초 영상 한 편에 약 $2.4 (무변화 자동 재시도가 붙으면 그 두 배).
+- 단계별 결과는 Vercel → Project → Logs에서 `vton event`로 검색한다. 한 줄에 하나씩 `{"e":"submitted|started|generated|downloaded|download_failed|noop_retry|failed|submit_failed|net_weak|photo_check", ...}`이 남는다. `s`는 그 단계에 걸린 초, `env`는 기기(ios/android)와 앱 안 브라우저(kakao·naver 등). fal 쪽 실패 원문은 `job failed`로 검색한다.
+- 셀카 점검(얼굴·여러 명·크기·옆모습·밝기·흐림)은 휴대폰 안에서 MediaPipe로 한다. wasm은 설치 때 `scripts/copy-mediapipe.mjs`가 `public/mediapipe/`로 복사한다(저장소엔 없음).
 - Vercel Hobby(무료) 요금제는 비상업 개인 용도 조건이 있어, 회사 실증이면 Pro를 검토한다.
 
 ## 남은 일
