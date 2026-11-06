@@ -6,10 +6,14 @@ export const NOOP_PSNR_DB = 35;
 const W = 160;
 const H = 90;
 const SAMPLES = 6;
+// 휴대폰(특히 iOS Safari)은 화면에 붙이지 않은 영상을 재생 전까지 받지 않아 loadeddata·seeked가 끝내 오지 않을 수 있다.
+// 그러면 「확인 중」에서 영원히 멈추고 조회 루프의 시간 제한도 돌지 않으므로, 확인은 이 시간 안에 못 끝내면 건너뛴다.
+export const CHECK_TIMEOUT_MS = 20_000;
 
-function load(src: string): Promise<HTMLVideoElement> {
+function load(src: string, made: HTMLVideoElement[]): Promise<HTMLVideoElement> {
   return new Promise((resolve, reject) => {
     const v = document.createElement("video");
+    made.push(v);
     v.crossOrigin = "anonymous";
     v.muted = true;
     v.playsInline = true;
@@ -17,6 +21,7 @@ function load(src: string): Promise<HTMLVideoElement> {
     v.onloadeddata = () => resolve(v);
     v.onerror = () => reject(new Error("영상 로드 실패"));
     v.src = src;
+    v.load();
   });
 }
 
@@ -32,10 +37,23 @@ function pixels(v: HTMLVideoElement, ctx: CanvasRenderingContext2D) {
   return ctx.getImageData(0, 0, W, H).data;
 }
 
-/** 원본과 결과의 평균 PSNR(dB). 영상을 읽을 수 없으면(CORS 등) null. */
-export async function psnrAgainstSource(sourceUrl: string, resultUrl: string): Promise<number | null> {
+/** 원본과 결과의 평균 PSNR(dB). 영상을 읽을 수 없거나(CORS 등) 제한 시간 안에 못 끝내면 null. */
+export async function psnrAgainstSource(sourceUrl: string, resultUrl: string, timeoutMs = CHECK_TIMEOUT_MS): Promise<number | null> {
+  const videos: HTMLVideoElement[] = [];
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  const timeout = new Promise<null>((resolve) => { timer = setTimeout(() => resolve(null), timeoutMs); });
   try {
-    const [a, b] = await Promise.all([load(sourceUrl), load(resultUrl)]);
+    return await Promise.race([measure(sourceUrl, resultUrl, videos), timeout]);
+  } finally {
+    clearTimeout(timer);
+    // 늦게 끝난 로드가 휴대폰 데이터를 계속 쓰지 않게 끊는다
+    for (const v of videos) { v.removeAttribute("src"); v.load(); }
+  }
+}
+
+async function measure(sourceUrl: string, resultUrl: string, videos: HTMLVideoElement[]): Promise<number | null> {
+  try {
+    const [a, b] = await Promise.all([load(sourceUrl, videos), load(resultUrl, videos)]);
     const canvas = document.createElement("canvas");
     canvas.width = W;
     canvas.height = H;
