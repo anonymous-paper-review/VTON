@@ -48,6 +48,8 @@ export async function submitJob(opts: {
       target: opts.target,
       lineup: [...opts.keep.map((k) => ({ ...k, swap: false })), { target: opts.target, imageUrl: faceUrl, swap: true }],
     }),
+    // 만든 영상 등 fal 저장소 파일을 24시간 뒤 자동 삭제한다 (동의 화면의 보유 기간과 맞춤).
+    storageSettings: { expiresIn: "1d" },
   });
   return encodeId(opts.engine, request_id);
 }

@@ -170,10 +170,10 @@ const dict = {
   "done.retry": { ko: "다시 찍기", zh: "重拍", en: "Retake", ja: "撮り直す" },
   "done.other": { ko: "다른 장면", zh: "其他场景", en: "Other scenes", ja: "ほかのシーン" },
   "done.keep": {
-    ko: "영상 링크는 시간이 지나면 열리지 않을 수 있어요. 마음에 들면 지금 저장해 주세요.",
-    zh: "视频链接一段时间后可能失效，喜欢的话请现在保存。",
-    en: "The video link may expire. Save it now if you like it.",
-    ja: "動画のリンクは時間が経つと開けなくなることがあります。気に入ったら今すぐ保存してください。",
+    ko: "영상은 24시간 뒤 자동으로 삭제돼요. 마음에 들면 지금 저장해 주세요.",
+    zh: "视频将在24小时后自动删除，喜欢的话请现在保存。",
+    en: "The video is deleted after 24 hours. Save it now if you like it.",
+    ja: "動画は24時間後に自動で削除されます。気に入ったら今すぐ保存してください。",
   },
 
   "qr.title": { ko: "스캔하고 화개장터 주인공 되기", zh: "扫码成为花开市场的主角", en: "Scan to star in Hwagae Market", ja: "スキャンして花開市場の主人公に" },
