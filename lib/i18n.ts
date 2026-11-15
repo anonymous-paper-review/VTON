@@ -178,6 +178,8 @@ const dict = {
 
   "qr.title": { ko: "스캔하고 화개장터 주인공 되기", zh: "扫码成为花开市场的主角", en: "Scan to star in Hwagae Market", ja: "スキャンして花開市場の主人公に" },
 
+  "intro.closed": { ko: "얼굴 바꾸기는 정식 오픈 때 열려요. 지금은 장면만 둘러봐 주세요.", zh: "换脸功能将在正式开放时推出，现在请先浏览场景。", en: "Face swap opens at the official launch. For now, feel free to browse the scenes.", ja: "顔の入れ替えは正式オープン時に公開します。今はシーンをご覧ください。" },
+  "err.closed": { ko: "얼굴 바꾸기는 정식 오픈 때 열려요.", zh: "换脸功能将在正式开放时推出。", en: "Face swap opens at the official launch.", ja: "顔の入れ替えは正式オープン時に公開します。" },
   "err.video": { ko: "장면을 찾을 수 없어요.", zh: "找不到该场景。", en: "Scene not found.", ja: "シーンが見つかりません。" },
   "err.role": { ko: "바꿀 인물을 골라 주세요.", zh: "请选择要替换的人物。", en: "Please choose a character.", ja: "人物を選んでください。" },
   "err.consent": { ko: "개인정보 동의가 필요해요.", zh: "需要同意个人信息条款。", en: "Consent is required.", ja: "個人情報への同意が必要です。" },

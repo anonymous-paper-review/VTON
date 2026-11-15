@@ -7,6 +7,7 @@ import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
 import { readReturnUrl } from "@/lib/returnTo";
+import { GENERATION_OPEN } from "@/lib/open";
 import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
 import { checkPhoto, preloadFaceCheck, type PhotoCheck } from "@/lib/faceCheck";
 import { track } from "@/lib/track";
@@ -126,7 +127,9 @@ function Steps({ at }: { at: 0 | 1 | 2 }) {
 
 function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => void }) {
   const { t, pick } = useLang();
+  const [toast, toastNode] = useToast();
   const many = video.cast.length > 1;
+  const choose = (id: string) => (GENERATION_OPEN ? onPick(id) : toast(t("intro.closed")));
   return (
     <>
       <section className="stage">
@@ -148,7 +151,7 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
       {many ? (
         <div className="cast">
           {video.cast.map((c) => (
-            <button key={c.id} className="card tile" onClick={() => onPick(c.id)}>
+            <button key={c.id} className="card tile" onClick={() => choose(c.id)}>
               <span className="ph" style={c.photo ? { backgroundImage: `url(${c.photo})` } : undefined} />
               <span className="who">
                 <b>{pick(c.label)}</b>
@@ -159,12 +162,13 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
         </div>
       ) : (
         <div className="solo">
-          <button className="btn" onClick={() => onPick(video.cast[0].id)}>{t("intro.start")}</button>
+          <button className="btn" onClick={() => choose(video.cast[0].id)}>{t("intro.start")}</button>
         </div>
       )}
       <div className="foot">
         <Link className="text-btn" href="/">{t("done.other")}</Link>
       </div>
+      {toastNode}
     </>
   );
 }

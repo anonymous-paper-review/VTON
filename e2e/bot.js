@@ -1,5 +1,6 @@
 // VTON 웹앱 점검 봇. VTON_MOCK=1 로 띄운 로컬 서버(BASE)에 대고 전체 흐름과 실패 경로를 돈다.
-// 실행: VTON_MOCK=1 npm run build && VTON_MOCK=1 npx next start -p 3100 그다음 npm run bot [flow|fail|resume|return|photo|progress|selfie]
+// 실행: VTON_MOCK=1 NEXT_PUBLIC_GENERATION_OPEN=1 npm run build && VTON_MOCK=1 npx next start -p 3100 그다음 npm run bot [flow|fail|resume|return|photo|progress|selfie]
+// 생성 잠금 확인: NEXT_PUBLIC_GENERATION_OPEN 없이 빌드·실행한 서버에 npm run bot closed
 // Playwright가 깔린 환경(클라우드 세션 등)에서 돈다. 스크린샷은 e2e/shots/
 const { chromium } = require("playwright");
 const fs = require("fs");
@@ -439,9 +440,25 @@ async function progressPaths(browser) {
   }
 }
 
+// 생성이 잠겨 있을 때(정식 오픈 전): 장면은 보이고, 주인공 되기는 안내만, 서버도 503
+async function closedPaths(browser) {
+  const ctx = await newCtx(browser); const page = await ctx.newPage();
+  await page.goto(`${BASE}/v/simni-tunnel?lang=ko`);
+  await page.locator(".cast .tile, .solo .btn").first().click();
+  await page.waitForTimeout(400);
+  const toastText = await page.locator("body").innerText();
+  note(/정식 오픈/.test(toastText), "잠금: 주인공 되기 → 준비 중 안내");
+  note(await page.locator(".agree-all").count() === 0, "잠금: 동의 화면으로 안 넘어감");
+  await page.screenshot({ path: `${OUT}/closed-toast.png` });
+  const res = await page.request.post(`${BASE}/api/jobs`, { multipart: { videoId: "simni-tunnel" } });
+  note(res.status() === 503, "잠금: /api/jobs 503", String(res.status()));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch({ args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream", "--autoplay-policy=no-user-gesture-required", ...(hasFfmpeg ? [`--use-file-for-fake-video-capture=${FACE_CAM}`] : [])] });
   const only = process.argv[2];
+  if (only === "closed") await closedPaths(browser).catch((e) => note(false, "잠금 예외", e.message.split("\n")[0]));
   if (!only || only === "flow") for (const l of ["ko", "zh", "en", "ja"]) await fullFlow(browser, l).catch((e) => note(false, `${l} 전체 흐름 예외`, e.message.split("\n")[0]));
   if (!only || only === "fail") await failurePaths(browser).catch((e) => note(false, "실패 경로 예외", e.message.split("\n")[0]));
   if (!only || only === "resume") await resumePaths(browser).catch((e) => note(false, "이어보기 예외", e.message.split("\n")[0]));
