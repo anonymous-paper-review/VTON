@@ -324,7 +324,8 @@ async function returnPaths(browser) {
   const c2 = await newCtx(browser); const p2 = await c2.newPage();
   await p2.goto(`${BASE}/?return=${encodeURIComponent("javascript:alert(1)")}`);
   await p2.waitForTimeout(300);
-  note(await p2.locator("header .map-btn").count() === 0, "javascript: 주소는 거부");
+  const h2 = await p2.locator("header .map-btn").getAttribute("href").catch(() => null);
+  note(!h2 || !h2.startsWith("javascript:"), "javascript: 주소는 거부(기본 지도 주소로 대체)", String(h2));
   await c2.close();
 }
 
