@@ -51,6 +51,10 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 
 2026-10-21 2차 비교 기준 MiniMax H3 Max Recast가 기본이다 (실험은 1080P, 앱은 768P로 만든다). 닮음 점수가 가장 높고 3분 정도 걸리지만 768P도 초당 $0.30으로 Kling O3(약 $0.168)의 1.8배라, 비용을 줄일 땐 `VTON_ENGINE=kling-o3`로 바꾼다. 셀카 1장으로 충분해서 캐릭터시트 단계는 두지 않았다. Kling O3가 가끔 원본과 거의 같은 영상을 돌려주므로, 브라우저에서 원본 대비 PSNR이 35dB를 넘으면 같은 셀카로 한 번 자동 재시도한다 (`lib/frameCheck.ts`). 실험 보고서는 프로젝트 파일 `vton/experiment/out/2026-10-21-jdrama/REPORT.md`.
 
+## 생성 잠금 (정식 오픈 전)
+
+기본값은 **잠금**이다. 목록과 장면 미리보기는 보이지만 「주인공 되기」를 누르면 "정식 오픈 때 열려요" 안내만 뜨고, 서버 `/api/jobs`도 503으로 막혀 fal 요금이 나가지 않는다. 열려면 Vercel 환경변수 `NEXT_PUBLIC_GENERATION_OPEN=1`을 넣고 Redeploy(빌드 때 들어가는 값이라 Redeploy 필요). 다시 잠그려면 지우고 Redeploy.
+
 ## 배포 (Vercel)
 
 1. vercel.com에 로그인 → **Add New… → Project** → GitHub의 `anonymous-paper-review/VTON` **Import**
