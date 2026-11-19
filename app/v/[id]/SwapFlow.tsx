@@ -31,7 +31,8 @@ const GIVE_UP_RUNNING_S = 15 * 60;
 const RETRYABLE = new Set(["generic", "busy", "timeout", "network"]);
 const SELFIE_MAX_PX = 1280;
 // 셀카(약 0.3MB) 보내기 제한. 응답이 없으면 끝없이 「사진 보내는 중」에 머물던 것을 막는다.
-const UPLOAD_TIMEOUT_MS = 60_000;
+// 서버가 캐릭터시트를 만든 뒤(최대 40초) 답하므로 넉넉히 둔다.
+const UPLOAD_TIMEOUT_MS = 80_000;
 // 결과 영상을 받다가 이만큼 한 바이트도 안 오면 끊고 우리 서버를 거쳐 다시 받는다
 const FETCH_STALL_MS = 20_000;
 // 2단계 막대를 채우는 기준: 8초·768P 실측 생성 시간 (2026-11-06 271초)
@@ -613,7 +614,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const stages: { key: MsgKey; detail?: string; bar?: number }[] = [
     {
       key: "stage.receive",
-      detail: phase === "upload" ? fill(t("stage.sending"), { pct: uploadPct })
+      detail: phase === "upload" ? (uploadPct >= 100 ? t("stage.fitting") : fill(t("stage.sending"), { pct: uploadPct }))
         : phase === "queue" ? (pos ? fill(t("stage.queued"), { n: pos }) : t("stage.next"))
         : t("stage.received"),
       bar: phase === "upload" ? uploadPct : undefined,

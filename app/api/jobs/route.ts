@@ -7,6 +7,9 @@ import { GENERATION_OPEN } from "@/lib/open";
 
 const MAX_SELFIE_BYTES = 8 * 1024 * 1024;
 
+// 캐릭터시트를 만든 뒤(20~30초, 최대 40초) 영상 작업을 맡기고 답한다.
+export const maxDuration = 60;
+
 export async function POST(req: Request) {
   if (!GENERATION_OPEN) return NextResponse.json({ code: "closed" }, { status: 503 });
   const form = await req.formData();
@@ -45,6 +48,7 @@ export async function POST(req: Request) {
       videoUrl: absoluteUrl(video.src, origin),
       target: role.target,
       keep: left.map((c) => ({ target: c.target, imageUrl: absoluteUrl(c.still!, origin) })),
+      outfit: role.outfit,
       selfie,
     });
     return NextResponse.json({ jobId });

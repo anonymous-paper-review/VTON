@@ -27,6 +27,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a pink cardigan",
+        "outfit": "a pale pink knit cardigan over a white top, and a white skirt",
         "still": "/videos/simni-woman.jpg",
         "photo": "/videos/simni-woman.jpg"
       },
@@ -39,6 +40,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a navy jacket",
+        "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
         "photo": "/videos/simni-man.jpg"
       }
     ]
@@ -71,6 +73,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a pink cardigan",
+        "outfit": "a pale pink knit cardigan over a white top, and a white skirt",
         "still": "/videos/simni-woman.jpg",
         "photo": "/videos/simni-woman.jpg"
       },
@@ -83,6 +86,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a navy jacket",
+        "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
         "photo": "/videos/simni-man.jpg"
       }
     ]
@@ -115,6 +119,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
         "still": "/videos/market-woman.jpg",
         "photo": "/videos/market-woman.jpg"
       },
@@ -127,6 +132,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
     ]
@@ -159,6 +165,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
         "still": "/videos/market-woman.jpg",
         "photo": "/videos/market-woman.jpg"
       },
@@ -171,6 +178,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
     ]
@@ -203,6 +211,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
         "still": "/videos/market-woman.jpg",
         "photo": "/videos/market-woman.jpg"
       },
@@ -215,6 +224,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
     ]
@@ -247,6 +257,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy dress",
+        "outfit": "a navy blue long-sleeve knit dress",
         "still": "/videos/tea-woman.jpg",
         "photo": "/videos/tea-woman.jpg"
       },
@@ -259,6 +270,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a cream sweater",
+        "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
         "photo": "/videos/tea-man.jpg"
       }
     ]
@@ -291,6 +303,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy dress",
+        "outfit": "a navy blue long-sleeve knit dress",
         "still": "/videos/tea-woman.jpg",
         "photo": "/videos/tea-woman.jpg"
       },
@@ -303,6 +316,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a cream sweater",
+        "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
         "photo": "/videos/tea-man.jpg"
       }
     ]
@@ -335,6 +349,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
         "still": "/videos/river-woman.jpg",
         "photo": "/videos/river-woman.jpg"
       },
@@ -347,6 +362,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
         "photo": "/videos/river-man.jpg"
       }
     ]
@@ -379,6 +395,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
         "still": "/videos/river-woman.jpg",
         "photo": "/videos/river-woman.jpg"
       },
@@ -391,6 +408,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
         "photo": "/videos/river-man.jpg"
       }
     ]
@@ -423,6 +441,7 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
         "still": "/videos/river-woman.jpg",
         "photo": "/videos/river-woman.jpg"
       },
@@ -435,6 +454,7 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
         "photo": "/videos/river-man.jpg"
       }
     ]
