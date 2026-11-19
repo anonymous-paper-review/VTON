@@ -1,21 +1,21 @@
 [
   {
-    "id": "hadong-cherry",
-    "group": "market",
+    "id": "simni-1",
+    "group": "simni",
     "title": {
-      "ko": "벚꽃 아래, 그 봄날",
-      "zh": "樱花树下的那个春天",
-      "en": "That Spring Under the Blossoms",
-      "ja": "桜の下、あの春の日"
+      "ko": "벚꽃 터널, 첫 만남",
+      "zh": "樱花隧道里的初遇",
+      "en": "First Glance in the Blossom Tunnel",
+      "ja": "桜のトンネル、はじめての出会い"
     },
     "description": {
-      "ko": "화개 십리벚꽃길, 꽃잎이 흩날리는 길에서 마주 선 두 사람. 그 봄날의 주인공이 되어 보세요.",
-      "zh": "花开十里樱花路，花瓣纷飞中相遇的两人。成为那个春天的主角吧。",
-      "en": "On Hwagae's Simni Cherry Blossom Road, two people meet as petals drift down. Star in that spring day.",
-      "ja": "花開の十里桜並木、花びらが舞う道で向かい合う二人。あの春の日の主人公になってみよう。"
+      "ko": "십리벚꽃길 벚꽃 터널에서 마주친 두 사람, 눈이 마주치는 순간. 둘 중 한 사람이 되어 보세요.",
+      "zh": "在十里樱花路的樱花隧道里相遇的两人，目光交汇的瞬间。成为其中一人吧。",
+      "en": "Two people meet in the blossom tunnel of the Simni Cherry Blossom Road, and their eyes lock. Step into either role.",
+      "ja": "十里桜並木の桜のトンネルで出会った二人、目が合う瞬間。どちらかになってみよう。"
     },
-    "src": "/videos/hadong-cherry.mp4",
-    "poster": "/videos/hadong-cherry.jpg",
+    "src": "/videos/simni-1.mp4",
+    "poster": "/videos/simni-1.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -27,8 +27,8 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a pink cardigan",
-        "still": "/videos/hadong-cherry-woman.jpg",
-        "photo": "/videos/hadong-cherry-woman.jpg"
+        "still": "/videos/simni-woman.jpg",
+        "photo": "/videos/simni-woman.jpg"
       },
       {
         "id": "man",
@@ -39,27 +39,115 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a navy jacket",
-        "photo": "/videos/hadong-cherry-man.jpg"
+        "photo": "/videos/simni-man.jpg"
       }
     ]
   },
   {
-    "id": "hadong-market",
-    "group": "market",
+    "id": "simni-2",
+    "group": "simni",
     "title": {
-      "ko": "장날 밤, 화개장터",
-      "zh": "赶集之夜，花开市场",
-      "en": "Market Night at Hwagae",
-      "ja": "市の夜、花開市場"
+      "ko": "손바닥 위 꽃잎 하나",
+      "zh": "掌心的一片花瓣",
+      "en": "A Petal in Her Palm",
+      "ja": "てのひらに花びらひとつ"
     },
     "description": {
-      "ko": "불빛 가득한 화개장터 장날 밤, 그가 건넨 한 입에 웃음이 터지는 그녀. 둘 중 한 사람이 되어 보세요.",
-      "zh": "灯火通明的花开市场赶集夜，他递来一口美食，她笑开了花。成为其中一人吧。",
-      "en": "On a lantern-lit market night at Hwagae, he offers her a bite and she bursts into a smile. Step into either role.",
-      "ja": "灯りに満ちた花開市場の市の夜、彼が差し出したひと口に笑顔がこぼれる彼女。どちらかになってみよう。"
+      "ko": "그가 건넨 꽃잎 한 장, 노을 진 벚꽃길에서 마주 보는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "他递来一片花瓣，两人在晚霞中的樱花路上相视而立。成为其中一人吧。",
+      "en": "He places a single petal in her hand, and they face each other on the blossom road at sunset. Step into either role.",
+      "ja": "彼が手渡した花びら一枚、夕焼けの桜並木で向かい合う二人。どちらかになってみよう。"
     },
-    "src": "/videos/hadong-market.mp4",
-    "poster": "/videos/hadong-market.jpg",
+    "src": "/videos/simni-2.mp4",
+    "poster": "/videos/simni-2.jpg",
+    "seconds": 9,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a pink cardigan",
+        "still": "/videos/simni-woman.jpg",
+        "photo": "/videos/simni-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a navy jacket",
+        "photo": "/videos/simni-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "market-1",
+    "group": "market",
+    "title": {
+      "ko": "장날 밤 나들이",
+      "zh": "赶集夜的漫步",
+      "en": "A Stroll on Market Night",
+      "ja": "市の夜のおでかけ"
+    },
+    "description": {
+      "ko": "불빛 가득한 화개장터를 함께 걷다, 그가 건넨 한 입. 둘 중 한 사람이 되어 보세요.",
+      "zh": "并肩走在灯火通明的花开市场，他递来一口小吃。成为其中一人吧。",
+      "en": "Walking together through lantern-lit Hwagae Market, he offers her a bite. Step into either role.",
+      "ja": "灯りに満ちた花開市場を並んで歩き、彼が差し出すひと口。どちらかになってみよう。"
+    },
+    "src": "/videos/market-1.mp4",
+    "poster": "/videos/market-1.jpg",
+    "seconds": 7,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "still": "/videos/market-woman.jpg",
+        "photo": "/videos/market-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "photo": "/videos/market-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "market-2",
+    "group": "market",
+    "title": {
+      "ko": "한 입의 설렘",
+      "zh": "一口的心动",
+      "en": "One Bite, One Flutter",
+      "ja": "ひと口のときめき"
+    },
+    "description": {
+      "ko": "장터 먹거리 한 입에 눈이 동그래지는 그녀, 북적이는 장날 밤. 둘 중 한 사람이 되어 보세요.",
+      "zh": "尝一口市场小吃，她睁大了眼睛，热闹的赶集之夜。成为其中一人吧。",
+      "en": "One bite of market food and her eyes go wide, on a bustling market night. Step into either role.",
+      "ja": "市場のおやつをひと口、目を丸くする彼女。にぎわう市の夜。どちらかになってみよう。"
+    },
+    "src": "/videos/market-2.mp4",
+    "poster": "/videos/market-2.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -71,8 +159,8 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
-        "still": "/videos/hadong-market-woman.jpg",
-        "photo": "/videos/hadong-market-woman.jpg"
+        "still": "/videos/market-woman.jpg",
+        "photo": "/videos/market-woman.jpg"
       },
       {
         "id": "man",
@@ -83,27 +171,27 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
-        "photo": "/videos/hadong-market-man.jpg"
+        "photo": "/videos/market-man.jpg"
       }
     ]
   },
   {
-    "id": "hadong-river",
+    "id": "market-3",
     "group": "market",
     "title": {
-      "ko": "섬진강 물결 위로",
-      "zh": "蟾津江的波光里",
-      "en": "Sparkles on the Seomjin River",
-      "ja": "蟾津江のきらめき"
+      "ko": "장터에서 한 잔",
+      "zh": "市场里的一杯",
+      "en": "A Cup at the Market",
+      "ja": "市場で一杯"
     },
     "description": {
-      "ko": "햇살이 부서지는 섬진강 모래톱, 손을 잡고 물가를 뛰어가는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "阳光洒落的蟾津江沙洲，两人牵着手在水边奔跑。成为其中一人吧。",
-      "en": "On a sunlit sandbar of the Seomjin River, two people run hand in hand along the water. Step into either role.",
-      "ja": "陽の光がきらめく蟾津江の砂州、手をつないで水辺を駆ける二人。どちらかになってみよう。"
+      "ko": "웃음이 터진 그녀와 나란히 서서 한 잔, 장날 밤의 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "她笑出了声，两人并肩举杯，赶集夜的一对。成为其中一人吧。",
+      "en": "She bursts out laughing, then they stand side by side with a cup each on market night. Step into either role.",
+      "ja": "笑いがこぼれる彼女と並んで一杯、市の夜の二人。どちらかになってみよう。"
     },
-    "src": "/videos/hadong-river.mp4",
-    "poster": "/videos/hadong-river.jpg",
+    "src": "/videos/market-3.mp4",
+    "poster": "/videos/market-3.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -114,9 +202,9 @@
           "en": "Her",
           "ja": "彼女"
         },
-        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
-        "still": "/videos/hadong-river-woman.jpg",
-        "photo": "/videos/hadong-river-woman.jpg"
+        "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "still": "/videos/market-woman.jpg",
+        "photo": "/videos/market-woman.jpg"
       },
       {
         "id": "man",
@@ -126,28 +214,28 @@
           "en": "Him",
           "ja": "彼"
         },
-        "target": "the young man with long hair tied in a ponytail in a blue shirt",
-        "photo": "/videos/hadong-river-man.jpg"
+        "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "photo": "/videos/market-man.jpg"
       }
     ]
   },
   {
-    "id": "hadong-tea",
-    "group": "market",
+    "id": "tea-1",
+    "group": "tea",
     "title": {
-      "ko": "하동 녹차밭에서",
-      "zh": "河东绿茶园",
-      "en": "Among Hadong's Tea Fields",
-      "ja": "河東の茶畑で"
+      "ko": "차 한 잔 건네는 아침",
+      "zh": "递来一杯茶的清晨",
+      "en": "A Morning Cup of Tea",
+      "ja": "お茶を手渡す朝"
     },
     "description": {
       "ko": "안개 낀 하동 녹차밭, 그가 건넨 차 한 잔에 미소 짓는 그녀. 둘 중 한 사람이 되어 보세요.",
       "zh": "雾气缭绕的河东绿茶园，他递来一杯茶，她微微一笑。成为其中一人吧。",
-      "en": "In Hadong's misty green tea fields, he hands her a cup of tea and she smiles. Step into either role.",
+      "en": "In Hadong's misty tea fields, he hands her a cup of tea and she smiles. Step into either role.",
       "ja": "霧に包まれた河東の茶畑、彼が差し出したお茶に微笑む彼女。どちらかになってみよう。"
     },
-    "src": "/videos/hadong-tea.mp4",
-    "poster": "/videos/hadong-tea.jpg",
+    "src": "/videos/tea-1.mp4",
+    "poster": "/videos/tea-1.jpg",
     "seconds": 8,
     "cast": [
       {
@@ -159,8 +247,8 @@
           "ja": "彼女"
         },
         "target": "the young woman with short wavy bob hair in a navy dress",
-        "still": "/videos/hadong-tea-woman.jpg",
-        "photo": "/videos/hadong-tea-woman.jpg"
+        "still": "/videos/tea-woman.jpg",
+        "photo": "/videos/tea-woman.jpg"
       },
       {
         "id": "man",
@@ -171,41 +259,29 @@
           "ja": "彼"
         },
         "target": "the young man with long hair tied in a ponytail in a cream sweater",
-        "photo": "/videos/hadong-tea-man.jpg"
+        "photo": "/videos/tea-man.jpg"
       }
     ]
   },
   {
-    "id": "simni-tunnel",
-    "group": "simni",
+    "id": "tea-2",
+    "group": "tea",
     "title": {
-      "ko": "십리벚꽃길, 그 봄날",
-      "zh": "十里樱花路的那个春天",
-      "en": "That Spring on the Cherry Blossom Road",
-      "ja": "十里桜並木、あの春の日"
+      "ko": "녹차밭의 웃음",
+      "zh": "茶园里的笑声",
+      "en": "Laughter in the Tea Fields",
+      "ja": "茶畑の笑い声"
     },
     "description": {
-      "ko": "화개장터 앞 십리벚꽃길, 꽃비 속을 함께 걸어가는 두 사람. 그 봄날의 주인공이 되어 보세요.",
-      "zh": "花开市场前的十里樱花路，两人在樱花雨中并肩走远。成为那个春天的主角吧。",
-      "en": "On the Simni Cherry Blossom Road by Hwagae Market, two people walk on together through a rain of petals. Star in that spring day.",
-      "ja": "花開（ファゲ）市場の前に続く十里桜並木、花吹雪の中を寄り添って歩く二人。あの春の日の主人公になってみよう。"
+      "ko": "초록 차밭을 뒤로하고 마주 웃는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "背靠一片翠绿的茶园，两人相视而笑。成为其中一人吧。",
+      "en": "With green tea fields behind them, the two share a laugh. Step into either role.",
+      "ja": "緑の茶畑を背に、笑い合う二人。どちらかになってみよう。"
     },
-    "src": "/videos/simni-tunnel.mp4",
-    "poster": "/videos/simni-tunnel.jpg",
+    "src": "/videos/tea-2.mp4",
+    "poster": "/videos/tea-2.jpg",
     "seconds": 8,
     "cast": [
-      {
-        "id": "man",
-        "label": {
-          "ko": "그",
-          "zh": "他",
-          "en": "Him",
-          "ja": "彼"
-        },
-        "target": "the man on the left",
-        "still": "/videos/simni-tunnel-man.jpg",
-        "photo": "/videos/simni-tunnel-man.jpg"
-      },
       {
         "id": "woman",
         "label": {
@@ -214,30 +290,10 @@
           "en": "Her",
           "ja": "彼女"
         },
-        "target": "the woman on the right",
-        "photo": "/videos/simni-tunnel-woman.jpg"
-      }
-    ]
-  },
-  {
-    "id": "simni-petal",
-    "group": "simni",
-    "title": {
-      "ko": "머리 위 벚꽃잎 하나",
-      "zh": "发间的一片樱花",
-      "en": "A Petal in Her Hair",
-      "ja": "髪にひとひらの桜"
-    },
-    "description": {
-      "ko": "십리벚꽃길에서 그녀 머리에 내려앉은 꽃잎을 떼어 주는 그. 둘 중 한 사람이 되어 보세요.",
-      "zh": "在十里樱花路上，他轻轻摘下落在她发间的花瓣。成为其中一人吧。",
-      "en": "On the Simni Cherry Blossom Road near Hwagae Market, petals shower down and he brushes one from her hair. Step into either role.",
-      "ja": "十里桜並木で、彼女の髪に舞い降りた花びらをそっと取る彼。どちらかになってみよう。"
-    },
-    "src": "/videos/simni-petal.mp4",
-    "poster": "/videos/simni-petal.jpg",
-    "seconds": 8,
-    "cast": [
+        "target": "the young woman with short wavy bob hair in a navy dress",
+        "still": "/videos/tea-woman.jpg",
+        "photo": "/videos/tea-woman.jpg"
+      },
       {
         "id": "man",
         "label": {
@@ -246,10 +302,30 @@
           "en": "Him",
           "ja": "彼"
         },
-        "target": "the man on the left",
-        "still": "/videos/simni-petal-man.jpg",
-        "photo": "/videos/simni-petal-man.jpg"
-      },
+        "target": "the young man with long hair tied in a ponytail in a cream sweater",
+        "photo": "/videos/tea-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "river-1",
+    "group": "river",
+    "title": {
+      "ko": "손을 잡고, 섬진강",
+      "zh": "牵手奔向蟾津江",
+      "en": "Hand in Hand by the Seomjin",
+      "ja": "手をつないで、蟾津江"
+    },
+    "description": {
+      "ko": "햇살이 부서지는 섬진강 모래톱, 내민 손을 잡고 물가를 달리는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "阳光洒落的蟾津江沙洲，握住伸来的手，两人在水边奔跑。成为其中一人吧。",
+      "en": "On a sunlit sandbar of the Seomjin River, she takes his hand and they run along the water. Step into either role.",
+      "ja": "陽の光がきらめく蟾津江の砂州、差し出された手を取って水辺を駆ける二人。どちらかになってみよう。"
+    },
+    "src": "/videos/river-1.mp4",
+    "poster": "/videos/river-1.jpg",
+    "seconds": 9,
+    "cast": [
       {
         "id": "woman",
         "label": {
@@ -258,30 +334,10 @@
           "en": "Her",
           "ja": "彼女"
         },
-        "target": "the woman on the right",
-        "photo": "/videos/simni-petal-woman.jpg"
-      }
-    ]
-  },
-  {
-    "id": "simni-stream",
-    "group": "simni",
-    "title": {
-      "ko": "화개천 노을 아래",
-      "zh": "花开川的夕阳下",
-      "en": "Sunset by the Hwagae Stream",
-      "ja": "花開川（ファゲチョン）の夕暮れ"
-    },
-    "description": {
-      "ko": "노을 지는 화개천 벚꽃길, 서로를 바라보며 웃음 짓는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "夕阳下的花开川樱花路，两人相视而笑。成为其中一人吧。",
-      "en": "On the cherry blossom road by the Hwagae stream at sunset, two people share a smile. Step into either role.",
-      "ja": "夕暮れの花開川（ファゲチョン）の桜並木、見つめ合って微笑む二人。どちらかになってみよう。"
-    },
-    "src": "/videos/simni-stream.mp4",
-    "poster": "/videos/simni-stream.jpg",
-    "seconds": 8,
-    "cast": [
+        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "still": "/videos/river-woman.jpg",
+        "photo": "/videos/river-woman.jpg"
+      },
       {
         "id": "man",
         "label": {
@@ -290,10 +346,30 @@
           "en": "Him",
           "ja": "彼"
         },
-        "target": "the man on the left",
-        "still": "/videos/simni-stream-man.jpg",
-        "photo": "/videos/simni-stream-man.jpg"
-      },
+        "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "photo": "/videos/river-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "river-2",
+    "group": "river",
+    "title": {
+      "ko": "강물 장난",
+      "zh": "江边嬉水",
+      "en": "Splashing in the River",
+      "ja": "川辺の水あそび"
+    },
+    "description": {
+      "ko": "섬진강 물을 튕기며 웃는 그녀, 흠뻑 젖고도 웃는 그. 둘 중 한 사람이 되어 보세요.",
+      "zh": "她笑着泼起蟾津江的水，他被溅湿了也在笑。成为其中一人吧。",
+      "en": "She laughs as she splashes river water, and he laughs even as he gets soaked. Step into either role.",
+      "ja": "蟾津江の水をはねて笑う彼女、濡れても笑う彼。どちらかになってみよう。"
+    },
+    "src": "/videos/river-2.mp4",
+    "poster": "/videos/river-2.jpg",
+    "seconds": 8,
+    "cast": [
       {
         "id": "woman",
         "label": {
@@ -302,8 +378,64 @@
           "en": "Her",
           "ja": "彼女"
         },
-        "target": "the woman on the right",
-        "photo": "/videos/simni-stream-woman.jpg"
+        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "still": "/videos/river-woman.jpg",
+        "photo": "/videos/river-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "photo": "/videos/river-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "river-3",
+    "group": "river",
+    "title": {
+      "ko": "강가에서 주운 것",
+      "zh": "在江边拾到的",
+      "en": "What We Found by the River",
+      "ja": "川辺で見つけたもの"
+    },
+    "description": {
+      "ko": "맑은 섬진강 물속에서 건져 올린 조개, 나란히 앉아 들여다보는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "从清澈的蟾津江水中捞起贝壳，两人并肩蹲着细看。成为其中一人吧。",
+      "en": "He scoops shells from the clear Seomjin water, and they crouch side by side to look. Step into either role.",
+      "ja": "澄んだ蟾津江の水からすくい上げた貝、並んでのぞき込む二人。どちらかになってみよう。"
+    },
+    "src": "/videos/river-3.mp4",
+    "poster": "/videos/river-3.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "still": "/videos/river-woman.jpg",
+        "photo": "/videos/river-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "photo": "/videos/river-man.jpg"
       }
     ]
   }

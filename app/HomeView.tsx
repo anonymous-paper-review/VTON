@@ -55,7 +55,7 @@ export function MapButton() {
 
 export default function HomeView({ videos }: { videos: Video[] }) {
   const { t, pick } = useLang();
-  const [tab, setTab] = useState<Group>("market");
+  const [tab, setTab] = useState<Group>("simni");
   const shown = videos.filter((v) => v.group === tab);
   // 앱을 닫았다 다시 QR로 들어온 사람에게 만들던 영상을 바로 보여 준다
   const [mine, setMine] = useState<MyJob[]>([]);
