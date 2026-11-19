@@ -1,6 +1,5 @@
 import { jobSource } from "@/lib/jobs";
 import { stitch } from "@/lib/stitch";
-import { absoluteUrl } from "@/lib/videos";
 
 // 완성 영상을 한 파일로 내준다: 엔진이 만든 얼굴 구간 + 원본의 얼굴 없는 구간 (lib/stitch.ts).
 // 요금을 줄이려고 엔진에는 얼굴 구간만 보내기 때문에, 화면·저장·이어 보기는 모두 이 주소를 쓴다.
@@ -22,7 +21,7 @@ export async function GET(req: Request) {
   if (!src) return new Response("not found", { status: 404 });
 
   try {
-    const out = await stitch({ resultUrl: src.resultUrl, fullUrl: absoluteUrl(src.video.src, url.origin), parts: src.video.parts! });
+    const out = await stitch({ resultUrl: src.resultUrl, fullSrc: src.video.src, origin: url.origin, parts: src.video.parts! });
     console.info("vton event", JSON.stringify({ ev: "stitched", video: src.video.id, s: out.seconds, mb: out.size / 1e6 }));
     return new Response(out.stream(), {
       headers: {

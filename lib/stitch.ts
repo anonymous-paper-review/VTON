@@ -69,16 +69,27 @@ export function stitchFilter(parts: Part[]): { filter: string; frames: number } 
 export type Stitched = { size: number; stream: () => ReadableStream<Uint8Array>; seconds: number };
 
 /** 이어 붙인 mp4를 임시 폴더에 만들고 스트림으로 돌려준다. 스트림이 끝나면 임시 파일을 지운다 (서버에 영상을 남기지 않는다). */
-export async function stitch(opts: { resultUrl: string; fullUrl: string; parts: Part[] }): Promise<Stitched> {
+/**
+ * 원본 전체 영상. 서버 함수에 함께 실어 둔 파일(next.config.ts)을 먼저 쓰고, 없으면 배포 주소에서 받는다.
+ * 배포 주소에서만 받으면 로그인으로 막힌 미리보기 배포에서는 영상 대신 로그인 화면이 와서 이어 붙이기가 실패한다.
+ */
+function bundledClip(src: string): string | null {
+  const m = /^\/videos\/([\w-]+\.mp4)$/.exec(src);
+  const file = m && path.join(process.cwd(), "public", "videos", m[1]);
+  return file && existsSync(file) ? file : null;
+}
+
+export async function stitch(opts: { resultUrl: string; fullSrc: string; origin: string; parts: Part[] }): Promise<Stitched> {
   const t0 = Date.now();
   const dir = await mkdtemp(path.join(tmpdir(), "vton-stitch-"));
   const clean = () => rm(dir, { recursive: true, force: true }).catch(() => {});
   try {
     // 파일 이름은 public/의 영상 이름과 겹치지 않게 둔다 (겹치면 빌드가 그 영상들을 서버 함수에 함께 싣는다)
     const gen = path.join(dir, "in-result.bin");
-    const full = path.join(dir, "in-full.bin");
+    const local = bundledClip(opts.fullSrc);
+    const full = local ?? path.join(dir, "in-full.bin");
     const out = path.join(dir, "stitched.bin");
-    await Promise.all([download(opts.resultUrl, gen), download(opts.fullUrl, full)]);
+    await Promise.all([download(opts.resultUrl, gen), local ? null : download(new URL(opts.fullSrc, opts.origin).toString(), full)]);
     const { filter, frames } = stitchFilter(opts.parts);
     const args = [
       "-v", "error", "-y", "-i", gen, "-i", full, "-filter_complex", filter,
