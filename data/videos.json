@@ -47,20 +47,20 @@
     "id": "simni-2",
     "group": "simni",
     "title": {
-      "ko": "손바닥 위 꽃잎 하나",
-      "zh": "掌心的一片花瓣",
-      "en": "A Petal in Her Palm",
-      "ja": "てのひらに花びらひとつ"
+      "ko": "노을 진 벚꽃길에서",
+      "zh": "晚霞中的樱花路",
+      "en": "Sunset on the Blossom Road",
+      "ja": "夕焼けの桜並木で"
     },
     "description": {
-      "ko": "그가 건넨 꽃잎 한 장, 노을 진 벚꽃길에서 마주 보는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "他递来一片花瓣，两人在晚霞中的樱花路上相视而立。成为其中一人吧。",
-      "en": "He places a single petal in her hand, and they face each other on the blossom road at sunset. Step into either role.",
-      "ja": "彼が手渡した花びら一枚、夕焼けの桜並木で向かい合う二人。どちらかになってみよう。"
+      "ko": "노을 진 십리벚꽃길, 마주 보고 웃는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "晚霞中的十里樱花路，两人相视而笑。成为其中一人吧。",
+      "en": "On the Simni Cherry Blossom Road at sunset, the two face each other and smile. Step into either role.",
+      "ja": "夕焼けの十里桜並木、向かい合って笑う二人。どちらかになってみよう。"
     },
     "src": "/videos/simni-2.mp4",
     "poster": "/videos/simni-2.jpg",
-    "seconds": 9,
+    "seconds": 7,
     "cast": [
       {
         "id": "woman",
@@ -104,7 +104,7 @@
     },
     "src": "/videos/market-1.mp4",
     "poster": "/videos/market-1.jpg",
-    "seconds": 7,
+    "seconds": 8,
     "cast": [
       {
         "id": "woman",
@@ -141,10 +141,10 @@
       "ja": "ひと口のときめき"
     },
     "description": {
-      "ko": "장터 먹거리 한 입에 눈이 동그래지는 그녀, 북적이는 장날 밤. 둘 중 한 사람이 되어 보세요.",
-      "zh": "尝一口市场小吃，她睁大了眼睛，热闹的赶集之夜。成为其中一人吧。",
-      "en": "One bite of market food and her eyes go wide, on a bustling market night. Step into either role.",
-      "ja": "市場のおやつをひと口、目を丸くする彼女。にぎわう市の夜。どちらかになってみよう。"
+      "ko": "장터 먹거리 한 입에 눈이 동그래지는 그녀, 그리고 나란히 한 잔. 둘 중 한 사람이 되어 보세요.",
+      "zh": "尝一口市场小吃，她睁大了眼睛，然后两人并肩喝上一杯。成为其中一人吧。",
+      "en": "One bite of market food and her eyes go wide, then a cup side by side. Step into either role.",
+      "ja": "市場のおやつをひと口、目を丸くする彼女。そして並んで一杯。どちらかになってみよう。"
     },
     "src": "/videos/market-2.mp4",
     "poster": "/videos/market-2.jpg",
@@ -185,14 +185,14 @@
       "ja": "市場で一杯"
     },
     "description": {
-      "ko": "웃음이 터진 그녀와 나란히 서서 한 잔, 장날 밤의 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "她笑出了声，两人并肩举杯，赶集夜的一对。成为其中一人吧。",
-      "en": "She bursts out laughing, then they stand side by side with a cup each on market night. Step into either role.",
-      "ja": "笑いがこぼれる彼女と並んで一杯、市の夜の二人。どちらかになってみよう。"
+      "ko": "불빛 가득한 장터에 나란히 서서 한 잔, 장날 밤의 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "在灯火通明的市场里并肩喝上一杯，赶集夜的两人。成为其中一人吧。",
+      "en": "Side by side with a cup each in the lantern-lit market, two people on market night. Step into either role.",
+      "ja": "灯りに満ちた市場で並んで一杯、市の夜の二人。どちらかになってみよう。"
     },
     "src": "/videos/market-3.mp4",
     "poster": "/videos/market-3.jpg",
-    "seconds": 8,
+    "seconds": 6,
     "cast": [
       {
         "id": "woman",
@@ -324,7 +324,7 @@
     },
     "src": "/videos/river-1.mp4",
     "poster": "/videos/river-1.jpg",
-    "seconds": 9,
+    "seconds": 7,
     "cast": [
       {
         "id": "woman",
@@ -368,7 +368,7 @@
     },
     "src": "/videos/river-2.mp4",
     "poster": "/videos/river-2.jpg",
-    "seconds": 8,
+    "seconds": 6,
     "cast": [
       {
         "id": "woman",
@@ -405,14 +405,14 @@
       "ja": "川辺で見つけたもの"
     },
     "description": {
-      "ko": "맑은 섬진강 물속에서 건져 올린 조개, 나란히 앉아 들여다보는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "从清澈的蟾津江水中捞起贝壳，两人并肩蹲着细看。成为其中一人吧。",
-      "en": "He scoops shells from the clear Seomjin water, and they crouch side by side to look. Step into either role.",
-      "ja": "澄んだ蟾津江の水からすくい上げた貝、並んでのぞき込む二人。どちらかになってみよう。"
+      "ko": "섬진강 물가에 나란히 앉아, 주운 조개를 들여다보는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "两人并肩蹲在蟾津江边，细看拾来的贝壳。成为其中一人吧。",
+      "en": "Crouched side by side at the edge of the Seomjin River, they look over the shells they found. Step into either role.",
+      "ja": "蟾津江の水辺に並んでしゃがみ、拾った貝をのぞき込む二人。どちらかになってみよう。"
     },
     "src": "/videos/river-3.mp4",
     "poster": "/videos/river-3.jpg",
-    "seconds": 8,
+    "seconds": 5,
     "cast": [
       {
         "id": "woman",
