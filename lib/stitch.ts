@@ -45,11 +45,12 @@ async function download(url: string, dest: string): Promise<void> {
 
 /** 입력 0 = 생성 결과(얼굴 구간만), 입력 1 = 원본 전체 영상. parts 순서대로 잘라 붙이는 필터. */
 export function stitchFilter(parts: Part[]): { filter: string; frames: number } {
-  const cuts: { input: 0 | 1; from: number; to: number }[] = [];
+  const cuts: { input: 0 | 1; from: number; to: number; fade?: number }[] = [];
   let g = 0; // 생성 결과에서의 위치(프레임)
   let f = 0; // 전체 영상에서의 위치
-  for (const [kind, n] of parts) {
-    if (kind === "gen") { cuts.push({ input: 0, from: g, to: g + n }); g += n; }
+  for (const [kind, n, fade] of parts) {
+    if (kind === "gen") { cuts.push({ input: 0, from: g, to: g + n, fade }); g += n; }
+    // 원본 구간은 전체 영상에 이미 디졸브가 들어 있어 다시 넣지 않는다
     else cuts.push({ input: 1, from: f, to: f + n });
     f += n;
   }
@@ -60,7 +61,11 @@ export function stitchFilter(parts: Part[]): { filter: string; frames: number } 
     // 프레임 수·크기가 원본과 조금 달라도 맞춘다. 결과가 몇 프레임 짧으면 마지막 프레임으로 채운다.
     const norm = `[${input}:v]fps=${CLIP_FPS},scale=${W}:${H},setsar=1${input === 0 ? ",tpad=stop_mode=clone:stop=12" : ""}`;
     chains.push(mine.length === 1 ? `${norm}[s${mine[0].i}]` : `${norm},split=${mine.length}${mine.map((c) => `[s${c.i}]`).join("")}`);
-    for (const c of mine) chains.push(`[s${c.i}]trim=start_frame=${c.from}:end_frame=${c.to},setpts=PTS-STARTPTS[p${c.i}]`);
+    for (const c of mine) {
+      // 끝 타이틀 앞 샷은 전체 영상과 똑같이 검정으로 디졸브한다
+      const fade = c.fade ? `,fade=t=out:start_frame=${c.to - c.from - c.fade}:nb_frames=${c.fade}` : "";
+      chains.push(`[s${c.i}]trim=start_frame=${c.from}:end_frame=${c.to},setpts=PTS-STARTPTS${fade}[p${c.i}]`);
+    }
   }
   chains.push(`${cuts.map((_, i) => `[p${i}]`).join("")}concat=n=${cuts.length}:v=1:a=0[v]`);
   return { filter: chains.join(";"), frames: f };

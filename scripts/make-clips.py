@@ -10,6 +10,10 @@
 그리고 data/videos.json의 seconds·gen·parts를 맞춰 고친다 (제목·등장인물은 그대로 둔다).
 결과가 오면 서버가 parts 순서대로 "생성 결과의 G 구간 + 전체 영상의 N 구간"을 이어 붙인다 (lib/stitch.ts).
 
+끝맺음: 마지막 샷이 검정으로 디졸브되고(FADE 프레임), 검정 바탕에 트레일러 끝 타이틀
+("장소 이름 / 화개(花開), 장날에 만나요", scripts/titles/<장소>.png)이 떠오른다(TAIL 프레임).
+타이틀은 전체 영상에만 들어가는 원본 구간이라 엔진에 보내는 길이(요금)는 그대로다.
+
 숫자는 트레일러의 프레임 번호(24fps)다. 컷 경계에서 한 프레임씩 안쪽으로 잡았다.
 H3 Max는 5초 미만 영상을 받지 않으므로 G 합계는 5.4초(130프레임) 이상으로 둔다.
 """
@@ -17,6 +21,9 @@ import json, os, subprocess, sys
 
 FPS = 24
 MIN_GEN_FRAMES = 130
+FADE = 12       # 마지막 샷이 검정으로 사라지는 길이 (0.5초)
+TAIL = 48       # 검정 바탕 타이틀 길이 (2초)
+TITLE_IN = 10   # 타이틀이 떠오르는 길이
 ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 OUT = os.path.join(ROOT, "public", "videos")
 TRAILER = {"simni": "cherry_F2a.mp4", "market": "market_D1a.mp4", "tea": "tea_W.mp4", "river": "river_F2b.mp4"}
@@ -36,15 +43,25 @@ CLIPS = {
 }
 
 
-def join(src, out, segs):
-    """프레임 구간들을 이어 붙인다. 소리는 첫 구간 시작부터 끊김 없이 이어서 쓴다(음악이 컷마다 튀지 않게)."""
-    n = sum(b - a for a, b in segs)
+def join(src, out, segs, title=None):
+    """프레임 구간들을 이어 붙인다. 소리는 첫 구간 시작부터 끊김 없이 이어서 쓴다(음악이 컷마다 튀지 않게).
+    title(그림 파일)을 주면 마지막 구간을 검정으로 디졸브하고 타이틀을 붙인다."""
+    n = sum(b - a for a, b in segs) + (TAIL if title else 0)
     tot = n / FPS
     a0 = segs[0][0] / FPS
-    f = ";".join(f"[0:v]trim=start_frame={a}:end_frame={b},setpts=PTS-STARTPTS[v{i}]" for i, (a, b) in enumerate(segs))
-    f += ";" + "".join(f"[v{i}]" for i in range(len(segs))) + f"concat=n={len(segs)}:v=1:a=0[v]"
-    f += f";[0:a]atrim={a0}:{a0 + tot},asetpts=PTS-STARTPTS,afade=t=in:d=0.3,afade=t=out:st={tot - 0.6}:d=0.6[a]"
-    subprocess.run(["ffmpeg", "-v", "error", "-y", "-i", src, "-filter_complex", f, "-map", "[v]", "-map", "[a]",
+    chains = []
+    for i, (a, b) in enumerate(segs):
+        fade = f",fade=t=out:start_frame={b - a - FADE}:nb_frames={FADE}" if title and i == len(segs) - 1 else ""
+        chains.append(f"[0:v]trim=start_frame={a}:end_frame={b},setpts=PTS-STARTPTS{fade}[v{i}]")
+    labels = "".join(f"[v{i}]" for i in range(len(segs)))
+    if title:
+        chains.append(f"[1:v]fps={FPS},scale=1344:768,format=yuv420p,fade=t=in:start_frame=0:nb_frames={TITLE_IN},trim=end_frame={TAIL},setpts=PTS-STARTPTS[tail]")
+        labels += "[tail]"
+    f = ";".join(chains) + ";" + labels + f"concat=n={len(segs) + (1 if title else 0)}:v=1:a=0[v]"
+    out_fade = 1.2 if title else 0.6
+    f += f";[0:a]atrim={a0}:{a0 + tot},asetpts=PTS-STARTPTS,afade=t=in:d=0.3,afade=t=out:st={tot - out_fade}:d={out_fade}[a]"
+    inputs = ["-i", src] + (["-loop", "1", "-framerate", str(FPS), "-t", str(TAIL / FPS + 1), "-i", title] if title else [])
+    subprocess.run(["ffmpeg", "-v", "error", "-y", *inputs, "-filter_complex", f, "-map", "[v]", "-map", "[a]",
                     "-c:v", "libx264", "-crf", "22", "-preset", "slow", "-pix_fmt", "yuv420p", "-r", str(FPS), "-frames:v", str(n),
                     "-movflags", "+faststart", "-c:a", "aac", "-b:a", "128k", "-t", f"{tot:.4f}", out], check=True)
     return n
@@ -56,8 +73,10 @@ def main(trailers):
     by_id = {v["id"]: v for v in videos}
     total_cost = 0.0
     for vid, (poster, shots) in CLIPS.items():
-        src = os.path.join(trailers, TRAILER[vid.split("-")[0]])
-        full = join(src, os.path.join(OUT, f"{vid}.mp4"), [(a, b) for _, a, b in shots])
+        group = vid.split("-")[0]
+        src = os.path.join(trailers, TRAILER[group])
+        title = os.path.join(ROOT, "scripts", "titles", f"{group}.png")
+        full = join(src, os.path.join(OUT, f"{vid}.mp4"), [(a, b) for _, a, b in shots], title)
         gen_shots = [(a, b) for k, a, b in shots if k == "G"]
         gen = join(src, os.path.join(OUT, f"{vid}-gen.mp4"), gen_shots)
         assert gen >= MIN_GEN_FRAMES, f"{vid}: 생성 구간이 너무 짧다 ({gen}프레임)"
@@ -71,6 +90,9 @@ def main(trailers):
                 parts[-1][1] += b - a
             else:
                 parts.append([kind, b - a])
+        # 마지막 샷 끝을 검정으로 디졸브(세 번째 값)하고, 타이틀은 원본 구간으로 붙인다
+        parts[-1].append(FADE)
+        parts.append(["orig", TAIL])
         v = by_id[vid]
         v["seconds"] = round(full / FPS)
         v["gen"] = {"src": f"/videos/{vid}-gen.mp4", "seconds": round(gen / FPS, 2)}

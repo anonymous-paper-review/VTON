@@ -302,7 +302,7 @@ async function resumePaths(browser) {
     note(ok, "다른 기기 ?job= 링크로 완성 화면");
     await p2.waitForFunction(() => document.querySelector(".result video")?.duration > 0, null, { timeout: 8000 }).catch(() => {});
     const dur = await p2.evaluate(() => document.querySelector(".result video")?.duration || 0);
-    note(Math.abs(dur - 8.5) < 0.2, "?job= 링크: 이어 붙인 전체 길이 영상", `${dur.toFixed(2)}초 (전체 8.50초, 얼굴 구간만은 7.08초)`);
+    note(Math.abs(dur - 10.5) < 0.2, "?job= 링크: 이어 붙인 전체 길이 영상", `${dur.toFixed(2)}초 (전체 10.50초, 얼굴 구간만은 7.08초)`);
     await c2.close();
   }
   if (errs.length) note(false, "이어보기 콘솔 오류", errs.slice(0, 3).join(" | "));
@@ -463,7 +463,7 @@ async function progressPaths(browser) {
     await page.waitForFunction(() => document.querySelector(".result video")?.duration > 0, null, { timeout: 8000 }).catch(() => {});
     const dur = await page.evaluate(() => document.querySelector(".result video")?.duration || 0);
     const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("vton.jobs") || "[]")[0]?.resultUrl || "");
-    note(Math.abs(dur - 8.75) < 0.2 && saved.startsWith("/api/result?job="), "얼굴 구간만 생성 → 원본 샷을 이어 붙인 결과", `${dur.toFixed(2)}초 (전체 8.75초, 얼굴 구간만은 6.83초), ${saved.slice(0, 24)}`);
+    note(Math.abs(dur - 10.75) < 0.2 && saved.startsWith("/api/result?job="), "얼굴 구간만 생성 → 원본 샷을 이어 붙인 결과", `${dur.toFixed(2)}초 (전체 10.75초, 얼굴 구간만은 6.83초), ${saved.slice(0, 24)}`);
     await ctx.close();
   }
   // 5) 장면 의상(캐릭터시트)이 실패하면 사진 그대로 진행한다고 알리는가

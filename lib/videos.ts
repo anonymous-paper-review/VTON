@@ -22,8 +22,11 @@ export type Group = (typeof GROUPS)[number];
 
 /** 클립 프레임 속도. parts의 길이 단위(프레임)가 이 속도 기준이다 (scripts/make-clips.py). */
 export const CLIP_FPS = 24;
-/** 재생 순서대로 [종류, 프레임 수]. gen = 얼굴이 나와 AI가 다시 만드는 구간, orig = 얼굴이 없어 원본을 그대로 쓰는 구간. */
-export type Part = ["gen" | "orig", number];
+/**
+ * 재생 순서대로 [종류, 프레임 수, 끝 디졸브 프레임 수?]. gen = 얼굴이 나와 AI가 다시 만드는 구간, orig = 원본을 그대로 쓰는 구간(얼굴 없는 샷, 끝 타이틀).
+ * 세 번째 값이 있으면 그 구간의 마지막 N프레임이 검정으로 사라진다 (끝 타이틀 앞 샷).
+ */
+export type Part = ["gen" | "orig", number, number?];
 
 export type Video = {
   id: string;
