@@ -9,6 +9,47 @@ if (process.env.FAL_KEY) fal.config({ credentials: process.env.FAL_KEY });
 const MOCK = process.env.VTON_MOCK === "1";
 const MOCK_SECONDS = 6;
 
+// 캐릭터시트: 셀카 인물에게 영상 속 옷을 입혀 정면·반측면·측면 세 각도로 그린 한 장. 이걸 참고 사진으로 넣으면
+// 바뀐 뒤에도 옷이 원본과 같고(셀카만 넣으면 셀카 옷으로 바뀐다) 옆·뒷모습 컷도 맞는다 (2026-11-19 시험).
+// sync_mode라 결과가 data URI로만 돌아와 fal 저장소에 파일로 남지 않는다. VTON_SHEET=0 이면 끈다.
+const SHEET_ENDPOINT = "fal-ai/nano-banana-pro/edit";
+const SHEET_ON = process.env.VTON_SHEET !== "0";
+/** 보통 20~30초. 이보다 오래 걸리거나 실패하면 셀카를 그대로 쓴다 (서버 함수 제한 60초 안에 끝내야 한다). */
+const SHEET_TIMEOUT_MS = 40_000;
+
+const sheetPrompt = (outfit: string) =>
+  "Create a character reference sheet of exactly the same person as in the photo. " +
+  "Keep the face, facial hair, glasses if any, hairstyle, skin tone, age and body build exactly the same. " +
+  "Show three upper-body views of this one person side by side on a plain light gray studio background with soft even lighting: " +
+  "front view, three-quarter view, and side profile. " +
+  `In all three views the person wears the same outfit: ${outfit}. ` +
+  "Photorealistic, natural skin texture. No text, no labels, no borders.";
+
+/** 셀카(data URI) → 캐릭터시트(data URI). 실패·시간 초과면 null. */
+async function makeSheet(faceUrl: string, outfit: string): Promise<string | null> {
+  const t0 = Date.now();
+  let timer: ReturnType<typeof setTimeout> | undefined;
+  try {
+    const run = fal.subscribe(SHEET_ENDPOINT, {
+      input: { image_urls: [faceUrl], prompt: sheetPrompt(outfit), aspect_ratio: "16:9", resolution: "1K", output_format: "jpeg", num_images: 1, sync_mode: true },
+      pollInterval: 1000,
+    });
+    run.catch(() => {}); // 시간 초과로 먼저 빠져나간 뒤의 거절이 처리 안 된 오류로 남지 않게
+    const timeout = new Promise<never>((_, reject) => { timer = setTimeout(() => reject(new Error("sheet timeout")), SHEET_TIMEOUT_MS); });
+    const res = await Promise.race([run, timeout]);
+    const url = (res.data as { images?: { url?: string }[] })?.images?.[0]?.url;
+    // data URI가 아니면(파일로 저장된 주소) 쓰지 않는다: 동의 화면에 "사진을 파일로 보관하지 않는다"고 안내했다.
+    if (!url?.startsWith("data:image/")) throw new Error("sheet: no inline image");
+    console.info("vton event", JSON.stringify({ ev: "sheet_made", s: (Date.now() - t0) / 1000 }));
+    return url;
+  } catch (e) {
+    console.warn("sheet failed, using selfie", (Date.now() - t0) / 1000, (e as { status?: number })?.status, String((e as Error)?.message ?? e).slice(0, 200));
+    return null;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
 export type JobStatus =
   | { state: "queued"; position?: number }
   | { state: "running" }
@@ -31,6 +72,8 @@ export async function submitJob(opts: {
   target: string;
   /** 바꿀 인물보다 왼쪽에 있어 그대로 둘 인물들 (원본 얼굴 사진) */
   keep: { target: string; imageUrl: string }[];
+  /** 바꿀 인물의 영상 속 옷차림. 있으면 캐릭터시트를 먼저 만든다. */
+  outfit?: string;
   selfie: File;
 }): Promise<string> {
   if (MOCK) {
@@ -41,12 +84,14 @@ export async function submitJob(opts: {
   // fal 스토리지 업로드를 거치지 않아 사진이 별도 저장소에 남지 않는다.
   const faceUrl = `data:${opts.selfie.type};base64,${Buffer.from(await opts.selfie.arrayBuffer()).toString("base64")}`;
   const engine = ENGINES[opts.engine];
+  const sheetUrl = SHEET_ON && engine.sheet && opts.outfit ? await makeSheet(faceUrl, opts.outfit) : null;
+  const refUrl = sheetUrl ?? faceUrl;
   const { request_id } = await fal.queue.submit(engine.endpoint, {
     input: engine.build({
       videoUrl: opts.videoUrl,
-      faceUrl,
+      faceUrl: refUrl,
       target: opts.target,
-      lineup: [...opts.keep.map((k) => ({ ...k, swap: false })), { target: opts.target, imageUrl: faceUrl, swap: true }],
+      lineup: [...opts.keep.map((k) => ({ ...k, swap: false })), { target: opts.target, imageUrl: refUrl, swap: true, sheet: !!sheetUrl }],
     }),
     // 만든 영상 등 fal 저장소 파일을 24시간 뒤 자동 삭제한다 (동의 화면의 보유 기간과 맞춤).
     storageSettings: { expiresIn: "1d" },

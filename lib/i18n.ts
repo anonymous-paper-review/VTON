@@ -141,6 +141,7 @@ const dict = {
   "stage.make": { ko: "AI 영상 만들기", zh: "AI生成视频", en: "AI makes the video", ja: "AIが映像を制作" },
   "stage.fetch": { ko: "내 휴대폰으로 받기", zh: "下载到手机", en: "Download to your phone", ja: "スマホに受信" },
   "stage.sending": { ko: "사진 보내는 중 {pct}%", zh: "正在上传照片 {pct}%", en: "Sending photo {pct}%", ja: "写真を送信中 {pct}%" },
+  "stage.fitting": { ko: "장면 의상을 입혀 보는 중 · 30초쯤 걸려요", zh: "正在为你换上场景服装 · 约30秒", en: "Fitting your scene outfit · about 30s", ja: "シーンの衣装を合わせ中 · 約30秒" },
   "stage.queued": { ko: "접수 완료 · 앞에 {n}명이 기다리고 있어요", zh: "已接收 · 前面还有{n}人", en: "Received · {n} ahead of you", ja: "受付完了 · 前に{n}人待っています" },
   "stage.next": { ko: "접수 완료 · 곧 시작해요", zh: "已接收 · 马上开始", en: "Received · starting soon", ja: "受付完了 · まもなく開始" },
   "stage.received": { ko: "접수 완료", zh: "已接收", en: "Received", ja: "受付完了" },

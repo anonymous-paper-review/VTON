@@ -10,6 +10,8 @@ export type CastMember = {
   target: string;
   /** 원본 속 이 인물의 얼굴 사진. 오른쪽 인물을 바꿀 때 이 인물을 그대로 두려고 MiniMax에 함께 넣는다. */
   still?: string;
+  /** 영상 속 이 인물의 옷차림(영어). 셀카 인물에게 이 옷을 입힌 캐릭터시트를 만들어, 바뀐 뒤에도 옷이 원본과 같게 한다. */
+  outfit?: string;
   /** 고르는 타일에 보일 인물 사진 */
   photo?: string;
 };
