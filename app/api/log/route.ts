@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 
 // 화면 단계별 결과를 Vercel 로그에 남긴다 (lib/track.ts). 받은 값 중 정해진 키만, 길이를 잘라 남긴다.
-const EVENTS = new Set(["photo_check", "submitted", "submit_failed", "started", "generated", "downloaded", "download_failed", "noop_retry", "failed", "net_weak"]);
+const EVENTS = new Set(["photo_check", "submitted", "submit_failed", "fitted", "fit_skipped", "started", "generated", "downloaded", "download_failed", "noop_retry", "failed", "net_weak"]);
 const KEYS = ["job", "video", "code", "stage", "issue", "anyway", "skipped", "s", "mb", "env", "retry"];
 
 export async function POST(req: Request) {

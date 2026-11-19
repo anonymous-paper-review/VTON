@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { CONSENT_VERSION, consentItems } from "@/lib/consent";
 import { ENGINES, engineKey } from "@/lib/engines";
-import { falErrorCode, submitJob } from "@/lib/jobs";
+import { falErrorCode, submitJob, willMakeSheet } from "@/lib/jobs";
 import { absoluteUrl, findVideo } from "@/lib/videos";
 import { GENERATION_OPEN } from "@/lib/open";
 
@@ -29,7 +29,10 @@ export async function POST(req: Request) {
 
   const engine = engineKey();
   const { minSeconds, maxSeconds } = ENGINES[engine];
-  if (video.seconds < minSeconds || video.seconds > maxSeconds)
+  // 얼굴 구간만 담은 생성용 영상이 있으면 엔진에는 그것만 보낸다 (요금이 길이에 비례). 나머지 구간은 결과에 원본을 이어 붙인다.
+  const source = video.gen && video.parts ? video.gen : null;
+  const seconds = source?.seconds ?? video.seconds;
+  if (seconds < minSeconds || seconds > maxSeconds)
     return NextResponse.json({ code: "length" }, { status: 422 });
 
   // 동의 기록. 지금은 서버 로그에만 남긴다 (사진·개인 식별 정보는 남기지 않음).
@@ -42,18 +45,36 @@ export async function POST(req: Request) {
     return NextResponse.json({ code: "role" }, { status: 422 });
   const role = video.cast[roleIndex];
 
-  try {
-    const jobId = await submitJob({
-      engine,
-      videoUrl: absoluteUrl(video.src, origin),
-      target: role.target,
-      keep: left.map((c) => ({ target: c.target, imageUrl: absoluteUrl(c.still!, origin) })),
-      outfit: role.outfit,
-      selfie,
-    });
-    return NextResponse.json({ jobId });
-  } catch (e) {
-    console.error("submit failed", e);
-    return NextResponse.json({ code: falErrorCode(e) }, { status: 502 });
-  }
+  // 여기부터는 한 줄에 JSON 하나씩 흘려보낸다. 화면의 단계 표시가 실제로 끝난 일에 맞춰 넘어가게 하기 위해서다.
+  //   {ev:"received", sheet}  사진을 받음 (sheet: 장면 의상 단계가 있는지)
+  //   {ev:"sheet", ok}        장면 의상(캐릭터시트) 단계가 끝남. ok=false면 실패해 사진 그대로 진행
+  //   {jobId} 또는 {code}     영상 엔진에 넘김 / 실패
+  const enc = new TextEncoder();
+  const body = new ReadableStream<Uint8Array>({
+    async start(ctrl) {
+      const send = (o: object, pad = 0) => ctrl.enqueue(enc.encode(JSON.stringify(o) + " ".repeat(pad) + "\n"));
+      // 첫 덩어리를 모아 두는 브라우저가 있어 공백을 붙여 바로 전달되게 한다
+      send({ ev: "received", sheet: willMakeSheet(engine, role.outfit) }, 1024);
+      try {
+        const jobId = await submitJob({
+          engine,
+          videoUrl: absoluteUrl(source?.src ?? video.src, origin),
+          target: role.target,
+          keep: left.map((c) => ({ target: c.target, imageUrl: absoluteUrl(c.still!, origin) })),
+          outfit: role.outfit,
+          selfie,
+          stitchVideoId: source ? video.id : undefined,
+          onStage: send,
+        });
+        send({ jobId });
+      } catch (e) {
+        console.error("submit failed", e);
+        send({ code: falErrorCode(e) });
+      }
+      ctrl.close();
+    },
+  });
+  return new Response(body, {
+    headers: { "content-type": "application/x-ndjson; charset=utf-8", "cache-control": "no-store, no-transform", "x-accel-buffering": "no" },
+  });
 }

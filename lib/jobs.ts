@@ -1,6 +1,7 @@
 import "server-only";
 import { fal } from "@fal-ai/client";
 import { ENGINES, type EngineKey } from "@/lib/engines";
+import { findVideo, type Video } from "@/lib/videos";
 
 // fal 인증: FAL_KEY 환경변수가 있으면 쓰고, 없으면 네트워크 시크릿(프록시가 Authorization 헤더를 넣는 환경)을 믿고 그대로 호출한다.
 if (process.env.FAL_KEY) fal.config({ credentials: process.env.FAL_KEY });
@@ -24,6 +25,9 @@ const sheetPrompt = (outfit: string) =>
   "front view, three-quarter view, and side profile. " +
   `In all three views the person wears the same outfit: ${outfit}. ` +
   "Photorealistic, natural skin texture. No text, no labels, no borders.";
+
+/** 모의 모드에서 캐릭터시트 단계가 걸리는 시간 (진행 화면 점검용) */
+const MOCK_SHEET_MS = 1500;
 
 /** 셀카(data URI) → 캐릭터시트(data URI). 실패·시간 초과면 null. */
 async function makeSheet(faceUrl: string, outfit: string): Promise<string | null> {
@@ -58,13 +62,18 @@ export type JobStatus =
   /** 상태 조회가 잠깐 실패함. 화면은 다음 조회를 기다린다. */
   | { state: "unknown" };
 
-/** 클라이언트에 넘기는 job id: 엔진과 fal request id를 묶어 상태 조회 때 엔드포인트를 알 수 있게 한다. */
-const encodeId = (engine: EngineKey, requestId: string) => `${engine}.${requestId}`;
-function decodeId(id: string): { engine: EngineKey; requestId: string } | null {
-  const dot = id.indexOf(".");
-  const engine = id.slice(0, dot) as EngineKey;
-  return dot > 0 && engine in ENGINES ? { engine, requestId: id.slice(dot + 1) } : null;
+/**
+ * 클라이언트에 넘기는 job id: 엔진과 fal request id를 묶어 상태 조회 때 엔드포인트를 알 수 있게 한다.
+ * 얼굴 구간만 만들어 원본과 이어 붙이는 영상은 끝에 영상 id도 붙인다 (결과를 어느 영상과 붙일지 알아야 한다).
+ */
+const encodeId = (engine: EngineKey, requestId: string, videoId?: string) => `${engine}.${requestId}${videoId ? `.${videoId}` : ""}`;
+function decodeId(id: string): { engine: EngineKey; requestId: string; videoId?: string } | null {
+  const [engine, requestId, videoId] = id.split(".");
+  return requestId && engine in ENGINES ? { engine: engine as EngineKey, requestId, videoId } : null;
 }
+
+/** 작업 등록 중 실제로 끝난 단계를 화면에 알린다. sheet: 캐릭터시트(장면 의상 입히기)가 끝남, ok=false면 실패해 셀카 그대로 진행. */
+export type SubmitStage = { ev: "sheet"; ok: boolean };
 
 export async function submitJob(opts: {
   engine: EngineKey;
@@ -75,16 +84,25 @@ export async function submitJob(opts: {
   /** 바꿀 인물의 영상 속 옷차림. 있으면 캐릭터시트를 먼저 만든다. */
   outfit?: string;
   selfie: File;
+  /** 결과를 원본과 이어 붙여야 하는 영상의 id (videoUrl이 얼굴 구간만 담은 생성용 영상일 때) */
+  stitchVideoId?: string;
+  onStage?: (s: SubmitStage) => void;
 }): Promise<string> {
+  const wantSheet = SHEET_ON && !!ENGINES[opts.engine].sheet && !!opts.outfit;
   if (MOCK) {
-    const payload = Buffer.from(JSON.stringify({ at: Date.now(), video: opts.videoUrl })).toString("base64url");
+    if (wantSheet) {
+      await new Promise((r) => setTimeout(r, MOCK_SHEET_MS));
+      opts.onStage?.({ ev: "sheet", ok: process.env.VTON_MOCK_SHEET_FAIL !== "1" });
+    }
+    const payload = Buffer.from(JSON.stringify({ at: Date.now(), video: opts.videoUrl, vid: opts.stitchVideoId })).toString("base64url");
     return `mock.${payload}`;
   }
   // 셀카는 클라이언트에서 1280px JPEG로 줄여 오므로 data URI로 바로 넣는다 (실험에서 Kling·Wan·MiniMax가 받는 것을 확인).
   // fal 스토리지 업로드를 거치지 않아 사진이 별도 저장소에 남지 않는다.
   const faceUrl = `data:${opts.selfie.type};base64,${Buffer.from(await opts.selfie.arrayBuffer()).toString("base64")}`;
   const engine = ENGINES[opts.engine];
-  const sheetUrl = SHEET_ON && engine.sheet && opts.outfit ? await makeSheet(faceUrl, opts.outfit) : null;
+  const sheetUrl = wantSheet ? await makeSheet(faceUrl, opts.outfit!) : null;
+  if (wantSheet) opts.onStage?.({ ev: "sheet", ok: !!sheetUrl });
   const refUrl = sheetUrl ?? faceUrl;
   const { request_id } = await fal.queue.submit(engine.endpoint, {
     input: engine.build({
@@ -96,18 +114,42 @@ export async function submitJob(opts: {
     // 만든 영상 등 fal 저장소 파일을 24시간 뒤 자동 삭제한다 (동의 화면의 보유 기간과 맞춤).
     storageSettings: { expiresIn: "1d" },
   });
-  return encodeId(opts.engine, request_id);
+  return encodeId(opts.engine, request_id, opts.stitchVideoId);
 }
 
+/** 캐릭터시트를 만드는 조건인지 (화면이 「장면 의상」 단계를 보일지 정한다) */
+export const willMakeSheet = (engine: EngineKey, outfit?: string) => SHEET_ON && !!ENGINES[engine].sheet && !!outfit;
+
+/** 이어 붙일 영상 (job id에 붙어 온 영상 id가 구간 정보를 가진 영상일 때) */
+const stitchVideo = (videoId?: string): Video | undefined => {
+  const v = videoId ? findVideo(videoId) : undefined;
+  return v?.gen && v.parts ? v : undefined;
+};
+
+/** 화면에 주는 상태. 이어 붙이는 영상은 완성 주소를 fal 주소 대신 우리 서버의 이어 붙이기 주소(/api/result)로 준다. */
 export async function jobStatus(id: string): Promise<JobStatus> {
+  const s = await rawStatus(id);
+  if (s.state !== "done" || !s.stitch) return s.state === "done" ? { state: "done", videoUrl: s.videoUrl } : s;
+  return { state: "done", videoUrl: `/api/result?job=${encodeURIComponent(id)}` };
+}
+
+/** 이어 붙이기에 쓸 재료: 엔진이 만든 결과(얼굴 구간) 주소와 붙일 영상. 아직 완성 전이거나 이어 붙이는 영상이 아니면 null. */
+export async function jobSource(id: string): Promise<{ resultUrl: string; video: Video } | null> {
+  const s = await rawStatus(id);
+  return s.state === "done" && s.stitch ? { resultUrl: s.videoUrl, video: s.stitch } : null;
+}
+
+type RawStatus = Exclude<JobStatus, { state: "done" }> | { state: "done"; videoUrl: string; stitch?: Video };
+
+async function rawStatus(id: string): Promise<RawStatus> {
   // 모의 작업 id는 모의 모드에서만 받는다. 실서버에서 받으면 링크에 아무 영상 주소나 넣어 우리 화면에 띄울 수 있다.
   if (id.startsWith("mock.")) {
     if (!MOCK) return { state: "failed", code: "generic" };
-    const { at, video } = JSON.parse(Buffer.from(id.slice(5), "base64url").toString());
+    const { at, video, vid } = JSON.parse(Buffer.from(id.slice(5), "base64url").toString());
     const elapsed = (Date.now() - at) / 1000;
     if (elapsed < 2) return { state: "queued", position: 1 };
     if (elapsed < MOCK_SECONDS) return { state: "running" };
-    return { state: "done", videoUrl: video };
+    return { state: "done", videoUrl: video, stitch: stitchVideo(vid) };
   }
   const parsed = decodeId(id);
   if (!parsed) return { state: "failed", code: "generic" };
@@ -130,7 +172,7 @@ export async function jobStatus(id: string): Promise<JobStatus> {
   try {
     const result = await fal.queue.result(endpoint, { requestId: parsed.requestId });
     const url = (result.data as { video?: { url?: string } })?.video?.url;
-    return url ? { state: "done", videoUrl: url } : { state: "failed", code: "generic" };
+    return url ? { state: "done", videoUrl: url, stitch: stitchVideo(parsed.videoId) } : { state: "failed", code: "generic" };
   } catch (e) {
     // 실패 원인을 Vercel 로그에서 볼 수 있게 남긴다 (사진은 들어 있지 않음)
     console.error("job failed", parsed.engine, parsed.requestId, (e as { status?: number })?.status, JSON.stringify((e as { body?: unknown })?.body ?? String(e)).slice(0, 2000));

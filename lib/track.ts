@@ -5,6 +5,8 @@ export type TrackEvent =
   | "photo_check" // 휴대폰 안 사진 점검 결과 (issue, 사용자가 그래도 썼는지)
   | "submitted" // 사진 접수 (s: 보내는 데 걸린 초)
   | "submit_failed" // 접수 실패 (code)
+  | "fitted" // 장면 의상(캐릭터시트) 완성 (s: 사진 보낸 뒤 걸린 초)
+  | "fit_skipped" // 캐릭터시트 실패 → 사진 그대로 진행
   | "started" // fal이 만들기 시작 (s: 대기열에서 기다린 초)
   | "generated" // 생성 완료 (s: 만드는 데 걸린 초)
   | "downloaded" // 결과 영상 받음 (s, mb)
