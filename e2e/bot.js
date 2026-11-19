@@ -10,13 +10,14 @@ fs.mkdirSync(OUT, { recursive: true });
 
 // 가짜 카메라에 얼굴을 비춘다 (기본 가짜 화면엔 얼굴이 없어 사진 점검에 걸린다). 사진 점검용 어두운·흐린 사진도 만든다.
 const { execFileSync } = require("child_process");
-const VID = require("path").join(__dirname, "../public/videos");
+// 점검용 사진(정면 얼굴 1명 / 두 사람). 목록 영상이 바뀌어도 그대로 쓰도록 따로 둔다.
+const FIX = require("path").join(__dirname, "fixtures");
 const FACE_CAM = `${OUT}/face-cam.mjpeg`;
 let hasFfmpeg = true;
 try {
-  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-loop", "1", "-i", `${VID}/simni-tunnel-man.jpg`, "-t", "2", "-r", "15", "-vf", "scale=-2:480,pad=640:480:(ow-iw)/2:0", "-q:v", "3", FACE_CAM]);
-  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", `${VID}/simni-tunnel-man.jpg`, "-vf", "eq=brightness=-0.6", `${OUT}/photo-dark.jpg`]);
-  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", `${VID}/simni-tunnel-man.jpg`, "-vf", "gblur=sigma=6", `${OUT}/photo-blur.jpg`]);
+  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-loop", "1", "-i", `${FIX}/face-front.jpg`, "-t", "2", "-r", "15", "-vf", "scale=-2:480,pad=640:480:(ow-iw)/2:0", "-q:v", "3", FACE_CAM]);
+  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", `${FIX}/face-front.jpg`, "-vf", "eq=brightness=-0.6", `${OUT}/photo-dark.jpg`]);
+  execFileSync("ffmpeg", ["-y", "-loglevel", "error", "-i", `${FIX}/face-front.jpg`, "-vf", "gblur=sigma=6", `${OUT}/photo-blur.jpg`]);
 } catch { hasFfmpeg = false; console.log("ffmpeg 없음: 가짜 카메라에 얼굴 없이 진행 (사진 점검은 「그래도 이 사진으로」로 넘김)"); }
 
 /** 확인 화면에서 「이 사진으로 만들기」. 사진 점검에 걸리면 「그래도 이 사진으로」 */
@@ -67,18 +68,16 @@ async function fullFlow(browser, lang) {
   await shot(page, `${lang}-1-home`);
   // 탭 전환
   const tabs = page.locator('[role="tab"]');
-  await tabs.nth(1).click();
-  const simniCount = await page.locator(".scenes li").count();
-  await tabs.nth(0).click();
-  const marketCount = await page.locator(".scenes li").count();
-  if (marketCount !== 4 || simniCount !== 3) note(false, `${lang} 탭`, `simni=${simniCount} market=${marketCount}`);
+  const counts = [];
+  for (const i of [1, 2, 3, 0]) { await tabs.nth(i).click(); counts[i] = await page.locator(".scenes li").count(); }
+  if (counts.join() !== "2,3,2,3") note(false, `${lang} 탭`, `벚꽃·장터·녹차·섬진강=${counts.join()}`);
   // 장면 → intro
   await page.locator(".scenes a").first().click();
   await page.waitForURL(/\/v\//);
   await page.waitForTimeout(400);
   ok = (await check(page, `${lang} 장면 소개`)) && ok;
   await shot(page, `${lang}-2-intro`);
-  await page.locator(".cast .tile").nth(1).click(); // 오른쪽 인물(화개 장날 트레일러는 남자)
+  await page.locator(".cast .tile").nth(1).click(); // 오른쪽 인물(트레일러 클립은 남자)
   // 동의: 빈 채로 다음 → 토스트
   await page.locator(".foot .btn").click();
   const toast = await page.locator(".toast").isVisible().catch(() => false);
@@ -133,7 +132,7 @@ async function routeStatus(page, fn) {
     return route.fulfill({ status: r.status || 200, contentType: "application/json", body: JSON.stringify(r.json) });
   });
 }
-async function toWorking(page, videoId = "simni-tunnel") {
+async function toWorking(page, videoId = "simni-1") {
   await page.goto(`${BASE}/v/${videoId}?lang=ko`);
   await page.locator(".cast .tile").first().click();
   await page.locator(".agree-all").click();
@@ -215,7 +214,7 @@ async function failurePaths(browser) {
       if (n === 2) return { status: 503, json: { state: "unknown" } };
       if (n < 4) return { json: { state: "running" } };
       const id = decodeURIComponent(url.split("/").pop());
-      return { json: { state: "done", videoUrl: "/videos/simni-petal.mp4" } };
+      return { json: { state: "done", videoUrl: "/videos/simni-2.mp4" } };
     });
     await toWorking(page);
     await page.waitForSelector(".result, .empty[role=alert]", { timeout: 40000 });
@@ -254,7 +253,7 @@ async function resumePaths(browser) {
   // 1) 만드는 중 새로고침 → 이어보기
   const ctx = await newCtx(browser); const page = await ctx.newPage();
   const errs = await watch(page);
-  await toWorking(page, "simni-petal");
+  await toWorking(page, "simni-2");
   await page.waitForTimeout(2500);
   await page.reload();
   const resumed = await page.waitForSelector(".making, .result", { timeout: 5000 }).then(() => true).catch(() => false);
@@ -287,8 +286,8 @@ async function resumePaths(browser) {
   // 4) 다른 기기: ?job= 링크만으로 이어보기
   {
     const c2 = await newCtx(browser); const p2 = await c2.newPage();
-    const payload = Buffer.from(JSON.stringify({ at: Date.now() - 10000, video: "/videos/simni-stream.mp4" })).toString("base64url");
-    await p2.goto(`${BASE}/v/simni-stream?job=mock.${payload}&lang=en`);
+    const payload = Buffer.from(JSON.stringify({ at: Date.now() - 10000, video: "/videos/river-1.mp4" })).toString("base64url");
+    await p2.goto(`${BASE}/v/river-1?job=mock.${payload}&lang=en`);
     const ok = await p2.waitForSelector(".result", { timeout: 10000 }).then(() => true).catch(() => false);
     note(ok, "다른 기기 ?job= 링크로 완성 화면");
     await c2.close();
@@ -335,7 +334,7 @@ async function selfieEdge(browser) {
   const ctx = await newCtx(browser, { permissions: [] });
   const page = await ctx.newPage();
   await page.addInitScript(() => { navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError")); });
-  await page.goto(`${BASE}/v/hadong-tea?lang=ja`);
+  await page.goto(`${BASE}/v/tea-1?lang=ja`);
   await page.locator(".cast .tile").first().click();
   await page.locator(".agree-all").click();
   await page.locator(".foot .btn").click();
@@ -343,7 +342,7 @@ async function selfieEdge(browser) {
   const err = await page.locator(".cam-err").innerText().catch(() => "");
   await shot(page, "ja-camera-denied");
   // 앨범 사진 올리기
-  await page.setInputFiles('input[type="file"]', require("path").join(__dirname, "../public/videos/hadong-market-man.jpg"));
+  await page.setInputFiles('input[type="file"]', require("path").join(__dirname, "fixtures/face-front.jpg"));
   const got = await page.waitForSelector(".cam img", { timeout: 4000 }).then(() => true).catch(() => false);
   note(!!err && got, "카메라 거부 → 안내 + 사진 올리기", err.slice(0, 40));
   // 이미지가 아닌 파일
@@ -354,13 +353,13 @@ async function selfieEdge(browser) {
 async function photoPaths(browser) {
   // 앨범 사진으로 사진 점검: 걸려야 할 사진은 안내 + 「다시 찍기」가 앞, 정상 사진은 그대로
   const cases = [
-    ["hadong-market-man.jpg", `${VID}/hadong-market-man.jpg`, false],
-    ["두 사람 사진", `${VID}/simni-tunnel.jpg`, true],
+    ["face-front.jpg", `${FIX}/face-front.jpg`, false],
+    ["두 사람 사진", `${FIX}/two-people.jpg`, true],
     ...(hasFfmpeg ? [["어두운 사진", `${OUT}/photo-dark.jpg`, true], ["흐린 사진", `${OUT}/photo-blur.jpg`, true]] : []),
   ];
   const ctx = await newCtx(browser); const page = await ctx.newPage();
   await page.addInitScript(() => { navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError")); });
-  await page.goto(`${BASE}/v/simni-tunnel?lang=ko`);
+  await page.goto(`${BASE}/v/simni-1?lang=ko`);
   await page.locator(".cast .tile").first().click();
   await page.locator(".agree-all").click();
   await page.locator(".foot .btn").click();
@@ -373,7 +372,7 @@ async function photoPaths(browser) {
     await page.locator(".cam-confirm .btn" + (msg ? "" : ".sub")).first().click(); // 다시 찍기
   }
   // 걸린 사진도 「그래도 이 사진으로」로 보낼 수 있다
-  await page.setInputFiles('input[type="file"]', `${VID}/simni-tunnel.jpg`);
+  await page.setInputFiles('input[type="file"]', `${FIX}/two-people.jpg`);
   await page.waitForSelector(".photo-issue", { timeout: 10000 });
   const posted = page.waitForRequest((r) => r.url().endsWith("/api/jobs") && r.method() === "POST", { timeout: 5000 }).then(() => true).catch(() => false);
   await page.locator(".cam-confirm .btn.sub").click();
@@ -392,7 +391,7 @@ async function progressPaths(browser) {
       n++;
       if (n <= 2) return { json: { state: "queued", position: 3 } };
       if (n <= 4) return { json: { state: "running" } };
-      return { json: { state: "done", videoUrl: "/videos/simni-petal.mp4" } };
+      return { json: { state: "done", videoUrl: "/videos/simni-2.mp4" } };
     });
     await toWorking(page);
     await page.waitForFunction(() => /3/.test(document.querySelector('.stages li[data-s="now"]')?.textContent || ""), null, { timeout: 8000 }).catch(() => {});
@@ -443,14 +442,14 @@ async function progressPaths(browser) {
 // 생성이 잠겨 있을 때(정식 오픈 전): 장면은 보이고, 주인공 되기는 안내만, 서버도 503
 async function closedPaths(browser) {
   const ctx = await newCtx(browser); const page = await ctx.newPage();
-  await page.goto(`${BASE}/v/simni-tunnel?lang=ko`);
+  await page.goto(`${BASE}/v/simni-1?lang=ko`);
   await page.locator(".cast .tile, .solo .btn").first().click();
   await page.waitForTimeout(400);
   const toastText = await page.locator("body").innerText();
   note(/정식 오픈/.test(toastText), "잠금: 주인공 되기 → 준비 중 안내");
   note(await page.locator(".agree-all").count() === 0, "잠금: 동의 화면으로 안 넘어감");
   await page.screenshot({ path: `${OUT}/closed-toast.png` });
-  const res = await page.request.post(`${BASE}/api/jobs`, { multipart: { videoId: "simni-tunnel" } });
+  const res = await page.request.post(`${BASE}/api/jobs`, { multipart: { videoId: "simni-1" } });
   note(res.status() === 503, "잠금: /api/jobs 503", String(res.status()));
   await ctx.close();
 }

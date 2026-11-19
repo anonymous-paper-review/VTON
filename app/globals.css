@@ -128,7 +128,9 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .mine-card .chip { justify-self: start; }
 .mine-card > svg { flex: none; width: 18px; height: 18px; color: var(--text-secondary); }
 
-.tabs { display: flex; gap: var(--sp-2); padding: 0 var(--page-x) var(--sp-4); }
+.tabs { display: flex; gap: var(--sp-2); padding: 0 var(--page-x) var(--sp-4); overflow-x: auto; scrollbar-width: none; }
+.tabs::-webkit-scrollbar { display: none; }
+.tabs .chip { flex: none; white-space: nowrap; }
 .scenes { list-style: none; margin: 0; padding: 0 var(--page-x) var(--sp-6); display: grid; gap: var(--sp-4); }
 .scene { display: block; overflow: hidden; }
 .scene .frame { border-radius: var(--r-card) var(--r-card) 0 0; }
