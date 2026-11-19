@@ -1,5 +1,181 @@
 [
   {
+    "id": "hadong-cherry",
+    "group": "market",
+    "title": {
+      "ko": "벚꽃 아래, 그 봄날",
+      "zh": "樱花树下的那个春天",
+      "en": "That Spring Under the Blossoms",
+      "ja": "桜の下、あの春の日"
+    },
+    "description": {
+      "ko": "화개 십리벚꽃길, 꽃잎이 흩날리는 길에서 마주 선 두 사람. 그 봄날의 주인공이 되어 보세요.",
+      "zh": "花开十里樱花路，花瓣纷飞中相遇的两人。成为那个春天的主角吧。",
+      "en": "On Hwagae's Simni Cherry Blossom Road, two people meet as petals drift down. Star in that spring day.",
+      "ja": "花開の十里桜並木、花びらが舞う道で向かい合う二人。あの春の日の主人公になってみよう。"
+    },
+    "src": "/videos/hadong-cherry.mp4",
+    "poster": "/videos/hadong-cherry.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a pink cardigan",
+        "still": "/videos/hadong-cherry-woman.jpg",
+        "photo": "/videos/hadong-cherry-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a navy jacket",
+        "photo": "/videos/hadong-cherry-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hadong-market",
+    "group": "market",
+    "title": {
+      "ko": "장날 밤, 화개장터",
+      "zh": "赶集之夜，花开市场",
+      "en": "Market Night at Hwagae",
+      "ja": "市の夜、花開市場"
+    },
+    "description": {
+      "ko": "불빛 가득한 화개장터 장날 밤, 그가 건넨 한 입에 웃음이 터지는 그녀. 둘 중 한 사람이 되어 보세요.",
+      "zh": "灯火通明的花开市场赶集夜，他递来一口美食，她笑开了花。成为其中一人吧。",
+      "en": "On a lantern-lit market night at Hwagae, he offers her a bite and she bursts into a smile. Step into either role.",
+      "ja": "灯りに満ちた花開市場の市の夜、彼が差し出したひと口に笑顔がこぼれる彼女。どちらかになってみよう。"
+    },
+    "src": "/videos/hadong-market.mp4",
+    "poster": "/videos/hadong-market.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
+        "still": "/videos/hadong-market-woman.jpg",
+        "photo": "/videos/hadong-market-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a black sweater",
+        "photo": "/videos/hadong-market-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hadong-river",
+    "group": "market",
+    "title": {
+      "ko": "섬진강 물결 위로",
+      "zh": "蟾津江的波光里",
+      "en": "Sparkles on the Seomjin River",
+      "ja": "蟾津江のきらめき"
+    },
+    "description": {
+      "ko": "햇살이 부서지는 섬진강 모래톱, 손을 잡고 물가를 뛰어가는 두 사람. 둘 중 한 사람이 되어 보세요.",
+      "zh": "阳光洒落的蟾津江沙洲，两人牵着手在水边奔跑。成为其中一人吧。",
+      "en": "On a sunlit sandbar of the Seomjin River, two people run hand in hand along the water. Step into either role.",
+      "ja": "陽の光がきらめく蟾津江の砂州、手をつないで水辺を駆ける二人。どちらかになってみよう。"
+    },
+    "src": "/videos/hadong-river.mp4",
+    "poster": "/videos/hadong-river.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "still": "/videos/hadong-river-woman.jpg",
+        "photo": "/videos/hadong-river-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "photo": "/videos/hadong-river-man.jpg"
+      }
+    ]
+  },
+  {
+    "id": "hadong-tea",
+    "group": "market",
+    "title": {
+      "ko": "하동 녹차밭에서",
+      "zh": "河东绿茶园",
+      "en": "Among Hadong's Tea Fields",
+      "ja": "河東の茶畑で"
+    },
+    "description": {
+      "ko": "안개 낀 하동 녹차밭, 그가 건넨 차 한 잔에 미소 짓는 그녀. 둘 중 한 사람이 되어 보세요.",
+      "zh": "雾气缭绕的河东绿茶园，他递来一杯茶，她微微一笑。成为其中一人吧。",
+      "en": "In Hadong's misty green tea fields, he hands her a cup of tea and she smiles. Step into either role.",
+      "ja": "霧に包まれた河東の茶畑、彼が差し出したお茶に微笑む彼女。どちらかになってみよう。"
+    },
+    "src": "/videos/hadong-tea.mp4",
+    "poster": "/videos/hadong-tea.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a navy dress",
+        "still": "/videos/hadong-tea-woman.jpg",
+        "photo": "/videos/hadong-tea-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a cream sweater",
+        "photo": "/videos/hadong-tea-man.jpg"
+      }
+    ]
+  },
+  {
     "id": "simni-tunnel",
     "group": "simni",
     "title": {
@@ -128,138 +304,6 @@
         },
         "target": "the woman on the right",
         "photo": "/videos/simni-stream-woman.jpg"
-      }
-    ]
-  },
-  {
-    "id": "hwagae-tea",
-    "group": "market",
-    "title": {
-      "ko": "화개장터 찻집에서",
-      "zh": "花开市场的茶铺",
-      "en": "Tea at Hwagae Market",
-      "ja": "花開（ファゲ）市場の茶店で"
-    },
-    "description": {
-      "ko": "화개장터 녹차 가게, 갓 우린 녹차 한 잔에 웃음이 번지는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "在花开市场的茶铺，一杯现泡的绿茶让两人相视而笑。成为其中一人吧。",
-      "en": "At a green tea shop in Hwagae Market, a fresh cup of green tea brings a smile. Step into either role.",
-      "ja": "花開（ファゲ）市場の緑茶の店、淹れたての緑茶に笑みがこぼれる二人。どちらかになってみよう。"
-    },
-    "src": "/videos/hwagae-tea.mp4",
-    "poster": "/videos/hwagae-tea.jpg",
-    "seconds": 8,
-    "cast": [
-      {
-        "id": "man",
-        "label": {
-          "ko": "그",
-          "zh": "他",
-          "en": "Him",
-          "ja": "彼"
-        },
-        "target": "the man on the left",
-        "still": "/videos/hwagae-tea-man.jpg",
-        "photo": "/videos/hwagae-tea-man.jpg"
-      },
-      {
-        "id": "woman",
-        "label": {
-          "ko": "그녀",
-          "zh": "她",
-          "en": "Her",
-          "ja": "彼女"
-        },
-        "target": "the woman on the right",
-        "photo": "/videos/hwagae-tea-woman.jpg"
-      }
-    ]
-  },
-  {
-    "id": "hwagae-food",
-    "group": "market",
-    "title": {
-      "ko": "화개장터 먹거리 골목",
-      "zh": "花开市场美食街",
-      "en": "Hwagae Market Food Lane",
-      "ja": "花開（ファゲ）市場の屋台通り"
-    },
-    "description": {
-      "ko": "김이 오르는 화개장터 먹거리 골목, 구운 떡꼬치와 엿을 나눠 먹는 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "热气腾腾的花开市场美食街，两人分享烤年糕串和传统麦芽糖。成为其中一人吧。",
-      "en": "Steam rises in Hwagae Market's food lane as two friends share grilled rice cakes and yeot. Step into either role.",
-      "ja": "湯気の立つ花開（ファゲ）市場の屋台通り、焼き餅の串と飴を分け合う二人。どちらかになってみよう。"
-    },
-    "src": "/videos/hwagae-food.mp4",
-    "poster": "/videos/hwagae-food.jpg",
-    "seconds": 8,
-    "cast": [
-      {
-        "id": "man",
-        "label": {
-          "ko": "그",
-          "zh": "他",
-          "en": "Him",
-          "ja": "彼"
-        },
-        "target": "the man on the left",
-        "still": "/videos/hwagae-food-man.jpg",
-        "photo": "/videos/hwagae-food-man.jpg"
-      },
-      {
-        "id": "woman",
-        "label": {
-          "ko": "그녀",
-          "zh": "她",
-          "en": "Her",
-          "ja": "彼女"
-        },
-        "target": "the woman on the right",
-        "photo": "/videos/hwagae-food-woman.jpg"
-      }
-    ]
-  },
-  {
-    "id": "hwagae-river",
-    "group": "market",
-    "title": {
-      "ko": "섬진강변 화개장터",
-      "zh": "蟾津江畔的花开市场",
-      "en": "Hwagae Market by the Seomjin River",
-      "ja": "蟾津江（ソムジンガン）沿いの花開市場"
-    },
-    "description": {
-      "ko": "지리산과 섬진강이 만나는 화개장터 강변길, 산나물과 녹차를 손에 든 두 사람. 둘 중 한 사람이 되어 보세요.",
-      "zh": "智异山与蟾津江交汇处的花开市场江边路，两人手提山野菜和绿茶。成为其中一人吧。",
-      "en": "On Hwagae Market's riverside walk, where Jirisan meets the Seomjin River, two visitors carry mountain greens and green tea. Step into either role.",
-      "ja": "智異山（チリサン）と蟾津江が出会う花開（ファゲ）市場の川沿い、山菜と緑茶を手にした二人。どちらかになってみよう。"
-    },
-    "src": "/videos/hwagae-river.mp4",
-    "poster": "/videos/hwagae-river.jpg",
-    "seconds": 8,
-    "cast": [
-      {
-        "id": "man",
-        "label": {
-          "ko": "그",
-          "zh": "他",
-          "en": "Him",
-          "ja": "彼"
-        },
-        "target": "the man on the left",
-        "still": "/videos/hwagae-river-man.jpg",
-        "photo": "/videos/hwagae-river-man.jpg"
-      },
-      {
-        "id": "woman",
-        "label": {
-          "ko": "그녀",
-          "zh": "她",
-          "en": "Her",
-          "ja": "彼女"
-        },
-        "target": "the woman on the right",
-        "photo": "/videos/hwagae-river-woman.jpg"
       }
     ]
   }

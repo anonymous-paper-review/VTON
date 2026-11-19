@@ -68,17 +68,17 @@ async function fullFlow(browser, lang) {
   // 탭 전환
   const tabs = page.locator('[role="tab"]');
   await tabs.nth(1).click();
-  const marketCount = await page.locator(".scenes li").count();
-  await tabs.nth(0).click();
   const simniCount = await page.locator(".scenes li").count();
-  if (marketCount !== 3 || simniCount !== 3) note(false, `${lang} 탭`, `simni=${simniCount} market=${marketCount}`);
+  await tabs.nth(0).click();
+  const marketCount = await page.locator(".scenes li").count();
+  if (marketCount !== 4 || simniCount !== 3) note(false, `${lang} 탭`, `simni=${simniCount} market=${marketCount}`);
   // 장면 → intro
   await page.locator(".scenes a").first().click();
   await page.waitForURL(/\/v\//);
   await page.waitForTimeout(400);
   ok = (await check(page, `${lang} 장면 소개`)) && ok;
   await shot(page, `${lang}-2-intro`);
-  await page.locator(".cast .tile").nth(1).click(); // 오른쪽 인물(여자)
+  await page.locator(".cast .tile").nth(1).click(); // 오른쪽 인물(화개 장날 트레일러는 남자)
   // 동의: 빈 채로 다음 → 토스트
   await page.locator(".foot .btn").click();
   const toast = await page.locator(".toast").isVisible().catch(() => false);
@@ -107,7 +107,7 @@ async function fullFlow(browser, lang) {
   if (flagged && hasFfmpeg) note(false, `${lang} 정상 셀카가 사진 점검에 걸림`, await page.locator(".photo-issue").innerText().catch(() => ""));
   await posted;
   const role = await page.evaluate(() => window.__role);
-  if (role !== "woman") note(false, `${lang} 고른 인물 전달`, `role=${role}`);
+  if (role !== "man") note(false, `${lang} 고른 인물 전달`, `role=${role}`);
   await page.waitForSelector(".making");
   await page.waitForTimeout(800);
   ok = (await check(page, `${lang} 제작 중`)) && ok;
@@ -335,7 +335,7 @@ async function selfieEdge(browser) {
   const ctx = await newCtx(browser, { permissions: [] });
   const page = await ctx.newPage();
   await page.addInitScript(() => { navigator.mediaDevices.getUserMedia = () => Promise.reject(new DOMException("denied", "NotAllowedError")); });
-  await page.goto(`${BASE}/v/hwagae-tea?lang=ja`);
+  await page.goto(`${BASE}/v/hadong-tea?lang=ja`);
   await page.locator(".cast .tile").first().click();
   await page.locator(".agree-all").click();
   await page.locator(".foot .btn").click();
@@ -343,7 +343,7 @@ async function selfieEdge(browser) {
   const err = await page.locator(".cam-err").innerText().catch(() => "");
   await shot(page, "ja-camera-denied");
   // 앨범 사진 올리기
-  await page.setInputFiles('input[type="file"]', require("path").join(__dirname, "../public/videos/hwagae-food-man.jpg"));
+  await page.setInputFiles('input[type="file"]', require("path").join(__dirname, "../public/videos/hadong-market-man.jpg"));
   const got = await page.waitForSelector(".cam img", { timeout: 4000 }).then(() => true).catch(() => false);
   note(!!err && got, "카메라 거부 → 안내 + 사진 올리기", err.slice(0, 40));
   // 이미지가 아닌 파일
@@ -354,7 +354,7 @@ async function selfieEdge(browser) {
 async function photoPaths(browser) {
   // 앨범 사진으로 사진 점검: 걸려야 할 사진은 안내 + 「다시 찍기」가 앞, 정상 사진은 그대로
   const cases = [
-    ["hwagae-food-man.jpg", `${VID}/hwagae-food-man.jpg`, false],
+    ["hadong-market-man.jpg", `${VID}/hadong-market-man.jpg`, false],
     ["두 사람 사진", `${VID}/simni-tunnel.jpg`, true],
     ...(hasFfmpeg ? [["어두운 사진", `${OUT}/photo-dark.jpg`, true], ["흐린 사진", `${OUT}/photo-blur.jpg`, true]] : []),
   ];
