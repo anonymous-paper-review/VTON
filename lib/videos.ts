@@ -14,8 +14,8 @@ export type CastMember = {
   photo?: string;
 };
 
-/** 목록 탭. simni = 십리벚꽃길(3:4 세로), market = 화개장터(가로) */
-export const GROUPS = ["simni", "market"] as const;
+/** 목록 탭. market = 화개 장날(트레일러 16:9, 기본), simni = 십리벚꽃길(3:4 세로) */
+export const GROUPS = ["market", "simni"] as const;
 export type Group = (typeof GROUPS)[number];
 
 export type Video = {
