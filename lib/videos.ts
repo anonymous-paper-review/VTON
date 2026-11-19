@@ -20,6 +20,11 @@ export type CastMember = {
 export const GROUPS = ["simni", "market", "tea", "river"] as const;
 export type Group = (typeof GROUPS)[number];
 
+/** 클립 프레임 속도. parts의 길이 단위(프레임)가 이 속도 기준이다 (scripts/make-clips.py). */
+export const CLIP_FPS = 24;
+/** 재생 순서대로 [종류, 프레임 수]. gen = 얼굴이 나와 AI가 다시 만드는 구간, orig = 얼굴이 없어 원본을 그대로 쓰는 구간. */
+export type Part = ["gen" | "orig", number];
+
 export type Video = {
   id: string;
   group: Group;
@@ -28,7 +33,12 @@ export type Video = {
   /** 절대 URL 또는 /public 기준 경로. fal이 받아갈 수 있도록 배포 환경에서는 공개 URL이어야 한다. */
   src: string;
   poster?: string;
+  /** 전체 영상 길이(초). 화면에 보이는 길이 */
   seconds: number;
+  /** 생성용 영상: src에서 얼굴이 나오는 구간만 이어 붙인 것. 있으면 엔진에는 이것만 보내고(요금이 길이에 비례), 결과에 원본의 나머지 구간을 이어 붙인다. */
+  gen?: { src: string; seconds: number };
+  /** gen이 있을 때 src를 이루는 구간들 */
+  parts?: Part[];
   cast: CastMember[];
 };
 

@@ -35,6 +35,8 @@ const SELFIE_MAX_PX = 1280;
 const UPLOAD_TIMEOUT_MS = 80_000;
 // 결과 영상을 받다가 이만큼 한 바이트도 안 오면 끊고 우리 서버를 거쳐 다시 받는다
 const FETCH_STALL_MS = 20_000;
+// 원본 샷을 이어 붙이는 영상(/api/result)은 서버가 다 붙인 뒤에야 첫 바이트를 보낸다 (보통 10초쯤)
+const STITCH_WAIT_MS = 70_000;
 // 2단계 막대를 채우는 기준: 8초·768P 실측 생성 시간 (2026-11-06 271초)
 const TYPICAL_RUN_S = 270;
 const HEAD: Record<Exclude<Step, "intro">, MsgKey> = { consent: "consent.head", selfie: "selfie.head", working: "work.head", done: "done.head" };
@@ -97,6 +99,7 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
         <WorkingStep
           videoId={video.id}
           videoSrc={video.src}
+          fit={!!(video.cast.find((c) => c.id === role) ?? video.cast[0]).outfit}
           role={role}
           consentVersion={consent.version}
           agreed={agreed}
@@ -346,17 +349,31 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
   );
 }
 
+/** 서버가 작업 등록 중 실제로 끝난 일을 한 줄씩 알려 준다 (app/api/jobs/route.ts) */
+type SubmitEvent = { ev?: "received" | "sheet"; sheet?: boolean; ok?: boolean; jobId?: string; code?: string };
+
 /** 셀카를 보낸다. fetch는 올리는 진행률을 못 보여 주고 시간 제한도 없어서 XHR로 보낸다. */
-function postJob(fd: FormData, onPct: (p: number) => void): Promise<{ ok: boolean; json: { jobId?: string; code?: string } }> {
+function postJob(fd: FormData, onPct: (p: number) => void, onEvent: (e: SubmitEvent) => void): Promise<{ ok: boolean; json: { jobId?: string; code?: string } }> {
   return new Promise((resolve, reject) => {
     const x = new XMLHttpRequest();
     x.open("POST", "/api/jobs");
     x.timeout = UPLOAD_TIMEOUT_MS;
     x.upload.onprogress = (e) => { if (e.lengthComputable) onPct(Math.round((e.loaded / e.total) * 100)); };
+    // 응답은 한 줄에 JSON 하나씩 흘러온다. 줄이 끝난 것만 읽는다.
+    let seen = 0;
+    let last: SubmitEvent = {};
+    const read = () => {
+      const lines = x.responseText.split("\n").slice(0, -1);
+      for (; seen < lines.length; seen++) {
+        try { last = JSON.parse(lines[seen]); onEvent(last); } catch {}
+      }
+    };
+    x.onprogress = read;
     x.onload = () => {
-      let json = {};
-      try { json = JSON.parse(x.responseText); } catch {}
-      resolve({ ok: x.status >= 200 && x.status < 300, json });
+      read();
+      // 접수 전에 거절된 경우(동의·사진 오류 등)는 JSON 하나만 온다
+      if (!seen) { try { last = JSON.parse(x.responseText); } catch {} }
+      resolve({ ok: x.status >= 200 && x.status < 300 && !!last.jobId, json: last });
     };
     x.onerror = () => reject(new Error("network"));
     x.ontimeout = () => reject(new Error("network"));
@@ -365,9 +382,9 @@ function postJob(fd: FormData, onPct: (p: number) => void): Promise<{ ok: boolea
 }
 
 /** 결과 영상을 받으며 진행률을 알린다. 한동안 한 바이트도 안 오면 끊는다. */
-async function fetchProgress(url: string, onBytes: (got: number, total: number) => void): Promise<Blob> {
+async function fetchProgress(url: string, onBytes: (got: number, total: number) => void, firstByteMs = FETCH_STALL_MS): Promise<Blob> {
   const ctl = new AbortController();
-  let stall = setTimeout(() => ctl.abort(), FETCH_STALL_MS);
+  let stall = setTimeout(() => ctl.abort(), firstByteMs);
   try {
     const r = await fetch(url, { signal: ctl.signal });
     if (!r.ok || !r.body) throw new Error(String(r.status));
@@ -390,10 +407,11 @@ async function fetchProgress(url: string, onBytes: (got: number, total: number) 
   }
 }
 
-type Phase = "upload" | "queue" | "make" | "fetch";
+// upload 사진 보내는 중 → fit 장면 의상 입히는 중 → hand 영상 엔진에 넘기는 중 → queue 엔진이 받아 순서 대기 → make → fetch
+type Phase = "upload" | "fit" | "hand" | "queue" | "make" | "fetch";
 
-function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, jobId, startedAt, setJobId, onDone, onRetry }: {
-  videoId: string; videoSrc: string; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
+function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, selfie, jobId, startedAt, setJobId, onDone, onRetry }: {
+  videoId: string; videoSrc: string; fit: boolean; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
   startedAt: number | null; setJobId: (id: string | null) => void; onDone: (url: string, file: File | null) => void; onRetry: () => void;
 }) {
   const { t } = useLang();
@@ -403,6 +421,10 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const [error, setError] = useState<string | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [uploadPct, setUploadPct] = useState(0);
+  // 서버가 알려 준 실제 진행: 사진을 받았는지, 장면 의상 단계가 있는지, 그 단계가 어떻게 끝났는지
+  const [received, setReceived] = useState(false);
+  const [hasFit, setHasFit] = useState(fit);
+  const [fitted, setFitted] = useState<boolean | null>(null);
   const [fetchBytes, setFetchBytes] = useState<{ got: number; total: number } | null>(null);
   const [netWeak, setNetWeak] = useState(false);
   const t0 = useRef(startedAt ?? Date.now());
@@ -420,6 +442,8 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     if (jobId || !selfie || submitted.current || error) return;
     submitted.current = true;
     setUploadPct(0);
+    setReceived(false);
+    setFitted(null);
     const fd = new FormData();
     fd.append("videoId", videoId);
     fd.append("role", role);
@@ -427,7 +451,11 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     agreed.forEach((a) => fd.append("consent", a));
     fd.append("selfie", selfie, "selfie.jpg");
     const sentAt = Date.now();
-    postJob(fd, setUploadPct)
+    const onEvent = (e: SubmitEvent) => {
+      if (e.ev === "received") { setReceived(true); if (typeof e.sheet === "boolean") setHasFit(e.sheet); }
+      if (e.ev === "sheet") { setFitted(!!e.ok); track(e.ok ? "fitted" : "fit_skipped", { video: videoId, s: (Date.now() - sentAt) / 1000 }); }
+    };
+    postJob(fd, setUploadPct, onEvent)
       .then(({ ok, json }) => {
         if (!ok || !json.jobId) {
           track("submit_failed", { video: videoId, code: json.code ?? "generic" });
@@ -472,7 +500,7 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
       const onBytes = (got: number, total: number) => { if (!stop) setFetchBytes({ got, total }); };
       const sameOrigin = new URL(videoUrl, location.href).origin === location.origin;
       try {
-        const blob = await fetchProgress(videoUrl, onBytes).catch((e) => {
+        const blob = await fetchProgress(videoUrl, onBytes, videoUrl.startsWith("/api/result") ? STITCH_WAIT_MS : undefined).catch((e) => {
           if (sameOrigin || stop) throw e;
           return fetchProgress(`/api/download?url=${encodeURIComponent(videoUrl)}`, onBytes);
         });
@@ -596,7 +624,9 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
     );
   }
 
-  const phase: Phase = fetchBytes ? "fetch" : !jobId ? "upload" : status?.state === "running" ? "make" : status?.state === "queued" ? "queue" : runT0.current ? "make" : "queue";
+  const phase: Phase = fetchBytes ? "fetch"
+    : !jobId ? (!received && uploadPct < 100 ? "upload" : hasFit && fitted === null ? "fit" : "hand")
+    : status?.state === "running" ? "make" : status?.state === "queued" ? "queue" : runT0.current ? "make" : "queue";
   const runS = runT0.current ? Math.max(0, Math.floor((Date.now() - runT0.current) / 1000)) : 0;
   const clock = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
   const mb = (b: number) => (b / 1e6).toFixed(1);
@@ -605,23 +635,30 @@ function WorkingStep({ videoId, videoSrc, role, consentVersion, agreed, selfie, 
   const label: MsgKey = checking ? "work.checking"
     : phase === "fetch" ? "work.fetching"
     : phase === "upload" ? (retried.current ? "work.again" : "work.sending")
-    : phase === "queue" ? "work.queued"
+    : phase === "fit" ? (retried.current ? "work.again" : "work.fitting")
+    : phase === "queue" || phase === "hand" ? "work.queued"
     : LINES[Math.floor(elapsed / 12) % LINES.length];
 
-  const order: Phase[] = ["upload", "make", "fetch"];
-  const at = order.indexOf(phase === "queue" ? "upload" : phase);
+  // 단계는 실제로 끝난 일에 맞춰 넘어간다: 사진 접수(서버가 받음) → 장면 의상(캐릭터시트 완성) → AI 영상(엔진이 접수·대기·제작) → 받기
+  const order: ("upload" | "fit" | "make" | "fetch")[] = hasFit ? ["upload", "fit", "make", "fetch"] : ["upload", "make", "fetch"];
+  const at = order.indexOf(phase === "queue" || phase === "hand" ? "make" : phase === "fit" && !hasFit ? "make" : phase);
   const pos = status?.state === "queued" ? status.position : undefined;
   const stages: { key: MsgKey; detail?: string; bar?: number }[] = [
     {
       key: "stage.receive",
-      detail: phase === "upload" ? (uploadPct >= 100 ? t("stage.fitting") : fill(t("stage.sending"), { pct: uploadPct }))
-        : phase === "queue" ? (pos ? fill(t("stage.queued"), { n: pos }) : t("stage.next"))
-        : t("stage.received"),
+      detail: phase === "upload" ? fill(t("stage.sending"), { pct: uploadPct }) : t("stage.received"),
       bar: phase === "upload" ? uploadPct : undefined,
     },
+    ...(hasFit ? [{
+      key: "stage.fit" as MsgKey,
+      // 이어 보기로 들어온 경우엔 이 단계가 어떻게 끝났는지 모르므로 완료 표시만 한다
+      detail: phase === "fit" ? t("stage.fitting") : fitted === true ? t("stage.fitted") : fitted === false ? t("stage.fitSkipped") : undefined,
+    }] : []),
     {
       key: "stage.make",
-      detail: phase === "make" ? fill(t("stage.making"), { t: clock(runS) }) : at > 1 ? t("stage.made") : undefined,
+      detail: phase === "queue" ? (pos ? fill(t("stage.queued"), { n: pos }) : t("stage.next"))
+        : phase === "make" ? fill(t("stage.making"), { t: clock(runS) })
+        : phase === "fetch" ? t("stage.made") : undefined,
       // 남은 시간을 알 수 없어 보통 걸리는 시간(약 4분 30초)에 맞춰 채우고 95%에서 멈춘다
       bar: phase === "make" ? Math.min(95, (runS / TYPICAL_RUN_S) * 100) : undefined,
     },

@@ -16,7 +16,7 @@
     },
     "src": "/videos/simni-1.mp4",
     "poster": "/videos/simni-1.jpg",
-    "seconds": 8,
+    "seconds": 9,
     "cast": [
       {
         "id": "woman",
@@ -43,6 +43,20 @@
         "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
         "photo": "/videos/simni-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/simni-1-gen.mp4",
+      "seconds": 6.88
+    },
+    "parts": [
+      [
+        "orig",
+        46
+      ],
+      [
+        "gen",
+        165
+      ]
     ]
   },
   {
@@ -62,7 +76,7 @@
     },
     "src": "/videos/simni-2.mp4",
     "poster": "/videos/simni-2.jpg",
-    "seconds": 7,
+    "seconds": 9,
     "cast": [
       {
         "id": "woman",
@@ -89,6 +103,24 @@
         "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
         "photo": "/videos/simni-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/simni-2-gen.mp4",
+      "seconds": 6.83
+    },
+    "parts": [
+      [
+        "gen",
+        58
+      ],
+      [
+        "orig",
+        46
+      ],
+      [
+        "gen",
+        106
+      ]
     ]
   },
   {
@@ -135,6 +167,20 @@
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/market-1-gen.mp4",
+      "seconds": 5.83
+    },
+    "parts": [
+      [
+        "orig",
+        59
+      ],
+      [
+        "gen",
+        140
+      ]
     ]
   },
   {
@@ -181,6 +227,24 @@
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/market-2-gen.mp4",
+      "seconds": 5.71
+    },
+    "parts": [
+      [
+        "gen",
+        46
+      ],
+      [
+        "orig",
+        46
+      ],
+      [
+        "gen",
+        91
+      ]
     ]
   },
   {
@@ -200,7 +264,7 @@
     },
     "src": "/videos/market-3.mp4",
     "poster": "/videos/market-3.jpg",
-    "seconds": 6,
+    "seconds": 9,
     "cast": [
       {
         "id": "woman",
@@ -227,6 +291,20 @@
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
         "photo": "/videos/market-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/market-3-gen.mp4",
+      "seconds": 6.58
+    },
+    "parts": [
+      [
+        "orig",
+        59
+      ],
+      [
+        "gen",
+        158
+      ]
     ]
   },
   {
@@ -246,7 +324,7 @@
     },
     "src": "/videos/tea-1.mp4",
     "poster": "/videos/tea-1.jpg",
-    "seconds": 8,
+    "seconds": 10,
     "cast": [
       {
         "id": "woman",
@@ -273,6 +351,20 @@
         "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
         "photo": "/videos/tea-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/tea-1-gen.mp4",
+      "seconds": 7.42
+    },
+    "parts": [
+      [
+        "orig",
+        58
+      ],
+      [
+        "gen",
+        178
+      ]
     ]
   },
   {
@@ -292,7 +384,7 @@
     },
     "src": "/videos/tea-2.mp4",
     "poster": "/videos/tea-2.jpg",
-    "seconds": 8,
+    "seconds": 10,
     "cast": [
       {
         "id": "woman",
@@ -319,6 +411,20 @@
         "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
         "photo": "/videos/tea-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/tea-2-gen.mp4",
+      "seconds": 7.88
+    },
+    "parts": [
+      [
+        "orig",
+        46
+      ],
+      [
+        "gen",
+        189
+      ]
     ]
   },
   {
@@ -338,6 +444,70 @@
     },
     "src": "/videos/river-1.mp4",
     "poster": "/videos/river-1.jpg",
+    "seconds": 8,
+    "cast": [
+      {
+        "id": "woman",
+        "label": {
+          "ko": "그녀",
+          "zh": "她",
+          "en": "Her",
+          "ja": "彼女"
+        },
+        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
+        "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
+        "still": "/videos/river-woman.jpg",
+        "photo": "/videos/river-woman.jpg"
+      },
+      {
+        "id": "man",
+        "label": {
+          "ko": "그",
+          "zh": "他",
+          "en": "Him",
+          "ja": "彼"
+        },
+        "target": "the young man with long hair tied in a ponytail in a blue shirt",
+        "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
+        "photo": "/videos/river-man.jpg"
+      }
+    ],
+    "gen": {
+      "src": "/videos/river-1-gen.mp4",
+      "seconds": 7.08
+    },
+    "parts": [
+      [
+        "gen",
+        116
+      ],
+      [
+        "orig",
+        34
+      ],
+      [
+        "gen",
+        54
+      ]
+    ]
+  },
+  {
+    "id": "river-2",
+    "group": "river",
+    "title": {
+      "ko": "강물 장난",
+      "zh": "江边嬉水",
+      "en": "Splashing in the River",
+      "ja": "川辺の水あそび"
+    },
+    "description": {
+      "ko": "섬진강 물을 튕기며 웃는 그녀, 흠뻑 젖고도 웃는 그. 둘 중 한 사람이 되어 보세요.",
+      "zh": "她笑着泼起蟾津江的水，他被溅湿了也在笑。成为其中一人吧。",
+      "en": "She laughs as she splashes river water, and he laughs even as he gets soaked. Step into either role.",
+      "ja": "蟾津江の水をはねて笑う彼女、濡れても笑う彼。どちらかになってみよう。"
+    },
+    "src": "/videos/river-2.mp4",
+    "poster": "/videos/river-2.jpg",
     "seconds": 7,
     "cast": [
       {
@@ -365,52 +535,20 @@
         "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
         "photo": "/videos/river-man.jpg"
       }
-    ]
-  },
-  {
-    "id": "river-2",
-    "group": "river",
-    "title": {
-      "ko": "강물 장난",
-      "zh": "江边嬉水",
-      "en": "Splashing in the River",
-      "ja": "川辺の水あそび"
+    ],
+    "gen": {
+      "src": "/videos/river-2-gen.mp4",
+      "seconds": 5.54
     },
-    "description": {
-      "ko": "섬진강 물을 튕기며 웃는 그녀, 흠뻑 젖고도 웃는 그. 둘 중 한 사람이 되어 보세요.",
-      "zh": "她笑着泼起蟾津江的水，他被溅湿了也在笑。成为其中一人吧。",
-      "en": "She laughs as she splashes river water, and he laughs even as he gets soaked. Step into either role.",
-      "ja": "蟾津江の水をはねて笑う彼女、濡れても笑う彼。どちらかになってみよう。"
-    },
-    "src": "/videos/river-2.mp4",
-    "poster": "/videos/river-2.jpg",
-    "seconds": 6,
-    "cast": [
-      {
-        "id": "woman",
-        "label": {
-          "ko": "그녀",
-          "zh": "她",
-          "en": "Her",
-          "ja": "彼女"
-        },
-        "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
-        "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
-        "still": "/videos/river-woman.jpg",
-        "photo": "/videos/river-woman.jpg"
-      },
-      {
-        "id": "man",
-        "label": {
-          "ko": "그",
-          "zh": "他",
-          "en": "Him",
-          "ja": "彼"
-        },
-        "target": "the young man with long hair tied in a ponytail in a blue shirt",
-        "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
-        "photo": "/videos/river-man.jpg"
-      }
+    "parts": [
+      [
+        "orig",
+        45
+      ],
+      [
+        "gen",
+        133
+      ]
     ]
   },
   {
@@ -430,7 +568,7 @@
     },
     "src": "/videos/river-3.mp4",
     "poster": "/videos/river-3.jpg",
-    "seconds": 5,
+    "seconds": 8,
     "cast": [
       {
         "id": "woman",
@@ -457,6 +595,24 @@
         "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
         "photo": "/videos/river-man.jpg"
       }
+    ],
+    "gen": {
+      "src": "/videos/river-3-gen.mp4",
+      "seconds": 5.54
+    },
+    "parts": [
+      [
+        "gen",
+        51
+      ],
+      [
+        "orig",
+        59
+      ],
+      [
+        "gen",
+        82
+      ]
     ]
   }
 ]

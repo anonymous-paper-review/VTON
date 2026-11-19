@@ -132,6 +132,14 @@ async function routeStatus(page, fn) {
     return route.fulfill({ status: r.status || 200, contentType: "application/json", body: JSON.stringify(r.json) });
   });
 }
+/** 화면 글자가 나올 때까지 기다린다. 시계를 가짜로 바꾼 페이지에서도 되도록 봇 쪽 시간으로 잰다. */
+async function untilText(page, selector, re, ms = 8000) {
+  for (const end = Date.now() + ms; Date.now() < end; ) {
+    if (re.test(await page.locator(selector).innerText().catch(() => ""))) return true;
+    await new Promise((r) => setTimeout(r, 150));
+  }
+  return false;
+}
 async function toWorking(page, videoId = "simni-1") {
   await page.goto(`${BASE}/v/${videoId}?lang=ko`);
   await page.locator(".cast .tile").first().click();
@@ -178,10 +186,10 @@ async function failurePaths(browser) {
     const ctx = await newCtx(browser); const page = await ctx.newPage();
     await routeStatus(page, () => ({ json: { state: "queued", position: 7 } }));
     await toWorking(page);
-    await page.waitForTimeout(1500);
+    await untilText(page, ".stages", /앞에 7명/);
     const txt = await page.locator(".making").innerText();
     await shot(page, "queued-7");
-    note(/7/.test(txt), "대기 순번 표시", txt.replace(/\s+/g, " ").slice(0, 80));
+    note(/앞에 7명/.test(txt), "대기 순번 표시", txt.replace(/\s+/g, " ").slice(0, 110));
     await ctx.close();
   }
   // 4) 대기열 10분 초과 → 취소 + 시간 초과 안내 (시계 빨리 감기)
@@ -193,7 +201,8 @@ async function failurePaths(browser) {
     let polls = 0;
     await routeStatus(page, () => { polls++; return { json: { state: "queued", position: 3 } }; });
     await toWorking(page);
-    await page.waitForTimeout(500);
+    // 작업이 접수된 뒤부터 10분을 잰다 (접수 전에 시계를 감으면 시간 제한이 시작되지 않는다)
+    await untilText(page, ".stages", /앞에 3명/);
     await page.clock.runFor(6 * 60 * 1000 + 5000);
     const slow = await page.locator(".wait").innerText();
     await page.clock.runFor(4 * 60 * 1000 + 10000);
@@ -286,10 +295,14 @@ async function resumePaths(browser) {
   // 4) 다른 기기: ?job= 링크만으로 이어보기
   {
     const c2 = await newCtx(browser); const p2 = await c2.newPage();
-    const payload = Buffer.from(JSON.stringify({ at: Date.now() - 10000, video: "/videos/river-1.mp4" })).toString("base64url");
+    // 얼굴 구간만 만든 작업: 링크만으로도 서버가 원본 샷을 이어 붙여 전체 길이로 돌려줘야 한다
+    const payload = Buffer.from(JSON.stringify({ at: Date.now() - 10000, video: `${BASE}/videos/river-1-gen.mp4`, vid: "river-1" })).toString("base64url");
     await p2.goto(`${BASE}/v/river-1?job=mock.${payload}&lang=en`);
-    const ok = await p2.waitForSelector(".result", { timeout: 10000 }).then(() => true).catch(() => false);
+    const ok = await p2.waitForSelector(".result", { timeout: 20000 }).then(() => true).catch(() => false);
     note(ok, "다른 기기 ?job= 링크로 완성 화면");
+    await p2.waitForFunction(() => document.querySelector(".result video")?.duration > 0, null, { timeout: 8000 }).catch(() => {});
+    const dur = await p2.evaluate(() => document.querySelector(".result video")?.duration || 0);
+    note(Math.abs(dur - 8.5) < 0.2, "?job= 링크: 이어 붙인 전체 길이 영상", `${dur.toFixed(2)}초 (전체 8.50초, 얼굴 구간만은 7.08초)`);
     await c2.close();
   }
   if (errs.length) note(false, "이어보기 콘솔 오류", errs.slice(0, 3).join(" | "));
@@ -381,7 +394,7 @@ async function photoPaths(browser) {
 }
 
 async function progressPaths(browser) {
-  // 1) 3단계 표시: 접수·대기 → 만드는 중 → 받기, 단계 로그
+  // 1) 4단계 표시: 사진 접수 → 장면 의상 → AI 영상(접수·대기 → 만드는 중) → 받기, 단계 로그
   {
     const ctx = await newCtx(browser); const page = await ctx.newPage();
     const events = [];
@@ -394,18 +407,23 @@ async function progressPaths(browser) {
       return { json: { state: "done", videoUrl: "/videos/simni-2.mp4" } };
     });
     await toWorking(page);
-    await page.waitForFunction(() => /3/.test(document.querySelector('.stages li[data-s="now"]')?.textContent || ""), null, { timeout: 8000 }).catch(() => {});
+    // 서버가 사진을 받은 뒤 장면 의상(캐릭터시트)을 만드는 동안 2단계가 진행 중이어야 한다 (모의 서버는 1.5초)
+    const fitNow = await page.waitForSelector('.stages li:nth-child(2)[data-s="now"]', { timeout: 3000 }).then((h) => h.innerText()).catch(() => "");
+    await shot(page, "stages-0-fitting");
+    note(/의상/.test(fitNow) && (await page.locator('.stages li:nth-child(1)[data-s="done"]').count()) === 1, "단계 표시: 사진 접수 완료 → 장면 의상 입히는 중", fitNow.replace(/\s+/g, " ").slice(0, 60));
+    await page.waitForFunction(() => /앞에 3명/.test(document.querySelector('.stages li[data-s="now"]')?.textContent || ""), null, { timeout: 8000 }).catch(() => {});
     const q = await page.locator(".stages").innerText();
     await shot(page, "stages-1-queued");
-    note((await page.locator(".stages li").count()) === 3 && /3/.test(q), "3단계 표시: 접수·대기(앞에 3명)", q.replace(/\s+/g, " ").slice(0, 60));
-    await page.waitForSelector('.stages li:nth-child(2)[data-s="now"]', { timeout: 15000 }).catch(() => {});
+    note((await page.locator(".stages li").count()) === 4 && /의상 준비 완료/.test(q) && /AI 접수 완료 · 앞에 3명/.test(q) && (await page.locator('.stages li[data-s="done"]').count()) === 2,
+      "단계 표시: 의상 준비 완료 → AI 접수 완료(앞에 3명)", q.replace(/\s+/g, " ").slice(0, 110));
+    await page.waitForFunction(() => /지남/.test(document.querySelector('.stages li:nth-child(3)[data-s="now"]')?.textContent || ""), null, { timeout: 15000 }).catch(() => {});
     const m = await page.locator('.stages li[data-s="now"]').innerText().catch(() => "");
     await shot(page, "stages-2-making");
-    note((await page.locator('.stages li[data-s="done"]').count()) === 1, "3단계 표시: 만드는 중", m.replace(/\s+/g, " ").slice(0, 60));
+    note(/지남/.test(m) && (await page.locator('.stages li[data-s="done"]').count()) === 2, "단계 표시: 만드는 중", m.replace(/\s+/g, " ").slice(0, 60));
     await page.waitForSelector(".result", { timeout: 30000 });
     await page.waitForTimeout(500);
     const saveReady = await page.locator(".foot .btn:not([disabled])").first().innerText();
-    note(["submitted", "started", "generated", "downloaded"].every((e) => events.includes(e)), "단계 로그", events.join(","));
+    note(["fitted", "submitted", "started", "generated", "downloaded"].every((e) => events.includes(e)), "단계 로그", events.join(","));
     note(!/준비/.test(saveReady), "받아 둔 영상으로 저장 버튼 바로 준비", saveReady);
     await ctx.close();
   }
@@ -435,6 +453,32 @@ async function progressPaths(browser) {
     await shot(page, "net-weak");
     const gone = await page.waitForSelector(".notice.warn", { state: "detached", timeout: 10000 }).then(() => true).catch(() => false);
     note(shown && gone, "조회 연달아 실패 → 연결 불안정 안내, 회복 후 사라짐");
+    await ctx.close();
+  }
+  // 4) 얼굴 구간만 만들고(모의 서버는 생성용 영상을 그대로 결과로 준다) 원본 샷을 이어 붙인 전체 길이 영상이 오는가
+  {
+    const ctx = await newCtx(browser); const page = await ctx.newPage();
+    await toWorking(page, "simni-2");
+    await page.waitForSelector(".result", { timeout: 40000 }).catch(() => {});
+    await page.waitForFunction(() => document.querySelector(".result video")?.duration > 0, null, { timeout: 8000 }).catch(() => {});
+    const dur = await page.evaluate(() => document.querySelector(".result video")?.duration || 0);
+    const saved = await page.evaluate(() => JSON.parse(localStorage.getItem("vton.jobs") || "[]")[0]?.resultUrl || "");
+    note(Math.abs(dur - 8.75) < 0.2 && saved.startsWith("/api/result?job="), "얼굴 구간만 생성 → 원본 샷을 이어 붙인 결과", `${dur.toFixed(2)}초 (전체 8.75초, 얼굴 구간만은 6.83초), ${saved.slice(0, 24)}`);
+    await ctx.close();
+  }
+  // 5) 장면 의상(캐릭터시트)이 실패하면 사진 그대로 진행한다고 알리는가
+  {
+    const ctx = await newCtx(browser); const page = await ctx.newPage();
+    const job = `mock.${Buffer.from(JSON.stringify({ at: Date.now() + 60000, video: "/videos/simni-1.mp4" })).toString("base64url")}`;
+    await page.route(/\/api\/jobs$/, (r) => r.fulfill({
+      status: 200, contentType: "application/x-ndjson",
+      body: [{ ev: "received", sheet: true }, { ev: "sheet", ok: false }, { jobId: job }].map((o) => JSON.stringify(o)).join("\n") + "\n",
+    }));
+    await toWorking(page);
+    await page.waitForSelector('.stages li:nth-child(2)[data-s="done"]', { timeout: 5000 }).catch(() => {});
+    const fit = await page.locator(".stages li:nth-child(2)").innerText().catch(() => "");
+    await shot(page, "stages-fit-skipped");
+    note(/사진 그대로/.test(fit), "장면 의상 실패 → 사진 그대로 진행 안내", fit.replace(/\s+/g, " ").slice(0, 60));
     await ctx.close();
   }
 }
