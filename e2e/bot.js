@@ -33,6 +33,8 @@ const note = (ok, name, detail = "") => { findings.push({ ok, name, detail }); c
 
 async function newCtx(browser, opts = {}) {
   const ctx = await browser.newContext({ viewport: { width: 360, height: 780 }, deviceScaleFactor: 1, isMobile: true, hasTouch: true, permissions: ["camera"], ...opts });
+  // 점검 봇도 단계 로그를 보내게 한다 (lib/track.ts 는 자동화 브라우저를 사람 수에서 뺀다)
+  await ctx.addInitScript(() => { try { localStorage.setItem("vton.trackBots", "1"); } catch {} });
   return ctx;
 }
 async function watch(page, tag) {
