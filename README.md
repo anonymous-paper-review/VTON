@@ -57,7 +57,7 @@ Claude 클라우드 환경처럼 프록시가 fal 인증 헤더를 넣어 주는
 
 ## 생성 잠금 (정식 오픈 전)
 
-기본값은 **잠금**이다. 목록과 장면 미리보기는 보이지만 「주인공 되기」를 누르면 "정식 오픈 때 열려요" 안내만 뜨고, 서버 `/api/jobs`도 503으로 막혀 fal 요금이 나가지 않는다. 열려면 Vercel 환경변수 `NEXT_PUBLIC_GENERATION_OPEN=1`을 넣고 Redeploy(빌드 때 들어가는 값이라 Redeploy 필요). 다시 잠그려면 지우고 Redeploy.
+**한국 시간 2026-11-30 0시에 저절로 열린다**(`lib/open.ts`). 그 전에는 목록과 장면 미리보기는 보이지만 「주인공 되기」를 누르면 "정식 오픈 때 열려요" 안내만 뜨고, 서버 `/api/jobs`도 503으로 막혀 fal 요금이 나가지 않는다. 바로 열려면 Vercel 환경변수 `NEXT_PUBLIC_GENERATION_OPEN=1`, 시각과 상관없이 잠그려면 `=0`, 오픈 시각을 바꾸려면 `NEXT_PUBLIC_GENERATION_OPEN_AT=<ISO 시각>`을 넣고 Redeploy(빌드 때 들어가는 값).
 
 ## 배포 (Vercel)
 

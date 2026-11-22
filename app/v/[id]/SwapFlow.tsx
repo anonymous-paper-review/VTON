@@ -7,7 +7,7 @@ import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
 import { readReturnUrl } from "@/lib/returnTo";
-import { GENERATION_OPEN } from "@/lib/open";
+import { isGenerationOpen } from "@/lib/open";
 import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
 import { checkPhoto, preloadFaceCheck, type PhotoCheck } from "@/lib/faceCheck";
 import { track } from "@/lib/track";
@@ -137,8 +137,9 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
   const many = video.cast.length > 1;
   // 이용 통계: 「주인공 되기」를 누르면 생성 시도로 센다 (생성이 잠겨 있어 안내만 떠도 센다)
   const choose = (id: string) => {
-    track("attempt", { video: video.id, open: GENERATION_OPEN });
-    return GENERATION_OPEN ? onPick(id) : toast(t("intro.closed"));
+    const open = isGenerationOpen();
+    track("attempt", { video: video.id, open });
+    return open ? onPick(id) : toast(t("intro.closed"));
   };
   return (
     <>
