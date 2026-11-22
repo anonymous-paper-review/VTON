@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { findVideo, videos } from "@/lib/videos";
-import { CONSENT_VERSION, consentItems } from "@/lib/consent";
+import { CONSENT_VERSION, consentItems, partnerItem } from "@/lib/consent";
 import SwapFlow from "./SwapFlow";
 
 export function generateStaticParams() {
@@ -11,5 +11,5 @@ export default async function VideoPage({ params }: { params: Promise<{ id: stri
   const { id } = await params;
   const video = findVideo(id);
   if (!video) notFound();
-  return <SwapFlow video={video} consent={{ version: CONSENT_VERSION, items: consentItems }} />;
+  return <SwapFlow video={video} consent={{ version: CONSENT_VERSION, items: consentItems, partner: partnerItem }} />;
 }

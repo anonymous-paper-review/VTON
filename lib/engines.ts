@@ -17,6 +17,8 @@ type Engine = {
   endpoint: string;
   /** 셀카 대신 캐릭터시트(한 사람을 세 각도로 그린 한 장)를 참고 사진으로 받아도 되는 엔진 */
   sheet?: boolean;
+  /** 한 번에 여러 인물을 각자 다른 사진으로 바꿀 수 있는 엔진 (둘이 함께 바꾸기) */
+  multi?: boolean;
   minSeconds: number;
   maxSeconds: number;
   build: (a: BuildArgs) => Record<string, unknown>;
@@ -34,6 +36,8 @@ export const ENGINES: Record<EngineKey, Engine> = {
   "minimax-h3": {
     endpoint: "minimax/h3-max/recast",
     sheet: true,
+    // 참고 사진을 1~4장 받아 왼쪽 인물부터 대응한다. 2026-10-21 엔진 비교도 남녀 둘을 한 번에 바꾼 것이다.
+    multi: true,
     minSeconds: 5,
     maxSeconds: 30,
     build: ({ videoUrl, lineup }) => ({

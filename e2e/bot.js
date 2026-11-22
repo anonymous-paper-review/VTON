@@ -1,5 +1,5 @@
 // VTON 웹앱 점검 봇. VTON_MOCK=1 로 띄운 로컬 서버(BASE)에 대고 전체 흐름과 실패 경로를 돈다.
-// 실행: VTON_MOCK=1 NEXT_PUBLIC_GENERATION_OPEN=1 npm run build && VTON_MOCK=1 npx next start -p 3100 그다음 npm run bot [flow|fail|resume|return|photo|progress|selfie]
+// 실행: VTON_MOCK=1 NEXT_PUBLIC_GENERATION_OPEN=1 npm run build && VTON_MOCK=1 npx next start -p 3100 그다음 npm run bot [flow|fail|resume|return|photo|progress|selfie|couple]
 // 생성 잠금 확인: NEXT_PUBLIC_GENERATION_OPEN=0 으로 빌드·실행한 서버에 npm run bot closed (오픈 시각 2026-11-30 KST 전이면 값 없이도 잠김)
 // Playwright가 깔린 환경(클라우드 세션 등)에서 돈다. 스크린샷은 e2e/shots/
 const { chromium } = require("playwright");
@@ -500,6 +500,68 @@ async function closedPaths(browser) {
   await ctx.close();
 }
 
+/** 둘이 함께 바꾸기: 커플 카드 → 동의(함께 찍는 사람 항목) → 그 → 그녀 차례로 셀카 → 셀카 2장이 서버로 가는지 */
+async function couplePaths(browser, lang = "ko") {
+  const ctx = await newCtx(browser);
+  const page = await ctx.newPage();
+  await page.addInitScript(() => { const send = XMLHttpRequest.prototype.send; XMLHttpRequest.prototype.send = function (b) { if (b instanceof FormData) window.__form = [...b.keys()]; return send.call(this, b); }; });
+  const errs = await watch(page);
+  await page.goto(`${BASE}/v/market-1?lang=${lang}`);
+  await page.waitForTimeout(400);
+  await page.locator(".couple").scrollIntoViewIfNeeded();
+  await check(page, `${lang} 커플 카드`);
+  await shot(page, `couple-${lang}-1-intro`);
+  await page.locator(".couple").click();
+  const rows = await page.locator(".rows .row").count();
+  note(rows === 4, `${lang} 커플 동의 항목 4개`, String(rows));
+  await shot(page, `couple-${lang}-2-consent`);
+  await page.locator(".agree-all").click();
+  await page.locator(".foot .btn").click();
+  // 1번: 그
+  await page.waitForSelector(".pair-bar");
+  await page.waitForFunction(() => document.querySelector(".cam video")?.videoWidth > 0, null, { timeout: 8000 });
+  const first = await page.locator('.pair-bar [aria-selected="true"]').innerText();
+  note(/그$|他|Him|彼$/.test(first.trim()), `${lang} 커플 첫 차례가 그`, first.replace(/\n/g, " "));
+  await check(page, `${lang} 커플 셀카 1`);
+  await shot(page, `couple-${lang}-3-cam-him`);
+  await page.locator(".shutter").click();
+  await page.waitForSelector(".cam img");
+  await page.waitForSelector(".cam-confirm .btn:not([disabled])", { timeout: 10000 });
+  await shot(page, `couple-${lang}-4-confirm-him`);
+  await usePhoto(page);
+  // 2번: 그녀 (카메라가 다시 살아나야 한다)
+  const live = await page.waitForFunction(() => { const v = document.querySelector(".cam video"); return v && v.srcObject && v.videoWidth > 0; }, null, { timeout: 8000 }).then(() => true).catch(() => false);
+  note(live, `${lang} 커플 두 번째 카메라`);
+  const second = await page.locator('.pair-bar [aria-selected="true"]').innerText();
+  note(/그녀|她|Her|彼女/.test(second), `${lang} 커플 둘째 차례가 그녀`, second.replace(/\n/g, " "));
+  await page.waitForTimeout(300);
+  await shot(page, `couple-${lang}-5-cam-her`);
+  // 1번 칸을 눌러 다시 찍었다가 돌아오기
+  await page.locator(".pair-bar button").first().click();
+  await page.waitForFunction(() => document.querySelector(".cam video")?.videoWidth > 0, null, { timeout: 8000 });
+  await page.locator(".shutter").click();
+  await page.waitForSelector(".cam-confirm .btn:not([disabled])", { timeout: 10000 });
+  const lbl1 = await page.locator(".cam-confirm .btn").first().innerText();
+  await usePhoto(page);
+  await page.waitForFunction(() => document.querySelector(".cam video")?.videoWidth > 0, null, { timeout: 8000 });
+  await page.locator(".shutter").click();
+  await page.waitForSelector(".cam-confirm .btn:not([disabled])", { timeout: 10000 });
+  const lbl2 = await page.locator(".cam-confirm .btn").first().innerText();
+  note(/다음|下一|next|次/i.test(lbl1) && /두 사진|两张|both|2枚/i.test(lbl2), `${lang} 커플 버튼 글자`, `${lbl1} / ${lbl2}`);
+  await shot(page, `couple-${lang}-6-confirm-her`);
+  const posted = page.waitForRequest((r) => r.url().endsWith("/api/jobs") && r.method() === "POST");
+  await usePhoto(page);
+  await posted;
+  const keys = await page.evaluate(() => window.__form);
+  note(keys.includes("selfie.man") && keys.includes("selfie.woman") && keys.includes("role") && !keys.includes("selfie"), `${lang} 커플 셀카 2장 전송`, keys.join(","));
+  await page.waitForSelector(".making");
+  await page.waitForTimeout(800);
+  await shot(page, `couple-${lang}-7-working`);
+  await page.waitForSelector(".result", { timeout: 40000 }).then(() => note(true, `${lang} 커플 완성까지`)).catch(() => note(false, `${lang} 커플 완성`, "결과 화면이 안 뜸"));
+  if (errs.length) note(false, `${lang} 커플 콘솔 오류`, errs.slice(0, 3).join(" | "));
+  await ctx.close();
+}
+
 (async () => {
   const browser = await chromium.launch({ args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream", "--autoplay-policy=no-user-gesture-required", ...(hasFfmpeg ? [`--use-file-for-fake-video-capture=${FACE_CAM}`] : [])] });
   const only = process.argv[2];
@@ -511,6 +573,7 @@ async function closedPaths(browser) {
   if (!only || only === "photo") await photoPaths(browser).catch((e) => note(false, "사진 점검 예외", e.message.split("\n")[0]));
   if (!only || only === "progress") await progressPaths(browser).catch((e) => note(false, "진행 표시 예외", e.message.split("\n")[0]));
   if (!only || only === "selfie") await selfieEdge(browser).catch((e) => note(false, "셀카 예외", e.message.split("\n")[0]));
+  if (!only || only === "couple") for (const l of only ? ["ko", "zh", "en", "ja"] : ["ko"]) await couplePaths(browser, l).catch((e) => note(false, `${l} 커플 예외`, e.message.split("\n")[0]));
   await browser.close();
   fs.writeFileSync(`${OUT}/findings.json`, JSON.stringify(findings, null, 2));
   console.log(`\n${findings.filter((f) => !f.ok).length} FAIL / ${findings.length}`);

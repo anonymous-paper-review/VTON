@@ -58,6 +58,9 @@ const dict = {
   "intro.start": { ko: "화개장터 주인공 되기", zh: "成为花开市场的主角", en: "Star in Hwagae Market", ja: "花開市場の主人公になる" },
   "intro.become": { ko: "이 사람 되기", zh: "成为TA", en: "Become", ja: "この人になる" },
 
+  "intro.couple": { ko: "둘이 함께 주인공 되기", zh: "两人一起当主角", en: "Star together, both of you", ja: "二人一緒に主人公になる" },
+  "intro.coupleNote": { ko: "셀카 2장으로 두 사람을 한 번에 바꿔요", zh: "两张自拍，一次换掉两个人", en: "Two selfies swap both people at once", ja: "自撮り2枚で二人を一度に入れ替え" },
+
   "step.consent": { ko: "동의", zh: "同意", en: "Consent", ja: "同意" },
   "step.selfie": { ko: "셀카", zh: "自拍", en: "Selfie", ja: "自撮り" },
   "step.make": { ko: "제작", zh: "生成", en: "Create", ja: "制作" },
@@ -80,6 +83,9 @@ const dict = {
     en: "Look straight ahead in good light. Remove hats and masks.",
     ja: "正面から、明るい場所で。帽子とマスクは外してください。",
   },
+  "selfie.whose": { ko: "{who}가 될 분, 얼굴을 원 안에", zh: "扮演“{who}”的人，请把脸放进圆圈", en: "Playing “{who}”? Face in the circle", ja: "{who}になる人、顔を円の中に" },
+  "selfie.next": { ko: "이 사진으로, 다음 사람", zh: "用这张，拍下一位", en: "Use this, next person", ja: "この写真で、次の人へ" },
+  "selfie.useBoth": { ko: "두 사진으로 만들기", zh: "用这两张照片生成", en: "Use both photos", ja: "2枚の写真で作る" },
   "selfie.shoot": { ko: "촬영", zh: "拍摄", en: "Shoot", ja: "撮影" },
   "selfie.album": { ko: "앨범", zh: "相册", en: "Album", ja: "アルバム" },
   "selfie.noCam": {
