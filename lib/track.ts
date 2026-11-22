@@ -1,7 +1,14 @@
-// 단계별 결과를 Vercel 로그에 한 줄씩 남긴다 ("vton event"). 어디서 얼마나 실패하는지 숫자로 보려고.
-// 사진·개인 식별 정보는 보내지 않는다. 실패해도 화면에는 영향이 없다.
+// 단계별 결과를 Vercel 로그에 한 줄씩 남기고("vton event"), 이용 통계 DB(Supabase vton_events)에도 쌓는다.
+// 관광공사 보고용 숫자(진입·영상 재생·생성 시도 사용자 수)를 /admin/stats 에서 본다.
+// 사진·개인 식별 정보는 보내지 않는다. 사람 구분은 이 기기에서 만든 무작위 id(device)뿐이다.
+// 실패해도 화면에는 영향이 없다.
 
 export type TrackEvent =
+  | "visit" // 앱 진입 (페이지를 새로 열 때마다. path, src: 들어온 길)
+  | "view" // 장면 페이지 열람 = 영상 재생 (video)
+  | "attempt" // 「주인공 되기」를 누름 = 생성 시도 (video, open: 생성이 열려 있었는지)
+  | "consented" // 개인정보 동의 마침 (video)
+  | "saved" // 결과 영상 저장·공유 (job, how)
   | "photo_check" // 휴대폰 안 사진 점검 결과 (issue, 사용자가 그래도 썼는지)
   | "submitted" // 사진 접수 (s: 보내는 데 걸린 초)
   | "submit_failed" // 접수 실패 (code)
@@ -17,7 +24,7 @@ export type TrackEvent =
 
 export function track(e: TrackEvent, data: Record<string, string | number | boolean | null | undefined> = {}) {
   try {
-    const body = JSON.stringify({ e, ...data, env: browserEnv() });
+    const body = JSON.stringify({ e, env: browserEnv(), device: deviceId(), lang: document.documentElement.lang || undefined, ...data });
     if (navigator.sendBeacon?.("/api/log", new Blob([body], { type: "application/json" }))) return;
     fetch("/api/log", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
   } catch {}
@@ -29,4 +36,32 @@ function browserEnv() {
   const os = /iPhone|iPad|iPod/.test(ua) ? "ios" : /Android/.test(ua) ? "android" : "other";
   const app = /KAKAOTALK/i.test(ua) ? "kakao" : /NAVER/.test(ua) ? "naver" : /Instagram|FBAN|FBAV/.test(ua) ? "meta" : /Line\//.test(ua) ? "line" : /MicroMessenger/.test(ua) ? "wechat" : "";
   return app ? `${os}-${app}` : os;
+}
+
+const DEVICE_KEY = "vton.did";
+/** 이 기기의 익명 무작위 id (사용자 수를 세는 데만 쓴다). 저장이 막힌 브라우저는 페이지마다 새로 만든다. */
+let memId: string | null = null;
+function deviceId() {
+  try {
+    const v = localStorage.getItem(DEVICE_KEY);
+    if (v) return v;
+  } catch {}
+  memId ??= (crypto.randomUUID?.() ?? `${Date.now().toString(36)}-${Math.random().toString(36).slice(2)}`);
+  try { localStorage.setItem(DEVICE_KEY, memId); } catch {}
+  return memId;
+}
+
+/** 들어온 길: 지도 앱(AI관광집사)에서 ?return= 으로 / 다른 사이트 링크 / 그 밖(QR 스캔·주소 직접 입력) */
+export function entrySource(): string {
+  const q = new URLSearchParams(location.search);
+  if (q.get("return") || q.get("back")) return "map";
+  const given = q.get("src") ?? q.get("utm_source");
+  if (given) return given.slice(0, 16);
+  try {
+    if (document.referrer) {
+      const h = new URL(document.referrer).hostname;
+      if (h !== location.hostname) return h.includes("traveljipsa") ? "map" : "link";
+    }
+  } catch {}
+  return "direct";
 }

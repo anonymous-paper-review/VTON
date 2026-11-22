@@ -66,6 +66,8 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   }, [video.id]);
 
   useEffect(() => { window.scrollTo(0, 0); }, [step]);
+  // 이용 통계: 장면 페이지를 열면 그 영상이 자동 재생된다 = 영상 재생
+  useEffect(() => { track("view", { video: video.id }); }, [video.id]);
 
   const saveJobId = useCallback((id: string | null) => {
     setJobId(id);
@@ -91,7 +93,7 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
 
       {step === "intro" && <IntroStep video={video} onPick={(id) => { setRole(id); setStep("consent"); }} />}
 
-      {step === "consent" && <ConsentStep consent={consent} agreed={agreed} setAgreed={setAgreed} onNext={() => setStep("selfie")} />}
+      {step === "consent" && <ConsentStep consent={consent} agreed={agreed} setAgreed={setAgreed} onNext={() => { track("consented", { video: video.id }); setStep("selfie"); }} />}
 
       {step === "selfie" && <SelfieStep onDone={(blob) => { setSelfie(blob); setStep("working"); }} />}
 
@@ -133,7 +135,11 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
   const { t, pick } = useLang();
   const [toast, toastNode] = useToast();
   const many = video.cast.length > 1;
-  const choose = (id: string) => (GENERATION_OPEN ? onPick(id) : toast(t("intro.closed")));
+  // 이용 통계: 「주인공 되기」를 누르면 생성 시도로 센다 (생성이 잠겨 있어 안내만 떠도 센다)
+  const choose = (id: string) => {
+    track("attempt", { video: video.id, open: GENERATION_OPEN });
+    return GENERATION_OPEN ? onPick(id) : toast(t("intro.closed"));
+  };
   return (
     <>
       <section className="stage">
@@ -743,10 +749,11 @@ function ResultStep({ video, resultUrl, initialFile, onRetry }: { video: Video; 
 
   // 휴대폰은 공유 시트의 "동영상 저장"이 갤러리로 가는 길이다. 공유가 안 되는 브라우저는 파일 다운로드로.
   const save = async () => {
-    if (!file) return void window.open(resultUrl, "_blank", "noopener");
+    if (!file) { track("saved", { video: video.id, how: "tab" }); return void window.open(resultUrl, "_blank", "noopener"); }
     if (canShare) {
-      try { return await navigator.share({ files: [file] }); } catch (e) { if ((e as Error).name === "AbortError") return; }
+      try { await navigator.share({ files: [file] }); return void track("saved", { video: video.id, how: "share" }); } catch (e) { if ((e as Error).name === "AbortError") return; }
     }
+    track("saved", { video: video.id, how: "download" });
     const a = document.createElement("a");
     a.href = URL.createObjectURL(file);
     a.download = file.name;
