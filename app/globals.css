@@ -272,3 +272,24 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .poster .langs { display: grid; gap: var(--sp-1); font: var(--head-s); }
 .poster .langs span + span { font: var(--sub); color: var(--text-secondary); }
 .poster code { font: var(--caption); color: var(--text-secondary); }
+
+/* ── 둘이 함께 바꾸기(커플) ─────────────────────────────── */
+.couple-wrap { padding: var(--sp-3) var(--page-x) 0; }
+.couple { width: 100%; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); text-align: left; transition: border-color .15s ease; }
+.couple:active { border-color: var(--fill-brand); }
+.couple .faces { display: flex; flex: none; }
+.couple .faces span { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--fill-page); background: var(--fill-section) center / cover no-repeat; }
+.couple .faces span + span { margin-left: -14px; }
+.couple .txt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
+.couple .txt b { font: var(--head-s); }
+.couple .txt span { font: var(--label); color: var(--text-secondary); }
+.couple > svg { width: 18px; height: 18px; color: var(--text-brand); flex: none; }
+
+.pair-bar { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); padding: var(--sp-3) var(--page-x); background: var(--fill-page); }
+.pair-bar button { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2); border-radius: var(--r-card); border: 1.5px solid var(--border-weak); background: var(--fill-page); font: var(--label); color: var(--text-secondary); cursor: pointer; text-align: left; }
+.pair-bar button[aria-selected="true"] { border-color: var(--fill-brand); color: var(--text-primary); }
+.pair-bar .th { position: relative; width: 36px; height: 36px; flex: none; border-radius: 50%; background: var(--fill-section) center / cover no-repeat; }
+.pair-bar button:not(.has) .th { filter: grayscale(1); opacity: .45; }
+.pair-bar .th i { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--fill-brand); color: var(--text-inverse); display: grid; place-items: center; border: 2px solid var(--fill-page); }
+.pair-bar .th i svg { width: 10px; height: 10px; }
+.pair-bar b { font-weight: 600; color: var(--text-brand); margin-right: var(--sp-1); }

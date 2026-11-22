@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useCallback, useEffect, useRef, useState } from "react";
-import type { Video } from "@/lib/videos";
+import { useCallback, useEffect, useRef, useState, type ReactNode } from "react";
+import type { CastMember, Video } from "@/lib/videos";
 import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
@@ -15,7 +15,8 @@ import { Frame, TopBar } from "../../HomeView";
 import { useLang, useToast } from "../../LangProvider";
 import { Chevron, Clock, Close, Megaphone, Photo, Save, Tick } from "../../icons";
 
-type ConsentProps = { version: string; items: { id: string; title: Localized; body: Localized[] }[] };
+type ConsentItem = { id: string; title: Localized; body: Localized[] };
+type ConsentProps = { version: string; items: ConsentItem[]; partner: ConsentItem };
 type Step = "intro" | "consent" | "selfie" | "working" | "done";
 type Status = { state: "queued"; position?: number } | { state: "running" } | { state: "done"; videoUrl: string } | { state: "failed"; code: string };
 
@@ -41,13 +42,21 @@ const STITCH_WAIT_MS = 70_000;
 const TYPICAL_RUN_S = 270;
 const HEAD: Record<Exclude<Step, "intro">, MsgKey> = { consent: "consent.head", selfie: "selfie.head", working: "work.head", done: "done.head" };
 const LINES: MsgKey[] = ["work.line1", "work.line2", "work.line3", "work.line4"];
+/** 둘이 함께 바꾸기(커플)를 고른 경우의 role 값 (app/api/jobs/route.ts) */
+const BOTH = "both";
+/** 커플 셀카 찍는 순서: 그(남자) 먼저, 그다음 그녀 (오너 요청 2026-11-22) */
+const shootOrder = (cast: CastMember[]) => [...cast].sort((a, b) => Number(b.id === "man") - Number(a.id === "man"));
+/** 보낼 셀카: [폼 필드 이름, 사진]. 혼자면 selfie 하나, 커플이면 selfie.<인물 id> 둘 */
+type Selfies = [string, Blob][];
 
 export default function SwapFlow({ video, consent }: { video: Video; consent: ConsentProps }) {
   const { t, pick } = useLang();
   const [step, setStep] = useState<Step>("intro");
   const [agreed, setAgreed] = useState<string[]>([]);
-  const [selfie, setSelfie] = useState<Blob | null>(null);
+  const [selfies, setSelfies] = useState<Selfies | null>(null);
   const [role, setRole] = useState(video.cast[0].id);
+  const couple = role === BOTH;
+  const consentItems = couple ? [...consent.items, consent.partner] : consent.items;
   const [jobId, setJobId] = useState<string | null>(null);
   const [resultUrl, setResultUrl] = useState<string | null>(null);
   const [resultFile, setResultFile] = useState<File | null>(null);
@@ -78,8 +87,8 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
   // (그대로 셀카로 가면 서버가 동의 없음으로 거절한다)
   const reset = () => {
     forgetJobsFor(video.id);
-    const consented = consent.items.every((c) => agreed.includes(c.id));
-    setJobId(null); setResultUrl(null); setResultFile(null); setSelfie(null); setStartedAt(null); setStep(consented ? "selfie" : "intro");
+    const consented = consentItems.every((c) => agreed.includes(c.id));
+    setJobId(null); setResultUrl(null); setResultFile(null); setSelfies(null); setStartedAt(null); setStep(consented ? "selfie" : "intro");
   };
 
   const back = step === "consent" ? () => setStep("intro") : step === "selfie" ? () => setStep("consent") : undefined;
@@ -93,19 +102,21 @@ export default function SwapFlow({ video, consent }: { video: Video; consent: Co
 
       {step === "intro" && <IntroStep video={video} onPick={(id) => { setRole(id); setStep("consent"); }} />}
 
-      {step === "consent" && <ConsentStep consent={consent} agreed={agreed} setAgreed={setAgreed} onNext={() => { track("consented", { video: video.id }); setStep("selfie"); }} />}
+      {step === "consent" && <ConsentStep items={consentItems} agreed={agreed} setAgreed={setAgreed} onNext={() => { track("consented", { video: video.id, couple }); setStep("selfie"); }} />}
 
-      {step === "selfie" && <SelfieStep onDone={(blob) => { setSelfie(blob); setStep("working"); }} />}
+      {step === "selfie" && (couple
+        ? <CoupleSelfies cast={shootOrder(video.cast)} onDone={(s) => { setSelfies(s); setStep("working"); }} />
+        : <SelfieStep onDone={(blob) => { setSelfies([["selfie", blob]]); setStep("working"); }} />)}
 
       {step === "working" && (
         <WorkingStep
           videoId={video.id}
           videoSrc={video.src}
-          fit={!!(video.cast.find((c) => c.id === role) ?? video.cast[0]).outfit}
+          fit={couple ? video.cast.some((c) => c.outfit) : !!(video.cast.find((c) => c.id === role) ?? video.cast[0]).outfit}
           role={role}
           consentVersion={consent.version}
           agreed={agreed}
-          selfie={selfie}
+          selfies={selfies}
           jobId={jobId}
           startedAt={startedAt}
           setJobId={saveJobId}
@@ -135,10 +146,11 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
   const { t, pick } = useLang();
   const [toast, toastNode] = useToast();
   const many = video.cast.length > 1;
+  const pair = shootOrder(video.cast);
   // 이용 통계: 「주인공 되기」를 누르면 생성 시도로 센다 (생성이 잠겨 있어 안내만 떠도 센다)
   const choose = (id: string) => {
     const open = isGenerationOpen();
-    track("attempt", { video: video.id, open });
+    track("attempt", { video: video.id, open, couple: id === BOTH });
     return open ? onPick(id) : toast(t("intro.closed"));
   };
   return (
@@ -171,6 +183,20 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
             </button>
           ))}
         </div>
+      ) : null}
+      {many ? (
+        <div className="couple-wrap">
+          <button className="card couple" onClick={() => choose(BOTH)}>
+            <span className="faces" aria-hidden>
+              {pair.map((c) => <span key={c.id} style={c.photo ? { backgroundImage: `url(${c.photo})` } : undefined} />)}
+            </span>
+            <span className="txt">
+              <b>{t("intro.couple")}</b>
+              <span>{t("intro.coupleNote")}</span>
+            </span>
+            <Chevron />
+          </button>
+        </div>
       ) : (
         <div className="solo">
           <button className="btn" onClick={() => choose(video.cast[0].id)}>{t("intro.start")}</button>
@@ -184,12 +210,12 @@ function IntroStep({ video, onPick }: { video: Video; onPick: (id: string) => vo
   );
 }
 
-function ConsentStep({ consent, agreed, setAgreed, onNext }: {
-  consent: ConsentProps; agreed: string[]; setAgreed: (v: string[]) => void; onNext: () => void;
+function ConsentStep({ items, agreed, setAgreed, onNext }: {
+  items: ConsentItem[]; agreed: string[]; setAgreed: (v: string[]) => void; onNext: () => void;
 }) {
   const { t, pick } = useLang();
   const [toast, toastNode] = useToast();
-  const all = consent.items.every((c) => agreed.includes(c.id));
+  const all = items.every((c) => agreed.includes(c.id));
   const toggle = (id: string) => setAgreed(agreed.includes(id) ? agreed.filter((a) => a !== id) : [...agreed, id]);
   return (
     <>
@@ -197,12 +223,12 @@ function ConsentStep({ consent, agreed, setAgreed, onNext }: {
       <section className="screen">
         <h2 className="h-screen">{t("consent.title")}</h2>
         <p className="lead">{t("consent.sub")}</p>
-        <button className="card agree-all" aria-pressed={all} onClick={() => setAgreed(all ? [] : consent.items.map((c) => c.id))}>
+        <button className="card agree-all" aria-pressed={all} onClick={() => setAgreed(all ? [] : items.map((c) => c.id))}>
           <span className="check"><Tick /></span>
           {t("consent.all")}
         </button>
         <div className="rows">
-          {consent.items.map((c) => (
+          {items.map((c) => (
             <div className="row-wrap" key={c.id}>
               <button className="row" aria-pressed={agreed.includes(c.id)} onClick={() => toggle(c.id)}>
                 <span className="check"><Tick /></span>
@@ -235,7 +261,11 @@ async function toJpeg(src: CanvasImageSource, w: number, h: number) {
   return new Promise<Blob | null>((r) => c.toBlob(r, "image/jpeg", 0.9));
 }
 
-function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
+/**
+ * 셀카 한 장 찍기. 커플이면 CoupleSelfies가 사람마다 새로 그린다.
+ * top: 카메라 위 띠(커플의 두 칸), title: 원 위 안내, useLabel: 「이 사진으로」 버튼 글자
+ */
+function SelfieStep({ onDone, top, title, useLabel = "selfie.use" }: { onDone: (b: Blob) => void; top?: ReactNode; title?: string; useLabel?: MsgKey }) {
   const { t } = useLang();
   const videoRef = useRef<HTMLVideoElement>(null);
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -304,6 +334,7 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
 
   return (
     <div className="cam-screen">
+      {top}
       <div className="cam">
         {shot ? (
           // eslint-disable-next-line @next/next/no-img-element
@@ -316,7 +347,7 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
         )}
         {!shot && (
           <div className="cam-copy">
-            <h2>{t("selfie.title")}</h2>
+            <h2>{title ?? t("selfie.title")}</h2>
             <p>{t("selfie.tip")}</p>
           </div>
         )}
@@ -333,7 +364,7 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
             </>
           ) : (
             <>
-              <button className="btn" disabled={!check} onClick={() => use(shot.blob)}>{t(check ? "selfie.use" : "photo.checking")}</button>
+              <button className="btn" disabled={!check} onClick={() => use(shot.blob)}>{t(check ? useLabel : "photo.checking")}</button>
               <button className="btn sub" onClick={() => setShot(null)}>{t("selfie.retake")}</button>
             </>
           )}
@@ -354,6 +385,56 @@ function SelfieStep({ onDone }: { onDone: (b: Blob) => void }) {
       )}
     </div>
   );
+}
+
+/**
+ * 커플: 한 사람씩 차례로 찍는다 (그 → 그녀). 위 띠의 두 칸에 찍은 사진이 채워지고, 채워진 칸을 누르면 그 사람만 다시 찍는다.
+ * 앨범에서 고를 수도 있어 상대가 보내 준 사진도 쓸 수 있다.
+ */
+function CoupleSelfies({ cast, onDone }: { cast: CastMember[]; onDone: (s: Selfies) => void }) {
+  const { t, pick } = useLang();
+  const [shots, setShots] = useState<(Blob | null)[]>(() => cast.map(() => null));
+  const [at, setAt] = useState(0);
+  const thumbs = useThumbs(shots);
+  const fill = (s: string, who: string) => s.replace("{who}", who);
+  const empty = (list: (Blob | null)[], skip: number) => list.findIndex((b, i) => !b && i !== skip);
+  const take = (blob: Blob) => {
+    const next = shots.map((b, i) => (i === at ? blob : b));
+    setShots(next);
+    const n = empty(next, at);
+    if (n < 0) return onDone(cast.map((c, i) => [`selfie.${c.id}`, next[i]!]));
+    // 다음 사람 차례는 위 칸 표시와 원 위 안내(「그녀가 될 분…」)로 알린다. 토스트는 셔터를 가려서 쓰지 않는다.
+    setAt(n);
+  };
+  const last = empty(shots, at) < 0;
+  const top = (
+    <div className="pair-bar" role="tablist">
+      {cast.map((c, i) => (
+        <button key={c.id} role="tab" aria-selected={i === at} className={shots[i] ? "has" : undefined} onClick={() => setAt(i)}>
+          <span className="th" style={thumbs[i] ? { backgroundImage: `url(${thumbs[i]})` } : c.photo ? { backgroundImage: `url(${c.photo})` } : undefined}>
+            {shots[i] && <i><Tick /></i>}
+          </span>
+          <span><b>{i + 1}</b>{pick(c.label)}</span>
+        </button>
+      ))}
+    </div>
+  );
+  return (
+    <>
+      <SelfieStep key={at} top={top} title={fill(t("selfie.whose"), pick(cast[at].label))} useLabel={last ? "selfie.useBoth" : "selfie.next"} onDone={take} />
+    </>
+  );
+}
+
+/** 찍은 사진들의 미리보기 주소 (바뀌면 이전 주소를 풀어 준다) */
+function useThumbs(blobs: (Blob | null)[]) {
+  const [urls, setUrls] = useState<(string | null)[]>([]);
+  useEffect(() => {
+    const u = blobs.map((b) => (b ? URL.createObjectURL(b) : null));
+    setUrls(u);
+    return () => u.forEach((x) => x && URL.revokeObjectURL(x));
+  }, [blobs]);
+  return urls;
 }
 
 /** 서버가 작업 등록 중 실제로 끝난 일을 한 줄씩 알려 준다 (app/api/jobs/route.ts) */
@@ -417,8 +498,8 @@ async function fetchProgress(url: string, onBytes: (got: number, total: number) 
 // upload 사진 보내는 중 → fit 장면 의상 입히는 중 → hand 영상 엔진에 넘기는 중 → queue 엔진이 받아 순서 대기 → make → fetch
 type Phase = "upload" | "fit" | "hand" | "queue" | "make" | "fetch";
 
-function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, selfie, jobId, startedAt, setJobId, onDone, onRetry }: {
-  videoId: string; videoSrc: string; fit: boolean; role: string; consentVersion: string; agreed: string[]; selfie: Blob | null; jobId: string | null;
+function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, selfies, jobId, startedAt, setJobId, onDone, onRetry }: {
+  videoId: string; videoSrc: string; fit: boolean; role: string; consentVersion: string; agreed: string[]; selfies: Selfies | null; jobId: string | null;
   startedAt: number | null; setJobId: (id: string | null) => void; onDone: (url: string, file: File | null) => void; onRetry: () => void;
 }) {
   const { t } = useLang();
@@ -446,7 +527,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
 
   // 작업 등록 (한 번만)
   useEffect(() => {
-    if (jobId || !selfie || submitted.current || error) return;
+    if (jobId || !selfies || submitted.current || error) return;
     submitted.current = true;
     setUploadPct(0);
     setReceived(false);
@@ -456,7 +537,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
     fd.append("role", role);
     fd.append("consentVersion", consentVersion);
     agreed.forEach((a) => fd.append("consent", a));
-    fd.append("selfie", selfie, "selfie.jpg");
+    selfies.forEach(([field, blob], i) => fd.append(field, blob, `selfie-${i + 1}.jpg`));
     const sentAt = Date.now();
     const onEvent = (e: SubmitEvent) => {
       if (e.ev === "received") { setReceived(true); if (typeof e.sheet === "boolean") setHasFit(e.sheet); }
@@ -478,7 +559,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
         track("submit_failed", { video: videoId, code: "network", s: (Date.now() - sentAt) / 1000 });
         setError("network");
       });
-  }, [jobId, selfie, videoId, role, consentVersion, agreed, setJobId, error]);
+  }, [jobId, selfies, videoId, role, consentVersion, agreed, setJobId, error]);
 
   // 같은 셀카로 새 작업을 맡긴다 (자동 재시도와 실패 화면의 「같은 사진으로 다시」)
   const again = useCallback(() => {
@@ -529,7 +610,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
       }
       if (stop) return;
       setChecking(false);
-      if (db !== null && db > NOOP_PSNR_DB && !retried.current && selfie) {
+      if (db !== null && db > NOOP_PSNR_DB && !retried.current && selfies) {
         track("noop_retry", { job: jobId });
         return again();
       }
@@ -556,7 +637,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
         if (s.state === "failed") {
           track("failed", { job: jobId, code: s.code, stage: lastState, retry: retried.current });
           // 서버 쪽 일시 오류는 같은 사진으로 한 번 자동으로 다시 맡긴다
-          if (RETRYABLE.has(s.code) && !retried.current && selfie) return again();
+          if (RETRYABLE.has(s.code) && !retried.current && selfies) return again();
           return setError(s.code);
         }
       } catch {
@@ -589,7 +670,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
       document.removeEventListener("visibilitychange", wake);
       window.removeEventListener("online", wake);
     };
-  }, [jobId, videoSrc, selfie, again]);
+  }, [jobId, videoSrc, selfies, again]);
 
   useEffect(() => {
     if (error) return;
@@ -617,7 +698,7 @@ function WorkingStep({ videoId, videoSrc, fit, role, consentVersion, agreed, sel
           <p>{t(errKey(error))}</p>
         </div>
         <div className="foot">
-          {selfie && RETRYABLE.has(error) ? (
+          {selfies && RETRYABLE.has(error) ? (
             <>
               <button className="btn" onClick={() => { t0.current = Date.now(); setElapsed(0); again(); }}>{t("work.again.btn")}</button>
               <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("work.retry")}</button>

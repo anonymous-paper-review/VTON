@@ -75,42 +75,50 @@ function decodeId(id: string): { engine: EngineKey; requestId: string; videoId?:
 /** 작업 등록 중 실제로 끝난 단계를 화면에 알린다. sheet: 캐릭터시트(장면 의상 입히기)가 끝남, ok=false면 실패해 셀카 그대로 진행. */
 export type SubmitStage = { ev: "sheet"; ok: boolean };
 
+/** 화면 왼쪽부터 순서대로 둔 인물. keep = 원본 얼굴로 그대로 둘 인물, swap = 셀카 인물로 바꿀 인물. */
+export type Person =
+  | { kind: "keep"; target: string; imageUrl: string }
+  | { kind: "swap"; target: string; selfie: File; /** 영상 속 옷차림. 있으면 캐릭터시트를 먼저 만든다. */ outfit?: string };
+
 export async function submitJob(opts: {
   engine: EngineKey;
   videoUrl: string;
-  target: string;
-  /** 바꿀 인물보다 왼쪽에 있어 그대로 둘 인물들 (원본 얼굴 사진) */
-  keep: { target: string; imageUrl: string }[];
-  /** 바꿀 인물의 영상 속 옷차림. 있으면 캐릭터시트를 먼저 만든다. */
-  outfit?: string;
-  selfie: File;
+  /** 화면 왼쪽부터 바꿀 인물(마지막 swap)까지. 둘이 함께 바꾸면 swap이 둘이다. */
+  people: Person[];
   /** 결과를 원본과 이어 붙여야 하는 영상의 id (videoUrl이 얼굴 구간만 담은 생성용 영상일 때) */
   stitchVideoId?: string;
   onStage?: (s: SubmitStage) => void;
 }): Promise<string> {
-  const wantSheet = SHEET_ON && !!ENGINES[opts.engine].sheet && !!opts.outfit;
+  const swaps = opts.people.filter((p): p is Extract<Person, { kind: "swap" }> => p.kind === "swap");
+  const wantSheet = (p: { outfit?: string }) => willMakeSheet(opts.engine, p.outfit, swaps.length);
+  const anySheet = swaps.some(wantSheet);
   if (MOCK) {
-    if (wantSheet) {
+    if (anySheet) {
       await new Promise((r) => setTimeout(r, MOCK_SHEET_MS));
       opts.onStage?.({ ev: "sheet", ok: process.env.VTON_MOCK_SHEET_FAIL !== "1" });
     }
     const payload = Buffer.from(JSON.stringify({ at: Date.now(), video: opts.videoUrl, vid: opts.stitchVideoId })).toString("base64url");
     return `mock.${payload}`;
   }
+  const engine = ENGINES[opts.engine];
   // 셀카는 클라이언트에서 1280px JPEG로 줄여 오므로 data URI로 바로 넣는다 (실험에서 Kling·Wan·MiniMax가 받는 것을 확인).
   // fal 스토리지 업로드를 거치지 않아 사진이 별도 저장소에 남지 않는다.
-  const faceUrl = `data:${opts.selfie.type};base64,${Buffer.from(await opts.selfie.arrayBuffer()).toString("base64")}`;
-  const engine = ENGINES[opts.engine];
-  const sheetUrl = wantSheet ? await makeSheet(faceUrl, opts.outfit!) : null;
-  if (wantSheet) opts.onStage?.({ ev: "sheet", ok: !!sheetUrl });
-  const refUrl = sheetUrl ?? faceUrl;
+  // 둘이 함께 바꾸면 두 사람의 캐릭터시트를 동시에 만든다 (한 사람과 걸리는 시간이 같다). 실패한 사람만 셀카를 그대로 쓴다.
+  const refs = await Promise.all(swaps.map(async (p) => {
+    const faceUrl = `data:${p.selfie.type};base64,${Buffer.from(await p.selfie.arrayBuffer()).toString("base64")}`;
+    const sheetUrl = wantSheet(p) ? await makeSheet(faceUrl, p.outfit!) : null;
+    return { faceUrl, sheetUrl, tried: wantSheet(p) };
+  }));
+  if (anySheet) opts.onStage?.({ ev: "sheet", ok: refs.every((r) => !r.tried || !!r.sheetUrl) });
+  let i = 0;
+  const lineup = opts.people.map((p) => {
+    if (p.kind === "keep") return { target: p.target, imageUrl: p.imageUrl, swap: false };
+    const r = refs[i++];
+    return { target: p.target, imageUrl: r.sheetUrl ?? r.faceUrl, swap: true, sheet: !!r.sheetUrl };
+  });
+  const last = lineup[lineup.length - 1];
   const { request_id } = await fal.queue.submit(engine.endpoint, {
-    input: engine.build({
-      videoUrl: opts.videoUrl,
-      faceUrl: refUrl,
-      target: opts.target,
-      lineup: [...opts.keep.map((k) => ({ ...k, swap: false })), { target: opts.target, imageUrl: refUrl, swap: true, sheet: !!sheetUrl }],
-    }),
+    input: engine.build({ videoUrl: opts.videoUrl, faceUrl: last.imageUrl, target: last.target, lineup }),
     // 만든 영상 등 fal 저장소 파일을 24시간 뒤 자동 삭제한다 (동의 화면의 보유 기간과 맞춤).
     storageSettings: { expiresIn: "1d" },
   });
@@ -118,7 +126,10 @@ export async function submitJob(opts: {
 }
 
 /** 캐릭터시트를 만드는 조건인지 (화면이 「장면 의상」 단계를 보일지 정한다) */
-export const willMakeSheet = (engine: EngineKey, outfit?: string) => SHEET_ON && !!ENGINES[engine].sheet && !!outfit;
+// 둘이 함께 바꿀 때 시트 두 장이 섞이면 VTON_COUPLE_SHEET=0 으로 커플만 정면 셀카 두 장을 넣게 한다 (옷은 셀카를 따라간다).
+const COUPLE_SHEET_ON = process.env.VTON_COUPLE_SHEET !== "0";
+export const willMakeSheet = (engine: EngineKey, outfit?: string, swaps = 1) =>
+  SHEET_ON && (swaps < 2 || COUPLE_SHEET_ON) && !!ENGINES[engine].sheet && !!outfit;
 
 /** 이어 붙일 영상 (job id에 붙어 온 영상 id가 구간 정보를 가진 영상일 때) */
 const stitchVideo = (videoId?: string): Video | undefined => {
