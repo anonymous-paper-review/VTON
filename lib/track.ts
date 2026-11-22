@@ -24,6 +24,8 @@ export type TrackEvent =
 
 export function track(e: TrackEvent, data: Record<string, string | number | boolean | null | undefined> = {}) {
   try {
+    // 검색 로봇·자동 점검 브라우저(배포 직후 미리보기 촬영 등)는 사람이 아니므로 세지 않는다
+    if (!botsAllowed() && (navigator.webdriver || /bot|crawl|spider|slurp|headless|lighthouse|vercel|preview|facebookexternalhit|embedly|kakaotalk-scrap/i.test(navigator.userAgent))) return;
     const body = JSON.stringify({ e, env: browserEnv(), device: deviceId(), lang: document.documentElement.lang || undefined, ...data });
     if (navigator.sendBeacon?.("/api/log", new Blob([body], { type: "application/json" }))) return;
     fetch("/api/log", { method: "POST", body, keepalive: true, headers: { "content-type": "application/json" } }).catch(() => {});
@@ -64,4 +66,9 @@ export function entrySource(): string {
     }
   } catch {}
   return "direct";
+}
+
+/** e2e/bot.js 점검 봇만 켠다 */
+function botsAllowed() {
+  try { return localStorage.getItem("vton.trackBots") === "1"; } catch { return false; }
 }
