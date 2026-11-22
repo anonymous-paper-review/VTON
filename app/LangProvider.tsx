@@ -3,6 +3,7 @@
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Globe, Tick } from "./icons";
 import { DEFAULT_LANG, LANGS, detectLang, translate, type Lang, type Localized, type MsgKey } from "@/lib/i18n";
+import { entrySource, track } from "@/lib/track";
 
 const KEY = "vton.lang";
 
@@ -18,7 +19,10 @@ export function LangProvider({ children }: { children: React.ReactNode }) {
     let saved: string | null = null;
     try { saved = localStorage.getItem(KEY); } catch {}
     const valid = (v: string | null): v is Lang => !!v && LANGS.some((l) => l.id === v);
-    setLangState(valid(q) ? q : valid(saved) ? saved : detectLang(navigator.language));
+    const l = valid(q) ? q : valid(saved) ? saved : detectLang(navigator.language);
+    setLangState(l);
+    // 이용 통계: 앱 진입 (주소를 새로 열 때 한 번. 앱 안 이동은 다시 세지 않는다)
+    if (!/^\/(admin|qr)/.test(location.pathname)) track("visit", { lang: l, path: location.pathname, src: entrySource() });
   }, []);
 
   useEffect(() => { document.documentElement.lang = lang; }, [lang]);

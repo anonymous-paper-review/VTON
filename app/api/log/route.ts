@@ -1,8 +1,10 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
+import { recordEvent } from "@/lib/stats";
 
-// 화면 단계별 결과를 Vercel 로그에 남긴다 (lib/track.ts). 받은 값 중 정해진 키만, 길이를 잘라 남긴다.
-const EVENTS = new Set(["photo_check", "submitted", "submit_failed", "fitted", "fit_skipped", "started", "generated", "downloaded", "download_failed", "noop_retry", "failed", "net_weak"]);
-const KEYS = ["job", "video", "code", "stage", "issue", "anyway", "skipped", "s", "mb", "env", "retry"];
+// 화면 단계별 결과를 Vercel 로그에 남기고 이용 통계 DB에도 쌓는다 (lib/track.ts, lib/stats.ts).
+// 받은 값 중 정해진 키만, 길이를 잘라 남긴다.
+const EVENTS = new Set(["visit", "view", "attempt", "consented", "saved", "photo_check", "submitted", "submit_failed", "fitted", "fit_skipped", "started", "generated", "downloaded", "download_failed", "noop_retry", "failed", "net_weak"]);
+const KEYS = ["job", "video", "code", "stage", "issue", "anyway", "skipped", "s", "mb", "env", "retry", "open", "how", "path", "src", "lang", "device"];
 
 export async function POST(req: Request) {
   try {
@@ -17,7 +19,9 @@ export async function POST(req: Request) {
       else if (typeof v === "boolean") out[k] = v;
       else if (typeof v === "string") out[k] = v.slice(0, 80);
     }
-    console.info("vton event", JSON.stringify(out));
+    const { device, ...logged } = out;
+    console.info("vton event", JSON.stringify(logged));
+    after(() => recordEvent(out));
   } catch {
     return new NextResponse(null, { status: 400 });
   }
