@@ -1,6 +1,6 @@
 // VTON 웹앱 점검 봇. VTON_MOCK=1 로 띄운 로컬 서버(BASE)에 대고 전체 흐름과 실패 경로를 돈다.
 // 실행: VTON_MOCK=1 NEXT_PUBLIC_GENERATION_OPEN=1 npm run build && VTON_MOCK=1 npx next start -p 3100 그다음 npm run bot [flow|fail|resume|return|photo|progress|selfie]
-// 생성 잠금 확인: NEXT_PUBLIC_GENERATION_OPEN 없이 빌드·실행한 서버에 npm run bot closed
+// 생성 잠금 확인: NEXT_PUBLIC_GENERATION_OPEN=0 으로 빌드·실행한 서버에 npm run bot closed (오픈 시각 2026-11-30 KST 전이면 값 없이도 잠김)
 // Playwright가 깔린 환경(클라우드 세션 등)에서 돈다. 스크린샷은 e2e/shots/
 const { chromium } = require("playwright");
 const fs = require("fs");

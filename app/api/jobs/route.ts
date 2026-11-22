@@ -3,7 +3,7 @@ import { CONSENT_VERSION, consentItems } from "@/lib/consent";
 import { ENGINES, engineKey } from "@/lib/engines";
 import { falErrorCode, submitJob, willMakeSheet } from "@/lib/jobs";
 import { absoluteUrl, findVideo } from "@/lib/videos";
-import { GENERATION_OPEN } from "@/lib/open";
+import { isGenerationOpen } from "@/lib/open";
 
 const MAX_SELFIE_BYTES = 8 * 1024 * 1024;
 
@@ -11,7 +11,7 @@ const MAX_SELFIE_BYTES = 8 * 1024 * 1024;
 export const maxDuration = 60;
 
 export async function POST(req: Request) {
-  if (!GENERATION_OPEN) return NextResponse.json({ code: "closed" }, { status: 503 });
+  if (!isGenerationOpen()) return NextResponse.json({ code: "closed" }, { status: 503 });
   const form = await req.formData();
   const video = findVideo(String(form.get("videoId") ?? ""));
   const selfie = form.get("selfie");

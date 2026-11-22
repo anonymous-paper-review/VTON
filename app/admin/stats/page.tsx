@@ -12,6 +12,9 @@ export const dynamic = "force-dynamic";
 const COOKIE = "vton_admin";
 const ymd = (d: Date) => new Date(d.getTime() + 9 * 3600_000).toISOString().slice(0, 10);
 const isDate = (s?: string) => !!s && /^\d{4}-\d{2}-\d{2}$/.test(s);
+// KPI 집계 시작일: 정식 오픈(생성 열림)일. 그 전 기록(시험·점검)은 보고 숫자에 넣지 않는다 (오너 2026-11-22).
+const KPI_START = "2026-11-30";
+const atLeast = (d: string) => (d < KPI_START ? KPI_START : d);
 
 async function login(form: FormData) {
   "use server";
@@ -38,8 +41,8 @@ export default async function StatsPage({ searchParams }: { searchParams: Promis
   const sp = await searchParams;
   const key = (await cookies()).get(COOKIE)?.value;
   const today = ymd(new Date());
-  const from = isDate(sp.from) ? sp.from! : "2026-11-01";
-  const to = isDate(sp.to) ? sp.to! : today;
+  const from = atLeast(isDate(sp.from) ? sp.from! : KPI_START);
+  const to = atLeast(isDate(sp.to) ? sp.to! : today);
 
   if (!statsEnabled) return <Shell><p>통계 DB 연결 설정(VTON_STATS_URL, VTON_STATS_KEY)이 없는 배포입니다. 운영 주소에서 열어 주세요.</p></Shell>;
   const stats = key ? await readStats(key, from, to) : "denied";
@@ -83,15 +86,15 @@ function Report({ s, from, to, today, logout }: { s: Stats; from: string; to: st
   return (
     <Shell>
       <form style={{ display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
-        <input type="date" name="from" defaultValue={from} style={inp} />
+        <input type="date" name="from" defaultValue={from} min={KPI_START} style={inp} />
         <span>~</span>
         <input type="date" name="to" defaultValue={to} style={inp} />
         <button className="btn sub" style={{ width: "auto", padding: "0 16px", height: 40 }}>보기</button>
       </form>
       <div className="chips" style={{ marginTop: 8 }}>
-        {quick("오늘", today)}{quick("최근 7일", daysAgo(6))}{quick("최근 30일", daysAgo(29))}{quick("전체", "2026-11-01")}
+        {quick("오늘", today)}{quick("최근 7일", atLeast(daysAgo(6)))}{quick("최근 30일", atLeast(daysAgo(29)))}{quick("전체", KPI_START)}
       </div>
-      <p className="small" style={{ marginTop: 8 }}>사람 수는 서로 다른 기기 수입니다(기기마다 만든 익명 번호, 개인정보 없음). 날짜는 한국 시간. 집계 시작: {s.first ? ymd(new Date(s.first)) : "아직 기록 없음"}</p>
+      <p className="small" style={{ marginTop: 8 }}>사람 수는 서로 다른 기기 수입니다(기기마다 만든 익명 번호, 개인정보 없음). 날짜는 한국 시간. KPI 집계 시작: {KPI_START} (정식 오픈일, 그 전 시험 기록은 빼고 셈)</p>
 
       <section style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(150px,1fr))", gap: 8, marginTop: 16 }}>
         {funnel.slice(0, 3).map(([e, label]) => (
