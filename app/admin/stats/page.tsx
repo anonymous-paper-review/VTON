@@ -180,4 +180,4 @@ const tbl: React.CSSProperties = { width: "100%", borderCollapse: "collapse", fo
 const th: React.CSSProperties = { textAlign: "left", padding: "8px 6px", borderBottom: "1.5px solid var(--grey-200)", fontWeight: 600, whiteSpace: "nowrap" };
 const thr: React.CSSProperties = { ...th, textAlign: "right" };
 const td: React.CSSProperties = { padding: "8px 6px", borderBottom: "1px solid var(--grey-100)", verticalAlign: "top" };
-const tdr: React.CSSProperties = { ...td, textAlign: "right" };
+const tdr: React.CSSProperties = { ...td, textAlign: "right", whiteSpace: "nowrap" };
