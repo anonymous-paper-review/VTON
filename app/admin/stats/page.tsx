@@ -29,7 +29,7 @@ async function logout() {
 }
 
 const SRC: Record<string, string> = { direct: "QR 스캔·주소 직접 입력", map: "AI관광집사(지도)에서", link: "다른 사이트 링크" };
-const LANG: Record<string, string> = { ko: "한국어", en: "English", zh: "中文", ja: "日本語" };
+const LANG: Record<string, string> = { ko: "한국어", en: "영어", zh: "중국어(간체)", "zh-Hant": "중국어(번체)", ja: "일본어", vi: "베트남어", th: "태국어", id: "인도네시아어", es: "스페인어", ar: "아랍어" };
 const OS: Record<string, string> = { ios: "iPhone", android: "안드로이드", other: "PC·기타" };
 const envLabel = (k: string) => {
   const [os, app] = k.split("-");

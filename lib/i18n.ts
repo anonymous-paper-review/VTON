@@ -1,23 +1,52 @@
-// 화면 문구 4개 국어. 키를 더하면 네 언어 모두 채운다.
+// 화면 문구 10개 국어. 한·中(간체)·EN·日은 아래 dict 에, 나머지 6개는 lib/locales/<언어>.ts 에 있다.
+// 키를 더하면 dict 의 네 언어와 locales 여섯 파일을 모두 채운다(빠지면 typecheck 가 막는다).
 
+import zhHant from "./locales/zh-Hant";
+import vi from "./locales/vi";
+import th from "./locales/th";
+import id from "./locales/id";
+import es from "./locales/es";
+import ar from "./locales/ar";
+
+// 언어 시트에 보이는 순서. name 은 그 언어로 쓴 이름, code 는 헤더 버튼에 보이는 짧은 표시.
 export const LANGS = [
-  { id: "ko", label: "한", code: "KO", name: "한국어" },
-  { id: "zh", label: "中", code: "ZH", name: "中文" },
-  { id: "en", label: "EN", code: "EN", name: "English" },
-  { id: "ja", label: "日", code: "JA", name: "日本語" },
+  { id: "ko", code: "KO", name: "한국어" },
+  { id: "en", code: "EN", name: "English" },
+  { id: "zh", code: "简", name: "简体中文" },
+  { id: "zh-Hant", code: "繁", name: "繁體中文" },
+  { id: "ja", code: "JA", name: "日本語" },
+  { id: "vi", code: "VI", name: "Tiếng Việt" },
+  { id: "th", code: "TH", name: "ภาษาไทย" },
+  { id: "id", code: "ID", name: "Bahasa Indonesia" },
+  { id: "es", code: "ES", name: "Español" },
+  { id: "ar", code: "AR", name: "العربية" },
 ] as const;
 
 export type Lang = (typeof LANGS)[number]["id"];
 export type Localized = Record<Lang, string>;
+type BaseLang = "ko" | "zh" | "en" | "ja";
 
 export const DEFAULT_LANG: Lang = "ko";
 
-export function detectLang(nav: string | undefined): Lang {
-  const l = (nav ?? "").toLowerCase();
-  if (l.startsWith("zh")) return "zh";
-  if (l.startsWith("ja")) return "ja";
-  if (l.startsWith("ko")) return "ko";
-  return l ? "en" : DEFAULT_LANG;
+/** 오른쪽에서 왼쪽으로 쓰는 언어 */
+export const isRtl = (l: Lang) => l === "ar";
+
+/** 브라우저 언어 하나(예: "zh-TW", "es-419")를 지원 언어로. 없으면 null */
+function matchLang(tag: string): Lang | null {
+  const t = tag.toLowerCase();
+  const base = t.split("-")[0];
+  if (base === "zh") return /hant|-tw|-hk|-mo/.test(t) ? "zh-Hant" : "zh";
+  if (base === "in") return "id"; // 옛 안드로이드는 인도네시아어를 in 으로 보낸다
+  return LANGS.some((l) => l.id === base) ? (base as Lang) : null;
+}
+
+/** navigator.languages 순서대로 처음 맞는 지원 언어. 하나도 없으면 한국어 */
+export function detectLang(navs: readonly string[] | undefined): Lang {
+  for (const n of navs ?? []) {
+    const l = matchLang(n);
+    if (l) return l;
+  }
+  return DEFAULT_LANG;
 }
 
 const dict = {
@@ -206,11 +235,14 @@ const dict = {
   "err.timeout": { ko: "너무 오래 걸려서 멈췄어요. 다시 시도해 주세요.", zh: "等待时间过长，已停止。请重试。", en: "It took too long, so we stopped. Please try again.", ja: "時間がかかりすぎたため停止しました。もう一度お試しください。" },
   "err.network": { ko: "인터넷 연결이 끊겨 사진을 보내지 못했어요. 연결을 확인하고 다시 시도해 주세요.", zh: "网络中断，照片未能发送。请检查网络后重试。", en: "Your connection dropped and the photo wasn't sent. Check your connection and try again.", ja: "接続が切れて写真を送れませんでした。接続を確認してもう一度お試しください。" },
   "err.generic": { ko: "영상을 만들지 못했어요. 잠시 뒤 다시 시도해 주세요.", zh: "视频生成失败，请稍后再试。", en: "Couldn't make the video. Please try again shortly.", ja: "映像を作成できませんでした。しばらくしてから再度お試しください。" },
-} satisfies Record<string, Localized>;
+} satisfies Record<string, Record<BaseLang, string>>;
 
 export type MsgKey = keyof typeof dict;
 
-export const translate = (lang: Lang, key: MsgKey) => dict[key][lang];
+const extra: Record<Exclude<Lang, BaseLang>, Record<MsgKey, string>> = { "zh-Hant": zhHant, vi, th, id, es, ar };
+
+export const translate = (lang: Lang, key: MsgKey): string =>
+  lang === "ko" || lang === "zh" || lang === "en" || lang === "ja" ? dict[key][lang] : extra[lang][key];
 
 /** API가 돌려주는 오류 코드 → 문구 키 */
 export const errKey = (code: string | undefined): MsgKey =>
