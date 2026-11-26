@@ -6,7 +6,7 @@ import { listJobs, type MyJob } from "@/lib/myJobs";
 import { GROUPS, type Group, type Video } from "@/lib/videos";
 import { LangSwitch, useLang } from "./LangProvider";
 import { Back, Chevron, Clock, Compass, Pin } from "./icons";
-import { readReturnUrl } from "@/lib/returnTo";
+import { goBackToMap, readReturnUrl } from "@/lib/returnTo";
 
 /** 헤더 56 · ← + 가운데 제목 + 언어. back: 링크(href) 또는 화면 안 이전 단계(onClick). 없으면 왼쪽은 빈칸. */
 /** 왼쪽 칸: ← (back) 이 있으면 ←, 없으면 left(예: 지도로 돌아가기), 그것도 없으면 빈칸 */
@@ -50,7 +50,7 @@ export function MapButton() {
   const [url, setUrl] = useState<string | null>(null);
   useEffect(() => { setUrl(readReturnUrl()); }, []);
   if (!url) return null;
-  return <a className="map-btn" href={url} aria-label={t("map.back")}><Compass size={16} />{t("map.short")}</a>;
+  return <a className="map-btn" href={url} onClick={(e) => goBackToMap(e, url)} aria-label={t("map.back")}><Compass size={16} />{t("map.short")}</a>;
 }
 
 export default function HomeView({ videos }: { videos: Video[] }) {
