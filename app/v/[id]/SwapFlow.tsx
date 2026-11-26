@@ -6,7 +6,7 @@ import type { CastMember, Video } from "@/lib/videos";
 import type { Localized, MsgKey } from "@/lib/i18n";
 import { errKey } from "@/lib/i18n";
 import { NOOP_PSNR_DB, psnrAgainstSource } from "@/lib/frameCheck";
-import { readReturnUrl } from "@/lib/returnTo";
+import { goBackToMap, readReturnUrl } from "@/lib/returnTo";
 import { isGenerationOpen } from "@/lib/open";
 import { forgetJobsFor, latestJobFor, resumeUrl, saveJob } from "@/lib/myJobs";
 import { checkPhoto, preloadFaceCheck, type PhotoCheck } from "@/lib/faceCheck";
@@ -863,7 +863,7 @@ function ResultStep({ video, resultUrl, initialFile, onRetry }: { video: Video; 
         {canShare && <p className="small">{t("done.saveHint")}</p>}
         <button className="btn sub" style={{ marginTop: 12 }} onClick={onRetry}>{t("done.retry")}</button>
         <Link className="text-btn" href="/">{t("done.other")}</Link>
-        {mapUrl && <a className="text-btn" href={mapUrl}>{t("map.back")}</a>}
+        {mapUrl && <a className="text-btn" href={mapUrl} onClick={(e) => goBackToMap(e, mapUrl)}>{t("map.back")}</a>}
         <p className="terms" style={{ marginTop: 16 }}>{t("done.keep")}</p>
       </div>
     </>

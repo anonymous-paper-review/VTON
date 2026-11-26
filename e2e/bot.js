@@ -315,17 +315,75 @@ async function resumePaths(browser) {
 
 async function returnPaths(browser) {
   const ctx = await newCtx(browser); const page = await ctx.newPage();
-  await page.goto(`${BASE}/?return=${encodeURIComponent("https://map.example.com/spot/12")}&lang=zh`);
+  const DEEP = "https://map.traveljipsa.com/spot/12?tab=info&from=list#pin-3";
+  await page.goto(`${BASE}/?return=${encodeURIComponent(DEEP)}&lang=zh`);
   await page.waitForTimeout(400);
   const href = await page.locator("header .map-btn").getAttribute("href").catch(() => null);
   const box = await page.locator("header .map-btn").boundingBox().catch(() => null);
   await shot(page, "return-header");
-  note(href === "https://map.example.com/spot/12", "?return= → 헤더 지도 버튼", `${href} ${box ? Math.round(box.width) + "px" : ""}`);
+  note(href === DEEP, "?return= 깊은 주소(경로·쿼리·#) 그대로 → 헤더 지도 버튼", `${href} ${box ? Math.round(box.width) + "px" : ""}`);
   await check(page, "zh 홈(지도 버튼)");
-  // 다른 화면으로 갔다 돌아와도(파라미터 없이) 남는가
-  await page.goto(`${BASE}/`);
+  // 영상 화면으로 갔다가 언어 바꾸고 새로고침해도 같은 주소가 남는가
+  await page.goto(`${BASE}/v/tea-1?lang=en`);
+  await page.reload();
+  await page.goto(`${BASE}/?lang=ja`);
   await page.waitForTimeout(300);
-  note(await page.locator("header .map-btn").count() === 1, "?return= 기억(파라미터 없이 다시 열어도)");
+  const href2 = await page.locator("header .map-btn").getAttribute("href").catch(() => null);
+  note(href2 === DEEP, "?return= 기억(영상 화면·언어 변경·새로고침 뒤에도)", String(href2));
+  // 인코딩을 빠뜨린 주소도 & 와 # 가 잘리지 않는가
+  {
+    const c = await newCtx(browser); const p = await c.newPage();
+    await p.goto(`${BASE}/?lang=ko&return=${DEEP}`);
+    await p.waitForTimeout(300);
+    const h = await p.locator("header .map-btn").getAttribute("href").catch(() => null);
+    note(h === DEEP, "인코딩 안 된 ?return= 도 전체 주소 복원", String(h));
+    await c.close();
+  }
+  // 협업사가 아닌 주소는 거부(아무 사이트로 보내는 링크 방지)
+  {
+    const c = await newCtx(browser); const p = await c.newPage();
+    await p.goto(`${BASE}/?return=${encodeURIComponent("https://evil.example.com/phish")}`);
+    await p.waitForTimeout(300);
+    const h = await p.locator("header .map-btn").getAttribute("href").catch(() => null);
+    note(!h || !h.includes("evil.example.com"), "협업사 아닌 ?return= 거부(기본 지도 주소로 대체)", String(h));
+    await c.close();
+  }
+  // 지도에서 링크로 들어와 홈→영상→홈을 돌아다닌 뒤 버튼 → 뒤로 가기로 지도 원래 화면(새 기록 없이)
+  {
+    const c = await newCtx(browser); const p = await c.newPage();
+    await c.route("https://map.traveljipsa.com/**", (r) => r.fulfill({ contentType: "text/html", body: `<title>map</title><a id="go" href="${BASE}/?return=${encodeURIComponent(DEEP)}">go</a><script>if (!history.state) history.replaceState({ mapState: Math.random() }, "")</script>` }));
+    await p.goto(DEEP);
+    const mapState = await p.evaluate(() => history.state.mapState);
+    await p.click("#go");
+    await p.waitForSelector("header .map-btn");
+    const supported = await p.evaluate(() => !!window.navigation);
+    await p.locator(".card, a[href^='/v/']").first().click().catch(() => {});
+    await p.waitForURL(/\/v\//, { timeout: 5000 }).catch(() => {});
+    await p.goBack(); // 영상 화면 → 홈(우리 앱 안 뒤로)
+    await p.waitForSelector("header .map-btn");
+    await p.locator(".card, a[href^='/v/']").first().click().catch(() => {});
+    await p.waitForURL(/\/v\//, { timeout: 5000 }).catch(() => {});
+    await p.goto(`${BASE}/`); // 주소창으로 홈(기록 추가)
+    await p.waitForSelector("header .map-btn");
+    const lenBefore = await p.evaluate(() => history.length);
+    await p.locator("header .map-btn").click();
+    await p.waitForURL((u) => u.href === DEEP, { timeout: 5000 }).catch(() => {});
+    const r = await p.evaluate(() => ({ url: location.href, len: history.length, state: history.state?.mapState }));
+    note(r.url === DEEP && (!supported || (r.state === mapState && r.len === lenBefore)), "지도에서 들어온 탭: 버튼이 뒤로 가기로 지도 원래 화면 복원", `${JSON.stringify(r)} 이전 기록 ${lenBefore} navigation API ${supported}`);
+    await c.close();
+  }
+  // 새 탭으로 열린 경우(앞에 지도 기록 없음): 그냥 주소로 이동
+  {
+    const c = await newCtx(browser); const p0 = await c.newPage();
+    await c.route("https://map.traveljipsa.com/**", (r) => r.fulfill({ contentType: "text/html", body: `<title>map</title><a id="go" target="_blank" href="${BASE}/?return=${encodeURIComponent(DEEP)}">go</a>` }));
+    await p0.goto(DEEP);
+    const [p] = await Promise.all([c.waitForEvent("page"), p0.click("#go")]);
+    await p.waitForSelector("header .map-btn");
+    await p.locator("header .map-btn").click();
+    await p.waitForURL((u) => u.href === DEEP, { timeout: 5000 }).catch(() => {});
+    note(p.url() === DEEP, "새 탭으로 열린 경우: 버튼이 return 주소로 이동", p.url());
+    await c.close();
+  }
   // 4개 언어 모두 헤더 안에 들어가는가
   for (const l of ALL) {
     await page.goto(`${BASE}/?lang=${l}`);
