@@ -6,13 +6,25 @@
       "ko": "벚꽃 터널, 첫 만남",
       "zh": "樱花隧道里的初遇",
       "en": "First Glance in the Blossom Tunnel",
-      "ja": "桜のトンネル、はじめての出会い"
+      "ja": "桜のトンネル、はじめての出会い",
+      "zh-Hant": "櫻花隧道裡的初遇",
+      "vi": "Lần đầu gặp nhau dưới vòm hoa anh đào",
+      "th": "สบตาครั้งแรกในอุโมงค์ซากุระ",
+      "id": "Tatapan Pertama di Terowongan Sakura",
+      "es": "Primera mirada en el túnel de cerezos",
+      "ar": "النظرة الأولى في نفق أزهار الكرز"
     },
     "description": {
       "ko": "십리벚꽃길 벚꽃 터널에서 마주친 두 사람, 눈이 마주치는 순간. 둘 중 한 사람이 되어 보세요.",
       "zh": "在十里樱花路的樱花隧道里相遇的两人，目光交汇的瞬间。成为其中一人吧。",
       "en": "Two people meet in the blossom tunnel of the Simni Cherry Blossom Road, and their eyes lock. Step into either role.",
-      "ja": "十里桜並木の桜のトンネルで出会った二人、目が合う瞬間。どちらかになってみよう。"
+      "ja": "十里桜並木の桜のトンネルで出会った二人、目が合う瞬間。どちらかになってみよう。",
+      "zh-Hant": "在十里櫻花路的櫻花隧道裡相遇的兩人，目光交會的瞬間。成為其中一人吧。",
+      "vi": "Hai người gặp nhau dưới vòm hoa anh đào trên đường Simni, khoảnh khắc ánh mắt chạm nhau. Hãy vào vai một trong hai người.",
+      "th": "สองคนพบกันในอุโมงค์ซากุระบนถนนซากุระสิบลี้ ในวินาทีที่สายตาประสานกัน มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Dua orang bertemu di terowongan sakura Jalan Simni, saat mata mereka bertemu. Jadilah salah satunya.",
+      "es": "Dos personas se cruzan en el túnel de cerezos del camino de Simni y sus miradas se encuentran. Ponte en el papel de cualquiera de los dos.",
+      "ar": "يلتقي شخصان في نفق أزهار الكرز على طريق سيمني، في لحظة تلاقي النظرات. كن أحدهما."
     },
     "src": "/videos/simni-1.mp4",
     "poster": "/videos/simni-1.jpg",
@@ -24,7 +36,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a pink cardigan",
         "outfit": "a pale pink knit cardigan over a white top, and a white skirt",
@@ -37,7 +55,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a navy jacket",
         "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
@@ -71,13 +95,25 @@
       "ko": "노을 진 벚꽃길에서",
       "zh": "晚霞中的樱花路",
       "en": "Sunset on the Blossom Road",
-      "ja": "夕焼けの桜並木で"
+      "ja": "夕焼けの桜並木で",
+      "zh-Hant": "夕陽下的櫻花路",
+      "vi": "Hoàng hôn trên đường hoa anh đào",
+      "th": "แสงสนธยาบนถนนซากุระ",
+      "id": "Senja di Jalan Sakura",
+      "es": "Atardecer en el camino de los cerezos",
+      "ar": "غروب على طريق أزهار الكرز"
     },
     "description": {
       "ko": "노을 진 십리벚꽃길, 마주 보고 웃는 두 사람. 둘 중 한 사람이 되어 보세요.",
       "zh": "晚霞中的十里樱花路，两人相视而笑。成为其中一人吧。",
       "en": "On the Simni Cherry Blossom Road at sunset, the two face each other and smile. Step into either role.",
-      "ja": "夕焼けの十里桜並木、向かい合って笑う二人。どちらかになってみよう。"
+      "ja": "夕焼けの十里桜並木、向かい合って笑う二人。どちらかになってみよう。",
+      "zh-Hant": "夕陽染紅的十里櫻花路上，兩人相視而笑。成為其中一人吧。",
+      "vi": "Trên đường hoa anh đào Simni lúc hoàng hôn, hai người nhìn nhau mỉm cười. Hãy vào vai một trong hai người.",
+      "th": "บนถนนซากุระสิบลี้ยามพระอาทิตย์ตก ทั้งสองมองหน้ากันแล้วยิ้ม มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Di Jalan Sakura Simni saat senja, keduanya saling menatap dan tersenyum. Jadilah salah satunya.",
+      "es": "En el camino de cerezos de Simni al atardecer, los dos se miran y sonríen. Ponte en el papel de cualquiera de los dos.",
+      "ar": "على طريق أزهار الكرز في سيمني عند الغروب، يتبادل الاثنان النظرات والابتسامات. كن أحدهما."
     },
     "src": "/videos/simni-2.mp4",
     "poster": "/videos/simni-2.jpg",
@@ -89,7 +125,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a pink cardigan",
         "outfit": "a pale pink knit cardigan over a white top, and a white skirt",
@@ -102,7 +144,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a navy jacket",
         "outfit": "a navy blue button-up knit jacket over a light blue collared shirt, and beige chinos",
@@ -140,13 +188,25 @@
       "ko": "장날 밤 나들이",
       "zh": "赶集夜的漫步",
       "en": "A Stroll on Market Night",
-      "ja": "市の夜のおでかけ"
+      "ja": "市の夜のおでかけ",
+      "zh-Hant": "市集之夜的散步",
+      "vi": "Dạo chợ đêm phiên chợ",
+      "th": "เดินเล่นคืนวันตลาดนัด",
+      "id": "Jalan-jalan di Malam Pasar",
+      "es": "Paseo en noche de mercado",
+      "ar": "نزهة في ليلة السوق"
     },
     "description": {
       "ko": "불빛 가득한 화개장터를 함께 걷다, 그가 건넨 한 입. 둘 중 한 사람이 되어 보세요.",
       "zh": "并肩走在灯火通明的花开市场，他递来一口小吃。成为其中一人吧。",
       "en": "Walking together through lantern-lit Hwagae Market, he offers her a bite. Step into either role.",
-      "ja": "灯りに満ちた花開市場を並んで歩き、彼が差し出すひと口。どちらかになってみよう。"
+      "ja": "灯りに満ちた花開市場を並んで歩き、彼が差し出すひと口。どちらかになってみよう。",
+      "zh-Hant": "並肩走在燈火通明的花開市場，他遞上一口美食。成為其中一人吧。",
+      "vi": "Cùng dạo trong chợ Hwagae rực đèn, anh đưa cô một miếng ăn. Hãy vào vai một trong hai người.",
+      "th": "เดินเคียงกันในตลาดฮวาเกที่สว่างไสวด้วยโคมไฟ เขายื่นของกินให้เธอหนึ่งคำ มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Berjalan berdampingan di Pasar Hwagae yang terang lampion, ia menyuapinya sesuap. Jadilah salah satunya.",
+      "es": "Paseando juntos por el Mercado de Hwagae iluminado con farolillos, él le ofrece un bocado. Ponte en el papel de cualquiera de los dos.",
+      "ar": "يتمشيان معًا في سوق هواغيه المضاء بالفوانيس، ويقدّم لها لقمة. كن أحدهما."
     },
     "src": "/videos/market-1.mp4",
     "poster": "/videos/market-1.jpg",
@@ -158,7 +218,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
         "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
@@ -171,7 +237,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
@@ -205,13 +277,25 @@
       "ko": "한 입의 설렘",
       "zh": "一口的心动",
       "en": "One Bite, One Flutter",
-      "ja": "ひと口のときめき"
+      "ja": "ひと口のときめき",
+      "zh-Hant": "一口的心動",
+      "vi": "Một miếng, một rung động",
+      "th": "คำเดียวก็ใจเต้น",
+      "id": "Satu Gigitan, Satu Debaran",
+      "es": "Un bocado, un latido",
+      "ar": "لقمة واحدة وخفقة قلب"
     },
     "description": {
       "ko": "나란히 걷는 장날 밤, 장터 먹거리 한 입에 눈이 동그래지는 그녀. 둘 중 한 사람이 되어 보세요.",
       "zh": "并肩逛夜晚的集市，尝一口小吃就睁大眼睛的她。成为其中一人吧。",
       "en": "A night stroll through the market, and her eyes go wide at the first bite. Step into either role.",
-      "ja": "並んで歩く市の夜、ひと口で目を丸くする彼女。どちらかになってみよう。"
+      "ja": "並んで歩く市の夜、ひと口で目を丸くする彼女。どちらかになってみよう。",
+      "zh-Hant": "並肩漫步的市集之夜，嚐了一口市集小吃，她的眼睛亮了起來。成為其中一人吧。",
+      "vi": "Đêm phiên chợ cùng nhau dạo bước, cô tròn mắt khi nếm miếng đầu tiên. Hãy vào vai một trong hai người.",
+      "th": "คืนวันตลาดนัดที่เดินเคียงกัน เธอตาโตทันทีที่ได้ชิมของกินในตลาดคำแรก มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Malam pasar berjalan berdua, matanya membulat saat gigitan pertama. Jadilah salah satunya.",
+      "es": "Un paseo nocturno por el mercado, y a ella se le abren los ojos con el primer bocado. Ponte en el papel de cualquiera de los dos.",
+      "ar": "نزهة ليلية في السوق، وتتسع عيناها مع أول لقمة. كن أحدهما."
     },
     "src": "/videos/market-2.mp4",
     "poster": "/videos/market-2.jpg",
@@ -223,7 +307,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
         "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
@@ -236,7 +326,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
@@ -274,13 +370,25 @@
       "ko": "장터에서 한 잔",
       "zh": "市场里的一杯",
       "en": "A Cup at the Market",
-      "ja": "市場で一杯"
+      "ja": "市場で一杯",
+      "zh-Hant": "市集裡的一杯",
+      "vi": "Cạn ly giữa phiên chợ",
+      "th": "ดื่มด้วยกันที่ตลาด",
+      "id": "Secangkir di Pasar",
+      "es": "Un brindis en el mercado",
+      "ar": "كأس في السوق"
     },
     "description": {
       "ko": "불빛 가득한 장터에 나란히 서서 한 잔, 장날 밤의 두 사람. 둘 중 한 사람이 되어 보세요.",
       "zh": "在灯火通明的市场里并肩喝上一杯，赶集夜的两人。成为其中一人吧。",
       "en": "Side by side with a cup each in the lantern-lit market, two people on market night. Step into either role.",
-      "ja": "灯りに満ちた市場で並んで一杯、市の夜の二人。どちらかになってみよう。"
+      "ja": "灯りに満ちた市場で並んで一杯、市の夜の二人。どちらかになってみよう。",
+      "zh-Hant": "並肩站在燈火通明的市集裡各舉一杯，市集之夜的兩人。成為其中一人吧。",
+      "vi": "Đứng cạnh nhau giữa phiên chợ rực đèn, mỗi người một ly, hai người trong đêm chợ. Hãy vào vai một trong hai người.",
+      "th": "ยืนเคียงกันในตลาดที่สว่างไสว คนละแก้ว สองคนในคืนวันตลาดนัด มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Berdiri berdampingan di pasar yang terang, masing-masing memegang gelas, dua orang di malam pasar. Jadilah salah satunya.",
+      "es": "Uno junto al otro en el mercado iluminado, cada uno con su vaso: dos personas en noche de mercado. Ponte en el papel de cualquiera de los dos.",
+      "ar": "جنبًا إلى جنب في السوق المضيء، كأس لكل منهما، اثنان في ليلة السوق. كن أحدهما."
     },
     "src": "/videos/market-3.mp4",
     "poster": "/videos/market-3.jpg",
@@ -292,7 +400,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a navy vest over a light blue shirt",
         "outfit": "a navy knit vest over a light blue collared shirt, and a long white skirt",
@@ -305,7 +419,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a black sweater",
         "outfit": "a black V-neck sweater over a white collared shirt, and charcoal gray trousers",
@@ -339,13 +459,25 @@
       "ko": "차 한 잔 건네는 아침",
       "zh": "递来一杯茶的清晨",
       "en": "A Morning Cup of Tea",
-      "ja": "お茶を手渡す朝"
+      "ja": "お茶を手渡す朝",
+      "zh-Hant": "遞上一杯茶的早晨",
+      "vi": "Buổi sáng trao chén trà",
+      "th": "เช้าที่ยื่นชาให้กันหนึ่งถ้วย",
+      "id": "Secangkir Teh di Pagi Hari",
+      "es": "Una taza de té por la mañana",
+      "ar": "كوب شاي في الصباح"
     },
     "description": {
       "ko": "안개 낀 하동 녹차밭, 그가 건넨 차 한 잔에 미소 짓는 그녀. 둘 중 한 사람이 되어 보세요.",
       "zh": "雾气缭绕的河东绿茶园，他递来一杯茶，她微微一笑。成为其中一人吧。",
       "en": "In Hadong's misty tea fields, he hands her a cup of tea and she smiles. Step into either role.",
-      "ja": "霧に包まれた河東の茶畑、彼が差し出したお茶に微笑む彼女。どちらかになってみよう。"
+      "ja": "霧に包まれた河東の茶畑、彼が差し出したお茶に微笑む彼女。どちらかになってみよう。",
+      "zh-Hant": "在雲霧繚繞的河東茶園，他遞上一杯茶，她笑了。成為其中一人吧。",
+      "vi": "Giữa đồi chè sương mờ Hadong, anh trao cô chén trà và cô mỉm cười. Hãy vào vai một trong hai người.",
+      "th": "ในไร่ชาฮาดงที่ปกคลุมด้วยหมอก เขายื่นชาให้หนึ่งถ้วย แล้วเธอก็ยิ้ม มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Di kebun teh Hadong yang berkabut, ia memberinya secangkir teh dan ia tersenyum. Jadilah salah satunya.",
+      "es": "En los brumosos campos de té de Hadong, él le ofrece una taza de té y ella sonríe. Ponte en el papel de cualquiera de los dos.",
+      "ar": "في حقول شاي هادونغ الضبابية، يقدّم لها كوب شاي فتبتسم. كن أحدهما."
     },
     "src": "/videos/tea-1.mp4",
     "poster": "/videos/tea-1.jpg",
@@ -357,7 +489,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a navy dress",
         "outfit": "a navy blue long-sleeve knit dress",
@@ -370,7 +508,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a cream sweater",
         "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
@@ -404,13 +548,25 @@
       "ko": "녹차밭의 웃음",
       "zh": "茶园里的笑声",
       "en": "Laughter in the Tea Fields",
-      "ja": "茶畑の笑い声"
+      "ja": "茶畑の笑い声",
+      "zh-Hant": "綠茶園裡的笑聲",
+      "vi": "Tiếng cười trên đồi chè",
+      "th": "เสียงหัวเราะในไร่ชาเขียว",
+      "id": "Tawa di Kebun Teh",
+      "es": "Risas entre los campos de té",
+      "ar": "ضحكات في حقول الشاي"
     },
     "description": {
       "ko": "초록 차밭을 뒤로하고 마주 웃는 두 사람. 둘 중 한 사람이 되어 보세요.",
       "zh": "背靠一片翠绿的茶园，两人相视而笑。成为其中一人吧。",
       "en": "With green tea fields behind them, the two share a laugh. Step into either role.",
-      "ja": "緑の茶畑を背に、笑い合う二人。どちらかになってみよう。"
+      "ja": "緑の茶畑を背に、笑い合う二人。どちらかになってみよう。",
+      "zh-Hant": "以綠茶園為背景，兩人一起開懷大笑。成為其中一人吧。",
+      "vi": "Với đồi chè xanh phía sau, hai người cùng bật cười. Hãy vào vai một trong hai người.",
+      "th": "มีไร่ชาเขียวเป็นฉากหลัง ทั้งสองหัวเราะไปด้วยกัน มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Dengan kebun teh hijau di belakang, keduanya tertawa bersama. Jadilah salah satunya.",
+      "es": "Con los campos de té verde de fondo, los dos se ríen juntos. Ponte en el papel de cualquiera de los dos.",
+      "ar": "وخلفهما حقول الشاي الخضراء، يضحك الاثنان معًا. كن أحدهما."
     },
     "src": "/videos/tea-2.mp4",
     "poster": "/videos/tea-2.jpg",
@@ -422,7 +578,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a navy dress",
         "outfit": "a navy blue long-sleeve knit dress",
@@ -435,7 +597,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a cream sweater",
         "outfit": "a cream cable-knit sweater over a white collared shirt, and blue jeans",
@@ -469,13 +637,25 @@
       "ko": "손을 잡고, 섬진강",
       "zh": "牵手奔向蟾津江",
       "en": "Hand in Hand by the Seomjin",
-      "ja": "手をつないで、蟾津江"
+      "ja": "手をつないで、蟾津江",
+      "zh-Hant": "牽著手，蟾津江",
+      "vi": "Nắm tay bên sông Seomjin",
+      "th": "จับมือกันริมแม่น้ำซอมจิน",
+      "id": "Bergandengan di Tepi Seomjin",
+      "es": "De la mano junto al Seomjin",
+      "ar": "يدًا بيد على ضفاف سومجين"
     },
     "description": {
       "ko": "햇살이 부서지는 섬진강 모래톱, 내민 손을 잡고 물가를 달리는 두 사람. 둘 중 한 사람이 되어 보세요.",
       "zh": "阳光洒落的蟾津江沙洲，握住伸来的手，两人在水边奔跑。成为其中一人吧。",
       "en": "On a sunlit sandbar of the Seomjin River, she takes his hand and they run along the water. Step into either role.",
-      "ja": "陽の光がきらめく蟾津江の砂州、差し出された手を取って水辺を駆ける二人。どちらかになってみよう。"
+      "ja": "陽の光がきらめく蟾津江の砂州、差し出された手を取って水辺を駆ける二人。どちらかになってみよう。",
+      "zh-Hant": "在陽光灑落的蟾津江沙洲上，她牽起他的手沿著江邊奔跑。成為其中一人吧。",
+      "vi": "Trên bãi cát đầy nắng của sông Seomjin, cô nắm tay anh chạy dọc mép nước. Hãy vào vai một trong hai người.",
+      "th": "บนหาดทรายริมแม่น้ำซอมจินที่แดดส่อง เธอจับมือเขาแล้ววิ่งเลียบสายน้ำ มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Di gosong pasir Sungai Seomjin yang cerah, ia menggandeng tangannya dan berlari menyusuri air. Jadilah salah satunya.",
+      "es": "En un banco de arena soleado del río Seomjin, ella le toma la mano y corren junto al agua. Ponte en el papel de cualquiera de los dos.",
+      "ar": "على ضفة رملية مشمسة لنهر سومجين، تمسك بيده ويركضان بمحاذاة الماء. كن أحدهما."
     },
     "src": "/videos/river-1.mp4",
     "poster": "/videos/river-1.jpg",
@@ -487,7 +667,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
         "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
@@ -500,7 +686,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
         "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
@@ -538,13 +730,25 @@
       "ko": "강물 장난",
       "zh": "江边嬉水",
       "en": "Splashing in the River",
-      "ja": "川辺の水あそび"
+      "ja": "川辺の水あそび",
+      "zh-Hant": "江水嬉戲",
+      "vi": "Té nước trên sông",
+      "th": "เล่นน้ำในแม่น้ำ",
+      "id": "Main Air di Sungai",
+      "es": "Jugando en el río",
+      "ar": "لعب بمياه النهر"
     },
     "description": {
       "ko": "섬진강 물을 튕기며 웃는 그녀, 흠뻑 젖고도 웃는 그. 둘 중 한 사람이 되어 보세요.",
       "zh": "她笑着泼起蟾津江的水，他被溅湿了也在笑。成为其中一人吧。",
       "en": "She laughs as she splashes river water, and he laughs even as he gets soaked. Step into either role.",
-      "ja": "蟾津江の水をはねて笑う彼女、濡れても笑う彼。どちらかになってみよう。"
+      "ja": "蟾津江の水をはねて笑う彼女、濡れても笑う彼。どちらかになってみよう。",
+      "zh-Hant": "她笑著潑起江水，他被淋濕了也跟著笑。成為其中一人吧。",
+      "vi": "Cô cười khi té nước sông, còn anh dù ướt sũng vẫn cười theo. Hãy vào vai một trong hai người.",
+      "th": "เธอหัวเราะขณะสาดน้ำ ส่วนเขาก็หัวเราะแม้จะเปียกโชก มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Ia tertawa sambil memercikkan air sungai, dan ia ikut tertawa meski basah kuyup. Jadilah salah satunya.",
+      "es": "Ella ríe mientras salpica agua del río, y él ríe aunque acaba empapado. Ponte en el papel de cualquiera de los dos.",
+      "ar": "تضحك وهي ترش ماء النهر، ويضحك هو رغم أنه يبتلّ تمامًا. كن أحدهما."
     },
     "src": "/videos/river-2.mp4",
     "poster": "/videos/river-2.jpg",
@@ -556,7 +760,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
         "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
@@ -569,7 +779,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
         "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",
@@ -603,13 +819,25 @@
       "ko": "강가에서 주운 것",
       "zh": "在江边拾到的",
       "en": "What We Found by the River",
-      "ja": "川辺で見つけたもの"
+      "ja": "川辺で見つけたもの",
+      "zh-Hant": "在江邊撿到的東西",
+      "vi": "Những gì nhặt được bên sông",
+      "th": "สิ่งที่เก็บได้ริมแม่น้ำ",
+      "id": "Temuan di Tepi Sungai",
+      "es": "Lo que encontramos en el río",
+      "ar": "ما وجدناه عند النهر"
     },
     "description": {
       "ko": "섬진강 물가에 나란히 앉아, 주운 조개를 들여다보는 두 사람. 둘 중 한 사람이 되어 보세요.",
       "zh": "两人并肩蹲在蟾津江边，细看拾来的贝壳。成为其中一人吧。",
       "en": "Crouched side by side at the edge of the Seomjin River, they look over the shells they found. Step into either role.",
-      "ja": "蟾津江の水辺に並んでしゃがみ、拾った貝をのぞき込む二人。どちらかになってみよう。"
+      "ja": "蟾津江の水辺に並んでしゃがみ、拾った貝をのぞき込む二人。どちらかになってみよう。",
+      "zh-Hant": "並肩蹲在蟾津江邊，看著撿到的貝殼。成為其中一人吧。",
+      "vi": "Ngồi cạnh nhau bên mép sông Seomjin, họ ngắm những vỏ sò vừa nhặt được. Hãy vào vai một trong hai người.",
+      "th": "นั่งยองๆ เคียงกันริมแม่น้ำซอมจิน ดูเปลือกหอยที่เก็บได้ มาเป็นหนึ่งในสองคนนี้กัน",
+      "id": "Berjongkok berdampingan di tepi Sungai Seomjin, mereka melihat kerang yang mereka temukan. Jadilah salah satunya.",
+      "es": "Agachados juntos a la orilla del río Seomjin, miran las conchas que han encontrado. Ponte en el papel de cualquiera de los dos.",
+      "ar": "يجلسان القرفصاء جنبًا إلى جنب على حافة نهر سومجين، يتأملان الأصداف التي وجداها. كن أحدهما."
     },
     "src": "/videos/river-3.mp4",
     "poster": "/videos/river-3.jpg",
@@ -621,7 +849,13 @@
           "ko": "그녀",
           "zh": "她",
           "en": "Her",
-          "ja": "彼女"
+          "ja": "彼女",
+          "zh-Hant": "她",
+          "vi": "Cô ấy",
+          "th": "เธอ",
+          "id": "Perempuan",
+          "es": "Ella",
+          "ar": "هي"
         },
         "target": "the young woman with short wavy bob hair in a cream T-shirt and blue skirt",
         "outfit": "a cream short-sleeve knit top and a blue pleated midi skirt",
@@ -634,7 +868,13 @@
           "ko": "그",
           "zh": "他",
           "en": "Him",
-          "ja": "彼"
+          "ja": "彼",
+          "zh-Hant": "他",
+          "vi": "Anh ấy",
+          "th": "เขา",
+          "id": "Laki-laki",
+          "es": "Él",
+          "ar": "هو"
         },
         "target": "the young man with long hair tied in a ponytail in a blue shirt",
         "outfit": "a light blue chambray shirt with rolled-up sleeves, and cream trousers",

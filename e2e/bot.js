@@ -28,6 +28,9 @@ async function usePhoto(page) {
   return issue;
 }
 
+// 지원 언어 전부 (lib/i18n.ts LANGS 와 같은 순서)
+const ALL = ["ko", "en", "zh", "zh-Hant", "ja", "vi", "th", "id", "es", "ar"];
+
 const findings = [];
 const note = (ok, name, detail = "") => { findings.push({ ok, name, detail }); console.log(`${ok ? "PASS" : "FAIL"}  ${name}${detail ? "  — " + detail : ""}`); };
 
@@ -324,13 +327,15 @@ async function returnPaths(browser) {
   await page.waitForTimeout(300);
   note(await page.locator("header .map-btn").count() === 1, "?return= 기억(파라미터 없이 다시 열어도)");
   // 4개 언어 모두 헤더 안에 들어가는가
-  for (const l of ["ko", "zh", "en", "ja"]) {
+  for (const l of ALL) {
     await page.goto(`${BASE}/?lang=${l}`);
     await page.waitForTimeout(300);
     const r = await page.evaluate(() => {
       const h = document.querySelector("header.top"); const t = h.querySelector("h1"); const b = h.querySelector(".map-btn");
       const tr = t.getBoundingClientRect(), br = b?.getBoundingClientRect();
-      return { overlap: br ? br.right > tr.left + 2 && t.scrollWidth > t.clientWidth : false, clipped: t.scrollWidth > t.clientWidth };
+      const rtl = document.documentElement.dir === "rtl";
+      const hit = br ? (rtl ? br.left < tr.right - 2 : br.right > tr.left + 2) : false;
+      return { overlap: hit && t.scrollWidth > t.clientWidth, clipped: t.scrollWidth > t.clientWidth };
     });
     if (r.clipped || r.overlap) note(false, `${l} 헤더 제목 잘림/겹침`, JSON.stringify(r));
     await page.screenshot({ path: `${OUT}/${l}-header.png`, clip: { x: 0, y: 0, width: 360, height: 60 } });
@@ -521,7 +526,7 @@ async function couplePaths(browser, lang = "ko") {
   await page.waitForSelector(".pair-bar");
   await page.waitForFunction(() => document.querySelector(".cam video")?.videoWidth > 0, null, { timeout: 8000 });
   const first = await page.locator('.pair-bar [aria-selected="true"]').innerText();
-  note(/그$|他|Him|彼$/.test(first.trim()), `${lang} 커플 첫 차례가 그`, first.replace(/\n/g, " "));
+  note(/(그|他|Him|彼|Anh ấy|เขา|Laki-laki|Él|هو)$/.test(first.trim()), `${lang} 커플 첫 차례가 그`, first.replace(/\n/g, " "));
   await check(page, `${lang} 커플 셀카 1`);
   await shot(page, `couple-${lang}-3-cam-him`);
   await page.locator(".shutter").click();
@@ -533,7 +538,7 @@ async function couplePaths(browser, lang = "ko") {
   const live = await page.waitForFunction(() => { const v = document.querySelector(".cam video"); return v && v.srcObject && v.videoWidth > 0; }, null, { timeout: 8000 }).then(() => true).catch(() => false);
   note(live, `${lang} 커플 두 번째 카메라`);
   const second = await page.locator('.pair-bar [aria-selected="true"]').innerText();
-  note(/그녀|她|Her|彼女/.test(second), `${lang} 커플 둘째 차례가 그녀`, second.replace(/\n/g, " "));
+  note(/그녀|她|Her|彼女|Cô ấy|เธอ|Perempuan|Ella|هي/.test(second), `${lang} 커플 둘째 차례가 그녀`, second.replace(/\n/g, " "));
   await page.waitForTimeout(300);
   await shot(page, `couple-${lang}-5-cam-her`);
   // 1번 칸을 눌러 다시 찍었다가 돌아오기
@@ -547,7 +552,7 @@ async function couplePaths(browser, lang = "ko") {
   await page.locator(".shutter").click();
   await page.waitForSelector(".cam-confirm .btn:not([disabled])", { timeout: 10000 });
   const lbl2 = await page.locator(".cam-confirm .btn").first().innerText();
-  note(/다음|下一|next|次/i.test(lbl1) && /두 사진|两张|both|2枚/i.test(lbl2), `${lang} 커플 버튼 글자`, `${lbl1} / ${lbl2}`);
+  note(/다음|下一|next|次|tiếp theo|ถัดไป|berikutnya|siguiente|التالي/i.test(lbl1) && /두 사진|两张|兩張|both|2枚|hai ảnh|สองรูป|dua foto|las dos|بالصورتين/i.test(lbl2), `${lang} 커플 버튼 글자`, `${lbl1} / ${lbl2}`);
   await shot(page, `couple-${lang}-6-confirm-her`);
   const posted = page.waitForRequest((r) => r.url().endsWith("/api/jobs") && r.method() === "POST");
   await usePhoto(page);
@@ -562,18 +567,72 @@ async function couplePaths(browser, lang = "ko") {
   await ctx.close();
 }
 
+/** 휴대폰 언어로 첫 언어 고르기 · 직접 고른 언어 유지 · 아랍어 오른쪽→왼쪽 · 언어 시트 */
+async function langPaths(browser) {
+  const cases = [
+    [["zh-TW", "zh"], "zh-Hant"], [["zh-CN"], "zh"], [["vi-VN"], "vi"], [["th-TH"], "th"], [["in-ID"], "id"],
+    [["es-MX", "es"], "es"], [["ar-SA"], "ar"], [["fr-FR", "fr", "en-US"], "en"], [["fr-FR", "de"], "ko"], [["ja-JP"], "ja"],
+  ];
+  for (const [langs, want] of cases) {
+    const ctx = await newCtx(browser, { locale: langs[0] });
+    await ctx.addInitScript((ls) => { Object.defineProperty(navigator, "languages", { get: () => ls }); }, langs);
+    const page = await ctx.newPage();
+    await page.goto(`${BASE}/`);
+    await page.waitForTimeout(400);
+    const got = await page.evaluate(() => [document.documentElement.lang, document.documentElement.dir]);
+    note(got[0] === want && got[1] === (want === "ar" ? "rtl" : "ltr"), `휴대폰 언어 ${langs.join(",")} → ${want}`, got.join(" "));
+    await ctx.close();
+  }
+  // 직접 고른 언어는 휴대폰 언어보다 앞선다
+  const ctx = await newCtx(browser, { locale: "vi-VN" });
+  const page = await ctx.newPage();
+  await page.goto(`${BASE}/`);
+  await page.waitForTimeout(400);
+  await page.locator(".lang-btn").click();
+  await page.waitForTimeout(400); // 시트가 올라오는 애니메이션
+  const opts = await page.locator(".sheet .opt").count();
+  note(opts === ALL.length, `언어 시트 항목 ${ALL.length}개`, String(opts));
+  const fits = await page.evaluate(() => { const s = document.querySelector(".sheet"); return s.getBoundingClientRect().top >= 0; });
+  note(fits, "언어 시트가 화면 안에 들어옴");
+  await shot(page, "lang-sheet");
+  await page.locator('.sheet .opt[lang="es"]').click();
+  await page.reload();
+  await page.waitForTimeout(400);
+  note(await page.evaluate(() => document.documentElement.lang) === "es", "직접 고른 언어(es)가 다시 열어도 유지");
+  // 작은 화면(iPhone SE)에서도 시트가 넘치지 않고 안에서 스크롤
+  await page.setViewportSize({ width: 320, height: 568 });
+  await page.locator(".lang-btn").click();
+  await page.waitForTimeout(400);
+  const small = await page.evaluate(() => { const s = document.querySelector(".sheet"); return { top: Math.round(s.getBoundingClientRect().top), scroll: s.scrollHeight > s.clientHeight }; });
+  note(small.top >= 0, "작은 화면 언어 시트", JSON.stringify(small));
+  await shot(page, "lang-sheet-small");
+  await ctx.close();
+  // 아랍어: 뒤로 버튼이 오른쪽, 화살표가 뒤집힘, 본문이 오른쪽 정렬
+  const c2 = await newCtx(browser); const p2 = await c2.newPage();
+  await p2.goto(`${BASE}/v/market-1?lang=ar`);
+  await p2.waitForTimeout(500);
+  const r = await p2.evaluate(() => {
+    const b = document.querySelector("header .icon-btn"); const svg = b?.querySelector("svg");
+    return { backX: b ? Math.round(b.getBoundingClientRect().left) : -1, flip: svg ? getComputedStyle(svg).transform : "", dir: getComputedStyle(document.body).direction };
+  });
+  note(r.backX > 180 && r.flip !== "none" && r.dir === "rtl", "아랍어 오른쪽→왼쪽 배치(뒤로 버튼 오른쪽·화살표 뒤집힘)", JSON.stringify(r));
+  await check(p2, "ar 장면 소개");
+  await c2.close();
+}
+
 (async () => {
   const browser = await chromium.launch({ args: ["--use-fake-device-for-media-stream", "--use-fake-ui-for-media-stream", "--autoplay-policy=no-user-gesture-required", ...(hasFfmpeg ? [`--use-file-for-fake-video-capture=${FACE_CAM}`] : [])] });
   const only = process.argv[2];
   if (only === "closed") await closedPaths(browser).catch((e) => note(false, "잠금 예외", e.message.split("\n")[0]));
-  if (!only || only === "flow") for (const l of ["ko", "zh", "en", "ja"]) await fullFlow(browser, l).catch((e) => note(false, `${l} 전체 흐름 예외`, e.message.split("\n")[0]));
+  if (!only || only === "flow") for (const l of ALL) await fullFlow(browser, l).catch((e) => note(false, `${l} 전체 흐름 예외`, e.message.split("\n")[0]));
+  if (!only || only === "lang") await langPaths(browser).catch((e) => note(false, "언어 예외", e.message.split("\n")[0]));
   if (!only || only === "fail") await failurePaths(browser).catch((e) => note(false, "실패 경로 예외", e.message.split("\n")[0]));
   if (!only || only === "resume") await resumePaths(browser).catch((e) => note(false, "이어보기 예외", e.message.split("\n")[0]));
   if (!only || only === "return") await returnPaths(browser).catch((e) => note(false, "지도 버튼 예외", e.message.split("\n")[0]));
   if (!only || only === "photo") await photoPaths(browser).catch((e) => note(false, "사진 점검 예외", e.message.split("\n")[0]));
   if (!only || only === "progress") await progressPaths(browser).catch((e) => note(false, "진행 표시 예외", e.message.split("\n")[0]));
   if (!only || only === "selfie") await selfieEdge(browser).catch((e) => note(false, "셀카 예외", e.message.split("\n")[0]));
-  if (!only || only === "couple") for (const l of only ? ["ko", "zh", "en", "ja"] : ["ko"]) await couplePaths(browser, l).catch((e) => note(false, `${l} 커플 예외`, e.message.split("\n")[0]));
+  if (!only || only === "couple") for (const l of only ? ALL : ["ko"]) await couplePaths(browser, l).catch((e) => note(false, `${l} 커플 예외`, e.message.split("\n")[0]));
   await browser.close();
   fs.writeFileSync(`${OUT}/findings.json`, JSON.stringify(findings, null, 2));
   console.log(`\n${findings.filter((f) => !f.ok).length} FAIL / ${findings.length}`);

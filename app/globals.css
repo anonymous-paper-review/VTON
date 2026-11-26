@@ -12,6 +12,17 @@
 /* Pretendard에 없는 한자·가나는 언어별 Noto로 받는다 */
 :lang(ja) { --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans JP', -apple-system, sans-serif; }
 :lang(zh) { --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans SC', -apple-system, sans-serif; }
+:lang(zh-Hant) { --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans TC', -apple-system, sans-serif; }
+/* 베트남어·스페인어·인니어: Pretendard 경량 subset엔 ả ạ ố ñ 같은 글자가 빠져 있어, Pretendard 라틴의 바탕인 Inter로 쓴다 */
+:lang(vi), :lang(es), :lang(id) { --font: 'Inter', 'Pretendard Variable', 'Pretendard', -apple-system, sans-serif; }
+/* 태국어·아랍어 글자는 Pretendard에 없어 Noto로 받는다 (숫자·라틴은 Pretendard 그대로) */
+:lang(th) { --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans Thai', -apple-system, sans-serif; }
+:lang(ar) { --font: 'Pretendard Variable', 'Pretendard', 'Noto Sans Arabic', -apple-system, sans-serif; }
+/* 위아래 성조·모음 부호가 겹치지 않게 큰 제목 줄 간격을 넓힌다. 아랍 글자는 이어 쓰므로 자간을 좁히지 않는다 */
+:lang(vi) .display, :lang(th) .display, :lang(ar) .display { line-height: 1.3; }
+:lang(ar) .display, :lang(ar) .title { letter-spacing: 0; }
+/* 오른쪽→왼쪽(아랍어)에선 뒤로·다음 화살표를 뒤집는다 */
+[dir="rtl"] .rtl-flip { transform: scaleX(-1); }
 
 * { box-sizing: border-box; }
 html, body { margin: 0; background: var(--fill-page); color: var(--text-primary); }
@@ -38,7 +49,7 @@ h1, h2, h3, p { margin: 0; }
 }
 .top h1 { font: var(--head-s); text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .icon-btn { justify-self: start; width: 44px; height: 44px; margin: 0 0 0 var(--sp-1); display: grid; place-items: center; border: 0; background: none; color: var(--text-primary); border-radius: var(--r-field); padding: 0; }
-.lang-btn { white-space: nowrap; justify-self: end; margin-right: var(--sp-2); height: 44px; border: 0; background: none; padding: 0 var(--sp-1); display: flex; align-items: center; justify-content: center; gap: var(--sp-1); font: var(--sub-m); color: var(--text-primary); }
+.lang-btn { white-space: nowrap; justify-self: end; margin-inline-end: var(--sp-2); height: 44px; border: 0; background: none; padding: 0 var(--sp-1); display: flex; align-items: center; justify-content: center; gap: var(--sp-1); font: var(--sub-m); color: var(--text-primary); }
 .lang-btn svg { color: var(--text-secondary); }
 
 /* ── 아래에서 올라오는 시트 (언어 고르기) ───────────────────── */
@@ -46,10 +57,11 @@ h1, h2, h3, p { margin: 0; }
 .sheet {
   width: 100%; max-width: 360px; background: var(--fill-page); border-radius: var(--r-sheet) var(--r-sheet) 0 0;
   padding: var(--sp-3) var(--page-x) calc(var(--sp-6) + var(--safe-b)); animation: rise .24s ease;
+  max-height: 88svh; overflow-y: auto; overscroll-behavior: contain; /* 언어가 10개라 작은 화면에선 시트 안에서 스크롤 */
 }
 .sheet .handle { width: 36px; height: 4px; border-radius: 2px; background: var(--border-strong); margin: 0 auto var(--sp-4); }
 .sheet h2 { font: var(--head-s); margin-bottom: var(--sp-2); }
-.opt { display: flex; align-items: center; gap: var(--sp-3); width: 100%; height: 44px; border: 0; border-bottom: 1px solid var(--border-weak); background: none; padding: 0; text-align: left; font: var(--sub); }
+.opt { display: flex; align-items: center; gap: var(--sp-3); width: 100%; height: 44px; border: 0; border-bottom: 1px solid var(--border-weak); background: none; padding: 0; text-align: start; font: var(--sub); }
 .opt span { flex: 1; }
 .opt small { font: var(--label); color: var(--text-tertiary); }
 .opt svg { color: var(--fill-brand); }
@@ -102,7 +114,7 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .frame { position: relative; overflow: hidden; isolation: isolate; border-radius: var(--r-card); background: var(--grey-900); display: flex; justify-content: center; }
 .frame::before { content: ""; position: absolute; inset: -32px; z-index: -1; background: var(--poster, none) center / cover no-repeat; filter: blur(24px) brightness(.6); }
 .frame video { display: block; width: 100%; height: auto; max-height: 60svh; object-fit: contain; }
-.frame .on-video { position: absolute; top: var(--sp-3); left: var(--sp-3); }
+.frame .on-video { position: absolute; top: var(--sp-3); inset-inline-start: var(--sp-3); }
 .frame .on-video.chip { background: rgba(255,255,255,.92); border-color: transparent; color: var(--text-primary); }
 
 /* ── 홈 ─────────────────────────────────────────────────── */
@@ -142,7 +154,7 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 
 /* 지도로 돌아가는 버튼: 홈 헤더 왼쪽(← 자리가 비는 화면). 협업사 앱의 검정 「지도 보기」와 같은 결 */
 .map-btn {
-  justify-self: start; margin-left: var(--sp-3); height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-pill);
+  justify-self: start; margin-inline-start: var(--sp-3); height: 32px; padding: 0 var(--sp-3); border-radius: var(--r-pill);
   display: flex; align-items: center; gap: var(--sp-1); background: var(--grey-900); color: var(--text-inverse); font: 600 13px/20px var(--font); white-space: nowrap;
 }
 
@@ -152,7 +164,7 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .steps .cells i { height: 6px; border-radius: 3px; background: var(--border-weak); }
 .steps .cells i.on { background: var(--fill-brand); }
 .steps p { font: var(--label); color: var(--text-secondary); margin-top: var(--sp-2); }
-.steps p b { font-weight: 600; color: var(--text-brand); margin-right: var(--sp-1); }
+.steps p b { font-weight: 600; color: var(--text-brand); margin-inline-end: var(--sp-1); }
 
 /* ── 장면 상세 ──────────────────────────────────────────── */
 .stage { padding: var(--sp-4) var(--page-x) 0; }
@@ -164,7 +176,7 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .cast-h h2 { font: var(--head-l); }
 .cast-h p { font: var(--sub); color: var(--text-secondary); margin-top: var(--sp-2); }
 .cast { display: grid; grid-template-columns: repeat(auto-fit, minmax(0, 1fr)); gap: var(--sp-3); padding: var(--sp-4) var(--page-x) 0; }
-.tile { overflow: hidden; padding: 0; text-align: left; display: flex; flex-direction: column; transition: border-color .15s ease; }
+.tile { overflow: hidden; padding: 0; text-align: start; display: flex; flex-direction: column; transition: border-color .15s ease; }
 .tile:active { border-color: var(--fill-brand); }
 .tile .ph { aspect-ratio: 3 / 4; background: var(--fill-section) center / cover no-repeat; }
 .tile .who { padding: var(--sp-3); display: flex; align-items: center; gap: var(--sp-1); }
@@ -179,7 +191,7 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 .lead { font: var(--sub); color: var(--text-secondary); margin-top: var(--sp-2); }
 .agree-all {
   display: flex; align-items: center; gap: var(--sp-3); width: 100%; margin-top: var(--sp-6); padding: var(--sp-4);
-  text-align: left; font: var(--head-s);
+  text-align: start; font: var(--head-s);
 }
 .agree-all[aria-pressed="true"] { border-color: var(--fill-brand); }
 .check { flex: none; width: 24px; height: 24px; border-radius: 50%; border: 1px solid var(--border-strong); background: var(--fill-page); display: grid; place-items: center; color: var(--border-strong); }
@@ -187,12 +199,12 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 [aria-pressed="true"] > .check { background: var(--fill-brand); border-color: var(--fill-brand); color: var(--text-inverse); }
 .rows { margin-top: var(--sp-2); }
 .row-wrap { border-bottom: 1px solid var(--border-weak); }
-.row { display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 44px; padding: var(--sp-3) var(--sp-4); border: 0; background: none; text-align: left; font: var(--sub); }
+.row { display: flex; align-items: center; gap: var(--sp-3); width: 100%; min-height: 44px; padding: var(--sp-3) var(--sp-4); border: 0; background: none; text-align: start; font: var(--sub); }
 .row > span:last-child { flex: 1; }
 .row-wrap details { padding: 0 var(--sp-4) 0 52px; }
 .row-wrap summary { list-style: none; font: var(--label); color: var(--text-secondary); text-decoration: underline; cursor: pointer; margin: calc(-1 * var(--sp-2)) 0 var(--sp-3); width: fit-content; }
 .row-wrap summary::-webkit-details-marker { display: none; }
-.row-wrap ul { margin: 0 0 var(--sp-4); padding-left: var(--sp-4); color: var(--text-secondary); font: var(--label); }
+.row-wrap ul { margin: 0 0 var(--sp-4); padding-inline-start: var(--sp-4); color: var(--text-secondary); font: var(--label); }
 .screen .notice { margin-top: var(--sp-6); }
 
 /* ── 카메라 (헤더 아래를 꽉 채운다) ──────────────────────────── */
@@ -275,21 +287,21 @@ button.chip[aria-selected="true"], button.chip[aria-pressed="true"] { background
 
 /* ── 둘이 함께 바꾸기(커플) ─────────────────────────────── */
 .couple-wrap { padding: var(--sp-3) var(--page-x) 0; }
-.couple { width: 100%; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); text-align: left; transition: border-color .15s ease; }
+.couple { width: 100%; display: flex; align-items: center; gap: var(--sp-3); padding: var(--sp-3) var(--sp-4); text-align: start; transition: border-color .15s ease; }
 .couple:active { border-color: var(--fill-brand); }
 .couple .faces { display: flex; flex: none; }
 .couple .faces span { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--fill-page); background: var(--fill-section) center / cover no-repeat; }
-.couple .faces span + span { margin-left: -14px; }
+.couple .faces span + span { margin-inline-start: -14px; }
 .couple .txt { flex: 1; display: flex; flex-direction: column; gap: 2px; }
 .couple .txt b { font: var(--head-s); }
 .couple .txt span { font: var(--label); color: var(--text-secondary); }
 .couple > svg { width: 18px; height: 18px; color: var(--text-brand); flex: none; }
 
 .pair-bar { display: grid; grid-template-columns: 1fr 1fr; gap: var(--sp-2); padding: var(--sp-3) var(--page-x); background: var(--fill-page); }
-.pair-bar button { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2); border-radius: var(--r-card); border: 1.5px solid var(--border-weak); background: var(--fill-page); font: var(--label); color: var(--text-secondary); cursor: pointer; text-align: left; }
+.pair-bar button { display: flex; align-items: center; gap: var(--sp-2); padding: var(--sp-2); border-radius: var(--r-card); border: 1.5px solid var(--border-weak); background: var(--fill-page); font: var(--label); color: var(--text-secondary); cursor: pointer; text-align: start; }
 .pair-bar button[aria-selected="true"] { border-color: var(--fill-brand); color: var(--text-primary); }
 .pair-bar .th { position: relative; width: 36px; height: 36px; flex: none; border-radius: 50%; background: var(--fill-section) center / cover no-repeat; }
 .pair-bar button:not(.has) .th { filter: grayscale(1); opacity: .45; }
-.pair-bar .th i { position: absolute; right: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--fill-brand); color: var(--text-inverse); display: grid; place-items: center; border: 2px solid var(--fill-page); }
+.pair-bar .th i { position: absolute; inset-inline-end: -3px; bottom: -3px; width: 16px; height: 16px; border-radius: 50%; background: var(--fill-brand); color: var(--text-inverse); display: grid; place-items: center; border: 2px solid var(--fill-page); }
 .pair-bar .th i svg { width: 10px; height: 10px; }
-.pair-bar b { font-weight: 600; color: var(--text-brand); margin-right: var(--sp-1); }
+.pair-bar b { font-weight: 600; color: var(--text-brand); margin-inline-end: var(--sp-1); }

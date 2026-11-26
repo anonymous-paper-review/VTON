@@ -21,11 +21,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <head>
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-        {/* Pretendard(OFL)는 직접 싣는다. 한자·가나만 Noto로 받는다. */}
+        {/* Pretendard(OFL)는 직접 싣는다. Pretendard에 없는 글자(한자·가나·태국·아랍)는 Noto, 베트남·스페인·인니어는 Inter로 받는다. 글자별 unicode-range라 쓰는 언어 글꼴만 내려받는다. */}
         <link rel="stylesheet" href="/fonts/pretendard/pretendardvariable-dynamic-subset.css" />
         <link
           rel="stylesheet"
-          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;600;700&family=Noto+Sans+SC:wght@500;600;700&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@500;600;700&family=Noto+Sans+SC:wght@500;600;700&family=Noto+Sans+TC:wght@500;600;700&family=Noto+Sans+Thai:wght@500;600;700&family=Noto+Sans+Arabic:wght@500;600;700&family=Inter:wght@500;600;700&display=swap"
         />
       </head>
       <body>

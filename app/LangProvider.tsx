@@ -2,7 +2,7 @@
 
 import { createContext, useCallback, useContext, useEffect, useRef, useState } from "react";
 import { Globe, Tick } from "./icons";
-import { DEFAULT_LANG, LANGS, detectLang, translate, type Lang, type Localized, type MsgKey } from "@/lib/i18n";
+import { DEFAULT_LANG, LANGS, detectLang, isRtl, translate, type Lang, type Localized, type MsgKey } from "@/lib/i18n";
 import { entrySource, track } from "@/lib/track";
 
 const KEY = "vton.lang";
@@ -13,19 +13,22 @@ const LangContext = createContext<Ctx | null>(null);
 export function LangProvider({ children }: { children: React.ReactNode }) {
   const [lang, setLangState] = useState<Lang>(DEFAULT_LANG);
 
-  // ?lang= 링크 > 지난번 선택 > 브라우저 언어 순으로 고른다
+  // ?lang= 링크 > 지난번에 직접 고른 언어 > 휴대폰·브라우저 언어(navigator.languages) > 한국어 순으로 고른다
   useEffect(() => {
     const q = new URLSearchParams(location.search).get("lang");
     let saved: string | null = null;
     try { saved = localStorage.getItem(KEY); } catch {}
     const valid = (v: string | null): v is Lang => !!v && LANGS.some((l) => l.id === v);
-    const l = valid(q) ? q : valid(saved) ? saved : detectLang(navigator.language);
+    const l = valid(q) ? q : valid(saved) ? saved : detectLang(navigator.languages?.length ? navigator.languages : [navigator.language]);
     setLangState(l);
     // 이용 통계: 앱 진입 (주소를 새로 열 때 한 번. 앱 안 이동은 다시 세지 않는다)
     if (!/^\/(admin|qr)/.test(location.pathname)) track("visit", { lang: l, path: location.pathname, src: entrySource() });
   }, []);
 
-  useEffect(() => { document.documentElement.lang = lang; }, [lang]);
+  useEffect(() => {
+    document.documentElement.lang = lang;
+    document.documentElement.dir = isRtl(lang) ? "rtl" : "ltr";
+  }, [lang]);
 
   const setLang = useCallback((l: Lang) => {
     setLangState(l);
@@ -43,7 +46,7 @@ export function useLang() {
   return c;
 }
 
-/** 헤더 오른쪽 언어 버튼. 누르면 아래에서 시트가 올라와 네 언어 중 하나를 고른다. */
+/** 헤더 오른쪽 언어 버튼. 누르면 아래에서 시트가 올라와 지원 언어(10개) 중 하나를 고른다. 언어가 늘어도 헤더에는 버튼 하나만 둔다. */
 export function LangSwitch() {
   const { lang, setLang, t } = useLang();
   const [open, setOpen] = useState(false);
